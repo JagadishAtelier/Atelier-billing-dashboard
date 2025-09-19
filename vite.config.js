@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
@@ -10,8 +9,16 @@ export default defineConfig({
   ],
   server: {
     allowedHosts: [
-      'https://billing-frontend-kdco.onrender.com' // your Render domain
+      'localhost',
+      '127.0.0.1'
     ],
     historyApiFallback: true,
+  },
+  preview: {
+    allowedHosts: [
+      'billing-frontend-kdco.onrender.com' // your Render domain
+    ],
+    host: '0.0.0.0',
+    port: process.env.PORT || 4173
   }
 })
