@@ -9,7 +9,7 @@
     "build:hrms": "vite build --mode hrms",
     "build:ims": "vite build --mode ims",
     "build:both": "vite build --mode both",
-    "preview": "vite preview"
+    "start": "vite preview --host 0.0.0.0 --port $PORT"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.5",
