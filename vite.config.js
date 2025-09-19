@@ -10,7 +10,7 @@ export default defineConfig({
   ],
   server: {
     allowedHosts: [
-      'billing-frontend-1.onrender.com' // your Render domain
+      'https://billing-frontend-kdco.onrender.com' // your Render domain
     ],
     historyApiFallback: true,
   }
