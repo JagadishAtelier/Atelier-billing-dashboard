@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE =
   import.meta.env.VITE_API_URL ||
-  "http://192.168.43.85:10000/api/v1/billing/product";
+  "https://billing-backend-9hrh.onrender.com/api/v1/billing/product";
 
 // Function to get token from localStorage
 const getAuthToken = () => localStorage.getItem("token");
