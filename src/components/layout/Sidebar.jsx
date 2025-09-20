@@ -28,11 +28,12 @@ import { Popover } from "antd";
  * - When collapsed (desktop) clicking a parent with children shows a modern Popover flyout.
  * - Inline expansion is used when not collapsed or on mobile.
  *
- * Visual rules (as requested):
+ * Visual rules:
  * - Active: background #1C2244, text & icon color #ffffff
  * - Inactive: text & icon color #1C2244, background transparent
  *
  * Behavior change: when collapsed === true (desktop), icons show centered.
+ * Settings button is placed at the bottom of the sidebar.
  */
 
 const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, setSelectedParent }) => {
@@ -426,13 +427,16 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                 ))}
               </div>
 
-              {/* Settings */}
+              {/* Settings (sticky bottom) */}
               <div
                 style={{
                   padding: 12,
                   display: "flex",
+                  alignItems: "center",
                   justifyContent: collapsed && !isMobile ? "center" : "flex-start",
                   cursor: "pointer",
+                  marginTop: "auto",
+                  borderTop: `1px solid ${theme === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.04)"}`,
                 }}
                 onClick={() => {
                   navigate("/settings");
@@ -448,6 +452,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                     height: 22,
                     marginRight: collapsed && !isMobile ? 0 : 8,
                     filter: collapsed && !isMobile ? "none" : undefined,
+                    // color adjustment would be done by wrapper; img can't change fill easily
                   }}
                 />
                 {(!collapsed || isMobile) && <span style={{ color: INACTIVE_TEXT }}>Settings</span>}
