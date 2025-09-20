@@ -27,11 +27,9 @@ import { Popover } from "antd";
  * - When collapsed (desktop) clicking a parent with children shows a modern Popover flyout.
  * - Inline expansion is used when not collapsed or on mobile.
  *
- * Fixes applied:
- * - Popover rendered inside sidebar container via getPopupContainer.
- * - destroyTooltipOnHide used for clean unmount.
- * - child click calls navigate(...) first, then closes the popover.
- * - parent will be considered active if any of its children match the current route.
+ * Visual rules (as requested):
+ * - Active: background #1C2244, text & icon color #ffffff
+ * - Inactive: text & icon color #1C2244, background transparent
  */
 
 const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, setSelectedParent }) => {
@@ -41,6 +39,12 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
   const [openMenu, setOpenMenu] = useState(null); // stores key of open inline menu OR open popover
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const containerRef = useRef(null);
+
+  // Colors requested
+  const ACTIVE_BG = "#1C2244";
+  const ACTIVE_TEXT = "#ffffff";
+  const INACTIVE_TEXT = "#1C2244";
+  const INACTIVE_BG = "transparent";
 
   // Handle window resize
   useEffect(() => {
@@ -102,7 +106,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
   ];
   // ===================
 
-  // determine active state (improved: parents become active if any child matches current route)
+  // determine active state (parents active when any child matches)
   const isActive = (key) => {
     if (!key) return false;
 
@@ -126,12 +130,10 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
     );
   };
 
-  // Build modern popover content for children
+  // Build modern popover content for children (uses exact active/inactive colors requested)
   const buildPopoverContent = (item) => {
     const bg = theme === "dark" ? "#111827" : "#ffffff";
-    const text = theme === "dark" ? "#e5e7eb" : "#111827";
     const border = theme === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)";
-
     return (
       <div
         style={{
@@ -139,14 +141,13 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           borderRadius: 10,
           boxShadow: "0 8px 30px rgba(2,6,23,0.2)",
           background: bg,
-          color: text,
+          color: INACTIVE_TEXT,
           overflow: "hidden",
           border: `1px solid ${border}`,
         }}
-        // stopPropagation so popover clicks don't bubble to document handler
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ padding: "10px 12px", borderBottom: `1px solid ${border}`, fontWeight: 700 }}>
+        <div style={{ padding: "10px 12px", borderBottom: `1px solid ${border}`, fontWeight: 700, color: INACTIVE_TEXT }}>
           {item.label}
         </div>
 
@@ -157,12 +158,10 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
               <div
                 key={child.key}
                 onClick={(e) => {
-                  // ensure click doesn't bubble and interfere with popover visibility handlers
                   e.stopPropagation();
                   // navigate first, then close popover
                   navigate(child.key);
                   setOpenMenu(null);
-                  // keep sidebar collapsed on desktop; if mobile, close drawer
                   if (isMobile) setCollapsed(false);
                 }}
                 role="button"
@@ -174,12 +173,12 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                   padding: "8px 10px",
                   borderRadius: 8,
                   cursor: "pointer",
-                  background: active ? (theme === "dark" ? "#111827" : "#eef2ff") : "transparent",
-                  color: active ? primaryColor : text,
+                  background: active ? ACTIVE_BG : INACTIVE_BG,
+                  color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
                   fontWeight: active ? 700 : 500,
                 }}
               >
-                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
                   {child.icon}
                 </span>
                 <div style={{ fontSize: 14 }}>{child.label}</div>
@@ -205,8 +204,8 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           overlayClassName="sidebar-flyout-popover"
           visible={openMenu === item.key}
           onVisibleChange={(visible) => setOpenMenu(visible ? item.key : null)}
-          getPopupContainer={() => containerRef.current || document.body} // IMPORTANT: render inside sidebar container
-          destroyTooltipOnHide // unmount content when hidden to avoid stale handlers
+          getPopupContainer={() => containerRef.current || document.body} // render inside sidebar container
+          destroyTooltipOnHide
           overlayStyle={{ zIndex: 3000 }}
         >
           <div
@@ -217,17 +216,16 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
               borderRadius: 6,
               display: "flex",
               alignItems: "center",
-              color: active ? primaryColor : theme === "dark" ? "#ffffff" : "#111827",
-              background: active ? (theme === "dark" ? "#1C2244" : "#e5e7eb") : "transparent",
+              color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
+              background: active ? ACTIVE_BG : INACTIVE_BG,
               fontWeight: active ? "bold" : 500,
               transition: "all 0.15s ease",
             }}
-            // stopPropagation to avoid immediate document click handler closing popover in some edge cases
             onClick={(e) => {
               e.stopPropagation();
             }}
           >
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
               {item.icon}
             </span>
             {!collapsed && <span style={{ marginLeft: 8 }}>{item.label}</span>}
@@ -255,18 +253,18 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           borderRadius: 4,
           display: "flex",
           alignItems: "center",
-          color: active ? primaryColor : theme === "dark" ? "#d1d5db" : "#111827",
-          backgroundColor: active ? (theme === "dark" ? "#4b5563" : "#e5e7eb") : "transparent",
+          color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
+          backgroundColor: active ? ACTIVE_BG : INACTIVE_BG,
           fontWeight: active ? "bold" : 500,
           transition: "all 0.2s ease",
         }}
       >
-        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
           {item.icon}
         </span>
         {(!collapsed || isMobile) && <span style={{ marginLeft: 8 }}>{item.label}</span>}
         {item.children && (!collapsed || isMobile) && (
-          <span style={{ marginLeft: "auto", fontSize: 12 }}>{openMenu === item.key ? <UpOutlined /> : <DownOutlined />}</span>
+          <span style={{ marginLeft: "auto", fontSize: 12, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>{openMenu === item.key ? <UpOutlined /> : <DownOutlined />}</span>
         )}
       </div>
     );
@@ -404,13 +402,13 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                                   borderRadius: 6,
                                   display: "flex",
                                   alignItems: "center",
-                                  color: childActive ? primaryColor : theme === "dark" ? "#d1d5db" : "#111827",
-                                  backgroundColor: childActive ? (theme === "dark" ? "#111827" : "#eaf2ff") : "transparent",
+                                  color: childActive ? ACTIVE_TEXT : INACTIVE_TEXT,
+                                  backgroundColor: childActive ? ACTIVE_BG : INACTIVE_BG,
                                   fontWeight: childActive ? "700" : 500,
                                   transition: "all 0.15s ease",
                                 }}
                               >
-                                <span style={{ marginRight: 8 }}>{child.icon}</span>
+                                <span style={{ marginRight: 8, color: childActive ? ACTIVE_TEXT : INACTIVE_TEXT }}>{child.icon}</span>
                                 <span style={{ marginLeft: 8 }}>{child.label}</span>
                               </div>
                             );
