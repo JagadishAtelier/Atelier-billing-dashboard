@@ -6,14 +6,14 @@ const ThemeContext = createContext();
 const presetThemes = {
   light: {
     theme: "light",
-    primaryColor: "#0057ff",
+    primaryColor: "#1C2244",
     backgroundColor: "#ffffff",
     layoutType: "full",
     contentBgColor: "#f9fafb",
-    headerBgColor: "#0057ff",
+    headerBgColor: "#E1E6FF",
     headerGradient: "#E1E6FF",
     sidebarBgColor: "#E1E6FF",
-    footerBgColor: "#0057ff",
+    footerBgColor: "#E1E6FF",
   },
   blue: {
     theme: "light",

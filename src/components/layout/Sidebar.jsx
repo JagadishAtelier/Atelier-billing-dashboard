@@ -26,6 +26,11 @@ import { Popover } from "antd";
  * Sidebar component with modern popup for collapsed state.
  * - When collapsed (desktop) clicking a parent with children shows a modern Popover flyout.
  * - Inline expansion is used when not collapsed or on mobile.
+ *
+ * Fixes applied:
+ * - Popover rendered inside sidebar container via getPopupContainer.
+ * - destroyTooltipOnHide used for clean unmount.
+ * - child click calls navigate(...) first, then closes the popover.
  */
 
 const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, setSelectedParent }) => {
@@ -43,13 +48,12 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Close popup when clicking outside (extra guard)
+  // Close popup when clicking outside (guard). Only closes popover when collapsed & desktop.
   useEffect(() => {
     const handleDocClick = (e) => {
       if (!containerRef.current) return;
       if (!containerRef.current.contains(e.target)) {
         setOpenMenu((prev) => {
-          // only close if it's a popover key (we identify popover keys as when collapsed && !isMobile)
           return prev && collapsed && !isMobile ? null : prev;
         });
       }
@@ -125,6 +129,8 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           overflow: "hidden",
           border: `1px solid ${border}`,
         }}
+        // stopPropagation so popover clicks don't bubble to document handler
+        onClick={(e) => e.stopPropagation()}
       >
         <div style={{ padding: "10px 12px", borderBottom: `1px solid ${border}`, fontWeight: 700 }}>
           {item.label}
@@ -136,10 +142,13 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
             return (
               <div
                 key={child.key}
-                onClick={() => {
+                onClick={(e) => {
+                  // ensure click doesn't bubble and interfere with popover visibility handlers
+                  e.stopPropagation();
+                  // navigate first, then close popover
                   navigate(child.key);
                   setOpenMenu(null);
-                  // if mobile, close drawer
+                  // keep sidebar collapsed on desktop; if mobile, close drawer
                   if (isMobile) setCollapsed(false);
                 }}
                 role="button"
@@ -182,6 +191,9 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           overlayClassName="sidebar-flyout-popover"
           visible={openMenu === item.key}
           onVisibleChange={(visible) => setOpenMenu(visible ? item.key : null)}
+          getPopupContainer={() => containerRef.current || document.body} // IMPORTANT: render inside sidebar container
+          destroyTooltipOnHide // unmount content when hidden to avoid stale handlers
+          overlayStyle={{ zIndex: 3000 }}
         >
           <div
             style={{
@@ -196,7 +208,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
               fontWeight: active ? "bold" : 500,
               transition: "all 0.15s ease",
             }}
-            // prevent default expand behavior; popover handles open state
+            // stopPropagation to avoid immediate document click handler closing popover in some edge cases
             onClick={(e) => {
               e.stopPropagation();
             }}
@@ -339,7 +351,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
 
                 {(!collapsed || isMobile) && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <img
+                    {/* <img
                       src={!collapsed || isMobile ? companyLogo : logo}
                       alt="Logo"
                       style={{
@@ -351,7 +363,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                         navigate("/dashboard");
                         if (isMobile) setCollapsed(false);
                       }}
-                    />
+                    /> */}
                   </div>
                 )}
               </div>
