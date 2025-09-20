@@ -94,7 +94,7 @@ const HeaderBar = ({ collapsed /* this is optional */ }) => {
 
   return (
     <div
-      className="flex justify-between items-center shadow-lg h-18 px-4 py-2"
+      className="flex justify-between items-center shadow-lg h-14 px-4 py-2"
       style={{
         ...headerStyle,
         position: "sticky",

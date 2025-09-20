@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import companyLogo from "../assets/Company_logo.png";
-import logo from "../assets/Dark Logo.png";
+// import companyLogo from "../assets/Company_logo.png";
+// import logo from "../assets/Dark Logo.png";
 import { useTheme } from "../../context/ThemeContext";
 import {
   DownOutlined,
@@ -255,8 +255,8 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           borderRadius: 4,
           display: "flex",
           alignItems: "center",
-          color: active ? primaryColor : theme === "dark" ? "#d1d5db" : "#111827",
-          backgroundColor: active ? (theme === "dark" ? "#4b5563" : "#e5e7eb") : "transparent",
+          color: active ? primaryColor : theme === "dark" ? "#ffffff" : "#ffffff",
+          backgroundColor: active ? (theme === "dark" ? "#1c2244" : "#1c2244") : "transparent",
           fontWeight: active ? "bold" : 500,
           transition: "all 0.2s ease",
         }}
