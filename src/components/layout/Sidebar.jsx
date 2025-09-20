@@ -31,6 +31,7 @@ import { Popover } from "antd";
  * - Popover rendered inside sidebar container via getPopupContainer.
  * - destroyTooltipOnHide used for clean unmount.
  * - child click calls navigate(...) first, then closes the popover.
+ * - parent will be considered active if any of its children match the current route.
  */
 
 const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, setSelectedParent }) => {
@@ -101,10 +102,23 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
   ];
   // ===================
 
-  // determine active state
+  // determine active state (improved: parents become active if any child matches current route)
   const isActive = (key) => {
     if (!key) return false;
-    if (key === "Product") return ["/product", "/category", "/subcategory"].some((p) => pathname.startsWith(p));
+
+    // If this key matches a parent item that has children, check children's routes
+    const parentItem = menuItems.find((m) => m.key === key);
+    if (parentItem && parentItem.children && parentItem.children.length > 0) {
+      return parentItem.children.some((c) => {
+        return (
+          pathname === c.key ||
+          pathname.startsWith(c.key + "/") ||
+          pathname.includes(c.key.replace("/list", "").replace("/add", ""))
+        );
+      });
+    }
+
+    // Otherwise normal match for direct routes
     return (
       pathname === key ||
       pathname.startsWith(key + "/") ||
@@ -351,19 +365,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
 
                 {(!collapsed || isMobile) && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    {/* <img
-                      src={!collapsed || isMobile ? companyLogo : logo}
-                      alt="Logo"
-                      style={{
-                        height: 36,
-                        width: "auto",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => {
-                        navigate("/dashboard");
-                        if (isMobile) setCollapsed(false);
-                      }}
-                    /> */}
+                    {/* small logo intentionally omitted if you don't want it */}
                   </div>
                 )}
               </div>
@@ -390,9 +392,10 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                               <div
                                 key={child.key}
                                 onClick={() => {
+                                  // navigate and keep parent open (so it's visibly active)
                                   navigate(child.key);
+                                  setOpenMenu(item.key); // keep parent open / active in inline mode
                                   if (isMobile) setCollapsed(false);
-                                  setOpenMenu(null);
                                 }}
                                 style={{
                                   padding: "6px 8px",
