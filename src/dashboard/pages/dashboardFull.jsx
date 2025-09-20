@@ -163,11 +163,11 @@ const DashboardFull = () => {
                     />
 
                     <div className="flex items-center gap-3 relative z-10">
-                        <div className="text-3xl" style={{ color: "#fff", opacity: 0.95 }}>
+                        <div className="text-3xl" style={{ color: "#fff", opacity: 0.95, marginRight: 2 }}>
                             {icon}
                         </div>
                         <Statistic
-                            title={<span style={{ color: "#fff", fontSize: 13 }}>{title}</span>}
+                            title={<span style={{ color: "#fff",fontWeight: 700 , fontSize: 22 }}>{title}</span>}
                             value={value}
                             valueStyle={{ color: "#fff", fontWeight: 700, fontSize: 20 }}
                         />
