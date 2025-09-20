@@ -2,9 +2,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-// import companyLogo from "../assets/Company_logo.png";
-// import logo from "../assets/Dark Logo.png";
-import settingsIcon from "../assets/technology.png";
 import { useTheme } from "../../context/ThemeContext";
 import {
   DownOutlined,
@@ -20,20 +17,18 @@ import {
   DatabaseFilled,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  SettingFilled,
 } from "@ant-design/icons";
 import { Popover } from "antd";
 
 /**
- * Sidebar component with modern popup for collapsed state.
- * - When collapsed (desktop) clicking a parent with children shows a modern Popover flyout.
- * - Inline expansion is used when not collapsed or on mobile.
- *
- * Visual rules:
- * - Active: background #1C2244, text & icon color #ffffff
- * - Inactive: text & icon color #1C2244, background transparent
- *
- * Behavior change: when collapsed === true (desktop), icons show centered.
- * Settings button is placed at the bottom of the sidebar.
+ * Sidebar component
+ * - Collapsed (desktop): parent icons centered; parents with children open a Popover flyout.
+ * - Expanded or mobile: inline expand/collapse for parent children.
+ * - Visual rules:
+ *   Active: background #1C2244, text & icon color #ffffff
+ *   Inactive: text & icon color #1C2244, background transparent
+ * - Settings button is placed at the bottom and becomes active on the /settings route.
  */
 
 const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, setSelectedParent }) => {
@@ -276,6 +271,9 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
     );
   };
 
+  // Settings active check
+  const settingsActive = pathname === "/settings" || pathname.startsWith("/settings/");
+
   return (
     <>
       {/* Mobile Hamburger / Close */}
@@ -300,7 +298,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
 
       <AnimatePresence initial={false}>
         {(isMobile ? collapsed : true) && (
-          <div ref={containerRef}>
+          <div ref={containerRef} style={{ height: "100%" }}>
             {isMobile && collapsed && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -370,7 +368,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
 
                 {(!collapsed || isMobile) && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    {/* small logo intentionally omitted if you don't want it */}
+                    {/* small logo intentionally omitted */}
                   </div>
                 )}
               </div>
@@ -429,6 +427,12 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
 
               {/* Settings (sticky bottom) */}
               <div
+                onClick={() => {
+                  navigate("/settings");
+                  if (isMobile) setCollapsed(false);
+                }}
+                role="button"
+                tabIndex={0}
                 style={{
                   padding: 12,
                   display: "flex",
@@ -437,25 +441,12 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                   cursor: "pointer",
                   marginTop: "auto",
                   borderTop: `1px solid ${theme === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.04)"}`,
-                }}
-                onClick={() => {
-                  navigate("/settings");
-                  // Close mobile drawer when navigating to settings
-                  if (isMobile) setCollapsed(false);
+                  backgroundColor: settingsActive ? ACTIVE_BG : INACTIVE_BG,
+                  color: settingsActive ? ACTIVE_TEXT : INACTIVE_TEXT,
                 }}
               >
-                <img
-                  src={settingsIcon}
-                  alt="Settings"
-                  style={{
-                    width: 22,
-                    height: 22,
-                    marginRight: collapsed && !isMobile ? 0 : 8,
-                    filter: collapsed && !isMobile ? "none" : undefined,
-                    // color adjustment would be done by wrapper; img can't change fill easily
-                  }}
-                />
-                {(!collapsed || isMobile) && <span style={{ color: INACTIVE_TEXT }}>Settings</span>}
+                <SettingFilled style={{ fontSize: 18, color: settingsActive ? ACTIVE_TEXT : INACTIVE_TEXT }} />
+                {(!collapsed || isMobile) && <span style={{ marginLeft: 8, color: settingsActive ? ACTIVE_TEXT : INACTIVE_TEXT }}>Settings</span>}
               </div>
             </motion.div>
           </div>
