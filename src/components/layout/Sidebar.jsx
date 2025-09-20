@@ -370,6 +370,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                 )}
               </div>
 
+
               {/* Menu items */}
               <div style={{ flexGrow: 1, overflowY: "auto", padding: 8 }}>
                 {menuItems.map((item) => (
