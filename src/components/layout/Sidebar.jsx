@@ -253,6 +253,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           borderRadius: 4,
           display: "flex",
           alignItems: "center",
+          justifyContent:"center",
           color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
           backgroundColor: active ? ACTIVE_BG : INACTIVE_BG,
           fontWeight: active ? "bold" : 500,
@@ -264,7 +265,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
         </span>
         {(!collapsed || isMobile) && <span style={{ marginLeft: 8 }}>{item.label}</span>}
         {item.children && (!collapsed || isMobile) && (
-          <span style={{ marginLeft: "auto", fontSize: 12, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>{openMenu === item.key ? <UpOutlined /> : <DownOutlined />}</span>
+          <span style={{ marginLeft: "auto", fontSize: 16, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>{openMenu === item.key ? <UpOutlined /> : <DownOutlined />}</span>
         )}
       </div>
     );
@@ -351,7 +352,8 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                       justifyContent: "center",
                       width: 36,
                       height: 36,
-                      background: "#fff",
+                      color: "#ffffff",
+                      background: primaryColor,
                       borderRadius: 8,
                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                     }}
