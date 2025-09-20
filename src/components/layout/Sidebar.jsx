@@ -8,15 +8,15 @@ import { useTheme } from "../../context/ThemeContext";
 import {
   DownOutlined,
   UpOutlined,
-  DashboardOutlined,
+  DashboardFilled,
   UnorderedListOutlined,
   PlusOutlined,
   MenuOutlined,
   CloseOutlined,
   ShoppingCartOutlined,
-  FileTextOutlined,
-  DropboxOutlined,
-  DatabaseOutlined,
+  FileTextFilled,
+  DropboxCircleFilled,
+  DatabaseFilled,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
@@ -65,11 +65,11 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
 
   // === static menu ===
   const menuItems = [
-    { key: "/dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
+    { key: "/dashboard", label: "Dashboard", icon: <DashboardFilled /> },
     {
       key: "Billing",
       label: "Casier Billing",
-      icon: <FileTextOutlined />,
+      icon: <FileTextFilled />,
       children: [
         { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
         { key: "/billing/add", label: "Add Billing", icon: <PlusOutlined /> },
@@ -79,7 +79,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
     {
       key: "Product",
       label: "Product",
-      icon: <DropboxOutlined />,
+      icon: <DropboxCircleFilled />,
       children: [
         { key: "/product/list", label: "Product List", icon: <UnorderedListOutlined /> },
         { key: "/product/add", label: "Add Product", icon: <PlusOutlined /> },
@@ -98,7 +98,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
         { key: "/inward/add", label: "Add Inward", icon: <PlusOutlined /> },
       ],
     },
-    { key: "/stock/list", label: "Stocks", icon: <DatabaseOutlined /> },
+    { key: "/stock/list", label: "Stocks", icon: <DatabaseFilled /> },
   ];
   // ===================
 

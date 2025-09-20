@@ -1,318 +1,432 @@
-import { createContext, useContext, useState } from "react";
+// Sidebar.jsx
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+// import companyLogo from "../assets/Company_logo.png";
+// import logo from "../assets/Dark Logo.png";
+import { useTheme } from "../../context/ThemeContext";
+import {
+  DownOutlined,
+  UpOutlined,
+  DashboardFilled,
+  UnorderedListOutlined,
+  PlusOutlined,
+  MenuOutlined,
+  CloseOutlined,
+  ShoppingCartOutlined,
+  FileTextFilled,
+  DropboxCircleFilled,
+  DatabaseFilled,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+} from "@ant-design/icons";
+import { Popover } from "antd";
 
-const ThemeContext = createContext();
+/**
+ * Sidebar component with modern popup for collapsed state.
+ * - When collapsed (desktop) clicking a parent with children shows a modern Popover flyout.
+ * - Inline expansion is used when not collapsed or on mobile.
+ *
+ * Visual rules (as requested):
+ * - Active: background #1C2244, text & icon color #ffffff
+ * - Inactive: text & icon color #1C2244, background transparent
+ */
 
-// Define preset color schemes
-const presetThemes = {
-  light: {
-    theme: "light",
-    primaryColor: "#1C2244",
-    backgroundColor: "#ffffff",
-    layoutType: "full",
-    contentBgColor: "#f9fafb",
-    headerBgColor: "#E1E6FF",
-    headerGradient: "#E1E6FF",
-    sidebarBgColor: "#E1E6FF",
-    footerBgColor: "#E1E6FF",
-  },
-  blue: {
-    theme: "light",
-    primaryColor: "#1890ff",
-    backgroundColor: "#e6f7ff",
-    layoutType: "full",
-    contentBgColor: "#f0f5ff",
-    headerBgColor: "#ffffff",
-    headerGradient: "linear-gradient(to left, #1890ff, #096dd9)",
-    sidebarBgColor: "#ffffff",
-    footerBgColor: "#e6f7ff",
-  },
-  purple: {
-    theme: "light",
-    primaryColor: "#722ed1",
-    backgroundColor: "#f9f0ff",
-    layoutType: "full",
-    contentBgColor: "#f5f0fe",
-    headerBgColor: "#ffffff",
-    headerGradient: "linear-gradient(to left, #9254de,rgb(101, 59, 160))",
-    sidebarBgColor: "#ffffff",
-    footerBgColor: "#f9f0ff",
-  },
-  green: {
-    theme: "light",
-    primaryColor: "#52c41a",
-    backgroundColor: "#f6ffed",
-    layoutType: "full",
-    contentBgColor: "#f0fce9",
-    headerBgColor: "#ffffff",
-    headerGradient: "linear-gradient(to left, #73d13d, #52c41a)",
-    sidebarBgColor: "#ffffff",
-    footerBgColor: "#f6ffed",
-  },
-  grey: {
-    theme: "light",
-    primaryColor: "#8c8c8c",
-    backgroundColor: "#f5f5f5",
-    layoutType: "full",
-    contentBgColor: "#f0f2f5",
-    headerBgColor: "#ffffff",
-    headerGradient: "linear-gradient(to left, #bfbfbf, #8c8c8c)",
-    sidebarBgColor: "#ffffff",
-    footerBgColor: "#f5f5f5",
-  },
-};
+const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, setSelectedParent }) => {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { theme, primaryColor, sidebarBgColor } = useTheme();
+  const [openMenu, setOpenMenu] = useState(null); // stores key of open inline menu OR open popover
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const containerRef = useRef(null);
 
-const defaultTheme = presetThemes.light;
+  // Colors requested
+  const ACTIVE_BG = "#1C2244";
+  const ACTIVE_TEXT = "#ffffff";
+  const INACTIVE_TEXT = "#1C2244";
+  const INACTIVE_BG = "transparent";
 
-// Helper to get stored theme or default
-const getStoredTheme = (key, defaultValue) => {
-  try {
-    const storedValue = localStorage.getItem(`theme_${key}`);
-    return storedValue ? JSON.parse(storedValue) : defaultValue;
-  } catch (error) {
-    console.error(`Error retrieving theme setting ${key}:`, error);
-    return defaultValue;
-  }
-};
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-const createMildColor = (hexColor) => {
-  // Convert hex to RGB
-  const r = parseInt(hexColor.slice(1, 3), 16);
-  const g = parseInt(hexColor.slice(3, 5), 16);
-  const b = parseInt(hexColor.slice(5, 7), 16);
+  // Close popup when clicking outside (guard). Only closes popover when collapsed & desktop.
+  useEffect(() => {
+    const handleDocClick = (e) => {
+      if (!containerRef.current) return;
+      if (!containerRef.current.contains(e.target)) {
+        setOpenMenu((prev) => {
+          return prev && collapsed && !isMobile ? null : prev;
+        });
+      }
+    };
+    document.addEventListener("mousedown", handleDocClick);
+    return () => document.removeEventListener("mousedown", handleDocClick);
+  }, [collapsed, isMobile]);
 
-  // Make it milder by mixing with white (255,255,255)
-  const mildFactor = 0.85; 
-  const mildR = Math.round(r * mildFactor + 255 * (1 - mildFactor));
-  const mildG = Math.round(g * mildFactor + 255 * (1 - mildFactor));
-  const mildB = Math.round(b * mildFactor + 255 * (1 - mildFactor));
+  // === static menu ===
+  const menuItems = [
+    { key: "/dashboard", label: "Dashboard", icon: <DashboardFilled /> },
+    {
+      key: "Billing",
+      label: "Casier Billing",
+      icon: <FileTextFilled />,
+      children: [
+        { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
+        { key: "/billing/add", label: "Add Billing", icon: <PlusOutlined /> },
+      ],
+    },
+    { key: "/billing/customer-add", label: "Self Checkout", icon: <PlusOutlined /> },
+    {
+      key: "Product",
+      label: "Product",
+      icon: <DropboxCircleFilled />,
+      children: [
+        { key: "/product/list", label: "Product List", icon: <UnorderedListOutlined /> },
+        { key: "/product/add", label: "Add Product", icon: <PlusOutlined /> },
+        { key: "/category/list", label: "Category List", icon: <UnorderedListOutlined /> },
+        { key: "/category/add", label: "Add Category", icon: <PlusOutlined /> },
+        { key: "/subcategory/list", label: "Subcategory List", icon: <UnorderedListOutlined /> },
+        { key: "/subcategory/add", label: "Add Subcategory", icon: <PlusOutlined /> },
+      ],
+    },
+    {
+      key: "Inward",
+      label: "Inward",
+      icon: <ShoppingCartOutlined />,
+      children: [
+        { key: "/inward/list", label: "Inward List", icon: <UnorderedListOutlined /> },
+        { key: "/inward/add", label: "Add Inward", icon: <PlusOutlined /> },
+      ],
+    },
+    { key: "/stock/list", label: "Stocks", icon: <DatabaseFilled /> },
+  ];
+  // ===================
 
-  // Convert back to hex
-  return `#${mildR.toString(16).padStart(2, "0")}${mildG
-    .toString(16)
-    .padStart(2, "0")}${mildB.toString(16).padStart(2, "0")}`;
-};
+  // determine active state (parents active when any child matches)
+  const isActive = (key) => {
+    if (!key) return false;
 
-// Define common color schemes
-const commonColorSchemes = [
-  {
-    name: "Default Light",
-    headerBgColor: "#ffffff",
-    sidebarBgColor: "#ffffff",
-    contentBgColor: "#f9fafb",
-    footerBgColor: "#f4e6ff",
-    primaryColor: "#8e2de2",
-    headerGradient: "linear-gradient(90deg, #722ed1 0%, #9254de 100%)",
-  },
-  {
-    name: "Cool Blue",
-    headerBgColor: "#1890ff",
-    sidebarBgColor: "#ffffff",
-    contentBgColor: "#f0f5ff",
-    footerBgColor: "#e6f7ff",
-    primaryColor: "#1890ff",
-    headerGradient: "linear-gradient(to left, #1890ff, #096dd9)",
-  },
-  {
-    name: "Warm Purple",
-    headerBgColor: "#722ed1",
-    sidebarBgColor: "ffffff",
-    contentBgColor: "#f5f0fe",
-    footerBgColor: "#f9f0ff",
-    primaryColor: "#722ed1",
-    headerGradient: "linear-gradient(to left, #722ed1, #9254de )",
-  },
-];
-
-// Helper to create a gradient from a color
-const createGradientFromColor = (
-  hexColor,
-  direction = "to right",
-  intensity = 20
-) => {
-  if (!hexColor || typeof hexColor !== "string" || !hexColor.startsWith("#")) {
-    return "linear-gradient(to right, #cccccc, #999999)";
-  }
-  // Convert hex to RGB
-  let r = parseInt(hexColor.slice(1, 3), 16);
-  let g = parseInt(hexColor.slice(3, 5), 16);
-  let b = parseInt(hexColor.slice(5, 7), 16);
-
-  // Create a darker shade for the gradient
-  const darkR = Math.max(0, r - intensity);
-  const darkG = Math.max(0, g - intensity);
-  const darkB = Math.max(0, b - intensity);
-
-  const darkHexColor = `#${darkR.toString(16).padStart(2, "0")}${darkG
-    .toString(16)
-    .padStart(2, "0")}${darkB.toString(16).padStart(2, "0")}`;
-
-  return `linear-gradient(${direction}, ${hexColor}, ${darkHexColor})`;
-};
-
-export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() =>
-    getStoredTheme("theme", defaultTheme.theme)
-  );
-  const [primaryColor, setPrimaryColor] = useState(() =>
-    getStoredTheme("primaryColor", defaultTheme.primaryColor)
-  );
-  const [backgroundColor, setBackgroundColor] = useState(() =>
-    getStoredTheme("backgroundColor", defaultTheme.backgroundColor)
-  );
-  const [layoutType, setLayoutType] = useState(() =>
-    getStoredTheme("layoutType", defaultTheme.layoutType)
-  );
-  const [contentBgColor, setContentBgColor] = useState(() =>
-    getStoredTheme("contentBgColor", defaultTheme.contentBgColor)
-  );
-  const [headerBgColor, setHeaderBgColor] = useState(() =>
-    getStoredTheme("headerBgColor", defaultTheme.headerBgColor)
-  );
-  const [headerGradient, setHeaderGradient] = useState(() =>
-    getStoredTheme("headerGradient", defaultTheme.headerGradient)
-  );
-  const [sidebarBgColor, setSidebarBgColor] = useState(() =>
-    getStoredTheme("sidebarBgColor", defaultTheme.sidebarBgColor)
-  );
-  const [footerBgColor, setFooterBgColor] = useState(() =>
-    getStoredTheme("footerBgColor", defaultTheme.footerBgColor)
-  );
-  const [currentPreset, setCurrentPreset] = useState(() =>
-    getStoredTheme("currentPreset", "light")
-  );
-
-  // Custom setters that update localStorage
-  const updateTheme = (value) => {
-    setTheme(value);
-    localStorage.setItem("theme_theme", JSON.stringify(value));
-
-    if (value === "dark") {
-      updateHeaderBgColor("#001529");
-      updateHeaderGradient(null);
-    } else {
-      updateHeaderBgColor(defaultTheme.headerBgColor);
-      updateHeaderGradient(defaultTheme.headerGradient);
+    // If this key matches a parent item that has children, check children's routes
+    const parentItem = menuItems.find((m) => m.key === key);
+    if (parentItem && parentItem.children && parentItem.children.length > 0) {
+      return parentItem.children.some((c) => {
+        return (
+          pathname === c.key ||
+          pathname.startsWith(c.key + "/") ||
+          pathname.includes(c.key.replace("/list", "").replace("/add", ""))
+        );
+      });
     }
+
+    // Otherwise normal match for direct routes
+    return (
+      pathname === key ||
+      pathname.startsWith(key + "/") ||
+      pathname.includes(key.replace("/list", "").replace("/add", ""))
+    );
   };
 
-  const updatePrimaryColor = (value) => {
-    setPrimaryColor(value);
-    localStorage.setItem("theme_primaryColor", JSON.stringify(value));
+  // Build modern popover content for children (uses exact active/inactive colors requested)
+  const buildPopoverContent = (item) => {
+    const bg = theme === "dark" ? "#111827" : "#ffffff";
+    const border = theme === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)";
+    return (
+      <div
+        style={{
+          minWidth: 220,
+          borderRadius: 10,
+          boxShadow: "0 8px 30px rgba(2,6,23,0.2)",
+          background: bg,
+          color: INACTIVE_TEXT,
+          overflow: "hidden",
+          border: `1px solid ${border}`,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ padding: "10px 12px", borderBottom: `1px solid ${border}`, fontWeight: 700, color: INACTIVE_TEXT }}>
+          {item.label}
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: 8 }}>
+          {item.children.map((child) => {
+            const active = isActive(child.key);
+            return (
+              <div
+                key={child.key}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // navigate first, then close popover
+                  navigate(child.key);
+                  setOpenMenu(null);
+                  if (isMobile) setCollapsed(false);
+                }}
+                role="button"
+                tabIndex={0}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "8px 10px",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  background: active ? ACTIVE_BG : INACTIVE_BG,
+                  color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
+                  fontWeight: active ? 700 : 500,
+                }}
+              >
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
+                  {child.icon}
+                </span>
+                <div style={{ fontSize: 14 }}>{child.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
-  const updateBackgroundColor = (value) => {
-    setBackgroundColor(value);
-    localStorage.setItem("theme_backgroundColor", JSON.stringify(value));
-  };
+  // render parent button: when collapsed + desktop + has children => show popover, else inline expand or navigate
+  const renderParentButton = (item) => {
+    const active = isActive(item.key);
 
-  const updateLayoutType = (value) => {
-    setLayoutType(value);
-    localStorage.setItem("theme_layoutType", JSON.stringify(value));
-  };
-
-  const updateContentBgColor = (value) => {
-    const mildColor = createMildColor(value);
-    setContentBgColor(mildColor);
-    localStorage.setItem("theme_contentBgColor", JSON.stringify(mildColor));
-  };
-
-  const updateHeaderBgColor = (value) => {
-    setHeaderBgColor(value);
-    localStorage.setItem("theme_headerBgColor", JSON.stringify(value));
-  };
-
-  const updateHeaderGradient = (value) => {
-    setHeaderGradient(value);
-    localStorage.setItem("theme_headerGradient", JSON.stringify(value));
-  };
-
-  const updateSidebarBgColor = (value) => {
-    setSidebarBgColor(value);
-    localStorage.setItem("theme_sidebarBgColor", JSON.stringify(value));
-  };
-
-  const updateFooterBgColor = (value) => {
-    setFooterBgColor(value);
-    localStorage.setItem("theme_footerBgColor", JSON.stringify(value));
-  };
-
-  const updateCurrentPreset = (value) => {
-    setCurrentPreset(value);
-    localStorage.setItem("theme_currentPreset", JSON.stringify(value));
-  };
-
-  // Apply a preset theme
-  const applyPresetTheme = (presetName) => {
-    if (!presetThemes[presetName]) return;
-
-    const preset = presetThemes[presetName];
-    updateTheme(preset.theme);
-    updatePrimaryColor(preset.primaryColor);
-    updateBackgroundColor(preset.backgroundColor);
-    updateLayoutType(preset.layoutType);
-    updateContentBgColor(preset.contentBgColor);
-    updateHeaderBgColor(preset.headerBgColor);
-    updateHeaderGradient(preset.headerGradient);
-    updateSidebarBgColor(preset.sidebarBgColor);
-    updateFooterBgColor(preset.footerBgColor);
-    updateCurrentPreset(presetName);
-  };
-
-  // Apply a common color scheme
-  const applyCommonColorScheme = (schemeIndex) => {
-    if (schemeIndex < 0 || schemeIndex >= commonColorSchemes.length) return;
-
-    const scheme = commonColorSchemes[schemeIndex];
-    updateHeaderBgColor(scheme.headerBgColor);
-    updateSidebarBgColor(scheme.sidebarBgColor);
-    updateContentBgColor(scheme.contentBgColor);
-    updateFooterBgColor(scheme.footerBgColor);
-    if (scheme.primaryColor) {
-      updatePrimaryColor(scheme.primaryColor);
+    // Collapsed & Desktop & has children => use Popover (modern flyout)
+    if (collapsed && !isMobile && item.children) {
+      return (
+        <Popover
+          content={buildPopoverContent(item)}
+          trigger="click"
+          placement="rightTop"
+          overlayClassName="sidebar-flyout-popover"
+          visible={openMenu === item.key}
+          onVisibleChange={(visible) => setOpenMenu(visible ? item.key : null)}
+          getPopupContainer={() => containerRef.current || document.body} // render inside sidebar container
+          destroyTooltipOnHide
+          overlayStyle={{ zIndex: 3000 }}
+        >
+          <div
+            style={{
+              padding: 8,
+              cursor: "pointer",
+              margin: "4px 0",
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "center",
+              color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
+              background: active ? ACTIVE_BG : INACTIVE_BG,
+              fontWeight: active ? "bold" : 500,
+              transition: "all 0.15s ease",
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
+              {item.icon}
+            </span>
+            {!collapsed && <span style={{ marginLeft: 8 }}>{item.label}</span>}
+          </div>
+        </Popover>
+      );
     }
-    if (scheme.headerGradient) {
-      updateHeaderGradient(scheme.headerGradient);
-    }
-  };
 
-  const resetTheme = () => {
-    applyPresetTheme("light");
+    // Normal behavior (not collapsed or mobile)
+    return (
+      <div
+        onClick={() => {
+          if (item.children) {
+            setOpenMenu(openMenu === item.key ? null : item.key);
+          } else {
+            navigate(item.key);
+            if (isMobile) setCollapsed(false);
+            setOpenMenu(null);
+          }
+        }}
+        style={{
+          padding: collapsed && !isMobile ? 8 : "8px 16px",
+          cursor: "pointer",
+          margin: "4px 0",
+          borderRadius: 4,
+          display: "flex",
+          alignItems: "center",
+          color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
+          backgroundColor: active ? ACTIVE_BG : INACTIVE_BG,
+          fontWeight: active ? "bold" : 500,
+          transition: "all 0.2s ease",
+        }}
+      >
+        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
+          {item.icon}
+        </span>
+        {(!collapsed || isMobile) && <span style={{ marginLeft: 8 }}>{item.label}</span>}
+        {item.children && (!collapsed || isMobile) && (
+          <span style={{ marginLeft: "auto", fontSize: 12, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>{openMenu === item.key ? <UpOutlined /> : <DownOutlined />}</span>
+        )}
+      </div>
+    );
   };
 
   return (
-    <ThemeContext.Provider
-      value={{
-        theme,
-        setTheme: updateTheme,
-        primaryColor,
-        setPrimaryColor: updatePrimaryColor,
-        backgroundColor,
-        setBackgroundColor: updateBackgroundColor,
-        layoutType,
-        setLayoutType: updateLayoutType,
-        contentBgColor,
-        setContentBgColor: updateContentBgColor,
-        headerBgColor,
-        setHeaderBgColor: updateHeaderBgColor,
-        headerGradient,
-        setHeaderGradient: updateHeaderGradient,
-        sidebarBgColor,
-        setSidebarBgColor: updateSidebarBgColor,
-        footerBgColor,
-        setFooterBgColor: updateFooterBgColor,
-        resetTheme,
-        createMildColor,
-        presetThemes,
-        currentPreset,
-        applyPresetTheme,
-        commonColorSchemes,
-        applyCommonColorScheme,
-        createGradientFromColor,
-      }}
-    >
-      {children}
-    </ThemeContext.Provider>
+    <>
+      {/* Mobile Hamburger / Close */}
+      {isMobile && (
+        <div
+          style={{
+            position: "fixed",
+            top: 12,
+            left: 12,
+            zIndex: 2100,
+            cursor: "pointer",
+            background: "#fff",
+            borderRadius: "50%",
+            padding: 8,
+            boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+          }}
+          onClick={() => setCollapsed((prev) => !prev)}
+        >
+          {collapsed ? <CloseOutlined /> : <MenuOutlined />}
+        </div>
+      )}
+
+      <AnimatePresence initial={false}>
+        {(isMobile ? collapsed : true) && (
+          <div ref={containerRef}>
+            {isMobile && collapsed && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  position: "fixed",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  background: "black",
+                  zIndex: 1500,
+                }}
+                onClick={() => setCollapsed(false)}
+              />
+            )}
+
+            <motion.div
+              initial={{ x: isMobile ? -300 : 0, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: isMobile ? -300 : 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                height: "100%",
+                width: collapsed && !isMobile ? 60 : isMobile ? 200 : 200,
+                backgroundColor: theme === "dark" ? "#1f2937" : sidebarBgColor,
+                boxShadow: "2px 0 5px rgba(0,0,0,0.1)",
+                display: "flex",
+                flexDirection: "column",
+                position: isMobile ? "fixed" : "relative",
+                top: 0,
+                left: 0,
+                zIndex: 1601,
+              }}
+            >
+              {/* Top (toggle + small logo) */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: collapsed && !isMobile ? "center" : "space-between",
+                  padding: "8px 10px",
+                }}
+              >
+                <div>
+                  <div
+                    onClick={() => setCollapsed((prev) => !prev)}
+                    style={{
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 36,
+                      height: 36,
+                      background: "#fff",
+                      borderRadius: 8,
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    }}
+                    title={collapsed ? "Open sidebar" : "Close sidebar"}
+                  >
+                    {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                  </div>
+                </div>
+
+                {(!collapsed || isMobile) && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {/* small logo intentionally omitted if you don't want it */}
+                  </div>
+                )}
+              </div>
+
+              {/* Menu items */}
+              <div style={{ flexGrow: 1, overflowY: "auto", padding: 8 }}>
+                {menuItems.map((item) => (
+                  <div key={item.key}>
+                    {renderParentButton(item)}
+
+                    {/* Inline submenu when expanded or on mobile */}
+                    <AnimatePresence initial={false}>
+                      {item.children && openMenu === item.key && (!collapsed || isMobile) && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.18 }}
+                          style={{ marginLeft: 24, overflow: "hidden" }}
+                        >
+                          {item.children.map((child) => {
+                            const childActive = isActive(child.key);
+                            return (
+                              <div
+                                key={child.key}
+                                onClick={() => {
+                                  // navigate and keep parent open (so it's visibly active)
+                                  navigate(child.key);
+                                  setOpenMenu(item.key); // keep parent open / active in inline mode
+                                  if (isMobile) setCollapsed(false);
+                                }}
+                                style={{
+                                  padding: "6px 8px",
+                                  cursor: "pointer",
+                                  margin: "6px 0",
+                                  borderRadius: 6,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  color: childActive ? ACTIVE_TEXT : INACTIVE_TEXT,
+                                  backgroundColor: childActive ? ACTIVE_BG : INACTIVE_BG,
+                                  fontWeight: childActive ? "700" : 500,
+                                  transition: "all 0.15s ease",
+                                }}
+                              >
+                                <span style={{ marginRight: 8, color: childActive ? ACTIVE_TEXT : INACTIVE_TEXT }}>{child.icon}</span>
+                                <span style={{ marginLeft: 8 }}>{child.label}</span>
+                              </div>
+                            );
+                          })}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </div>
+
+              {/* optional footer (commented) */}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export default Sidebar;
