@@ -1,5 +1,5 @@
 // Sidebar.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import companyLogo from "../assets/Company_logo.png";
@@ -20,20 +20,21 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
+import { Popover } from "antd";
 
 /**
- * Sidebar component
- * - Always uses the static menuItems you provided (ignores parentMenuItems prop).
- * - No artificial filled backgrounds for icons.
- * - Clicking a parent when sidebar is collapsed (desktop) expands sidebar and opens submenu inline.
+ * Sidebar component with modern popup for collapsed state.
+ * - When collapsed (desktop) clicking a parent with children shows a modern Popover flyout.
+ * - Inline expansion is used when not collapsed or on mobile.
  */
 
 const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, setSelectedParent }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { theme, primaryColor, sidebarBgColor } = useTheme();
-  const [openMenu, setOpenMenu] = useState(null);
+  const [openMenu, setOpenMenu] = useState(null); // stores key of open inline menu OR open popover
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const containerRef = useRef(null);
 
   // Handle window resize
   useEffect(() => {
@@ -42,7 +43,22 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // === ALWAYS SHOW ONLY THIS MENU ===
+  // Close popup when clicking outside (extra guard)
+  useEffect(() => {
+    const handleDocClick = (e) => {
+      if (!containerRef.current) return;
+      if (!containerRef.current.contains(e.target)) {
+        setOpenMenu((prev) => {
+          // only close if it's a popover key (we identify popover keys as when collapsed && !isMobile)
+          return prev && collapsed && !isMobile ? null : prev;
+        });
+      }
+    };
+    document.addEventListener("mousedown", handleDocClick);
+    return () => document.removeEventListener("mousedown", handleDocClick);
+  }, [collapsed, isMobile]);
+
+  // === static menu ===
   const menuItems = [
     { key: "/dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
     {
@@ -79,13 +95,12 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
     },
     { key: "/stock/list", label: "Stocks", icon: <DatabaseOutlined /> },
   ];
-  // =================================
+  // ===================
 
-  // Determine if a menu or submenu is active
+  // determine active state
   const isActive = (key) => {
     if (!key) return false;
-    if (key === "Product")
-      return ["/product", "/category", "/subcategory"].some((p) => pathname.startsWith(p));
+    if (key === "Product") return ["/product", "/category", "/subcategory"].some((p) => pathname.startsWith(p));
     return (
       pathname === key ||
       pathname.startsWith(key + "/") ||
@@ -93,35 +108,105 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
     );
   };
 
-  // Render parent item. If collapsed on desktop and parent has children => expand + open submenu.
+  // Build modern popover content for children
+  const buildPopoverContent = (item) => {
+    const bg = theme === "dark" ? "#111827" : "#ffffff";
+    const text = theme === "dark" ? "#e5e7eb" : "#111827";
+    const border = theme === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)";
+
+    return (
+      <div
+        style={{
+          minWidth: 220,
+          borderRadius: 10,
+          boxShadow: "0 8px 30px rgba(2,6,23,0.2)",
+          background: bg,
+          color: text,
+          overflow: "hidden",
+          border: `1px solid ${border}`,
+        }}
+      >
+        <div style={{ padding: "10px 12px", borderBottom: `1px solid ${border}`, fontWeight: 700 }}>
+          {item.label}
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: 8 }}>
+          {item.children.map((child) => {
+            const active = isActive(child.key);
+            return (
+              <div
+                key={child.key}
+                onClick={() => {
+                  navigate(child.key);
+                  setOpenMenu(null);
+                  // if mobile, close drawer
+                  if (isMobile) setCollapsed(false);
+                }}
+                role="button"
+                tabIndex={0}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "8px 10px",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  background: active ? (theme === "dark" ? "#111827" : "#eef2ff") : "transparent",
+                  color: active ? primaryColor : text,
+                  fontWeight: active ? 700 : 500,
+                }}
+              >
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+                  {child.icon}
+                </span>
+                <div style={{ fontSize: 14 }}>{child.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  // render parent button: when collapsed + desktop + has children => show popover, else inline expand or navigate
   const renderParentButton = (item) => {
     const active = isActive(item.key);
 
+    // Collapsed & Desktop & has children => use Popover (modern flyout)
     if (collapsed && !isMobile && item.children) {
       return (
-        <div
-          onClick={() => {
-            setCollapsed(false); // expand sidebar
-            setOpenMenu(item.key); // open submenu inline
-          }}
-          style={{
-            padding: 8,
-            cursor: "pointer",
-            margin: "4px 0",
-            borderRadius: 6,
-            display: "flex",
-            alignItems: "center",
-            color: active ? primaryColor : theme === "dark" ? "#d1d5db" : "#111827",
-            background: active ? (theme === "dark" ? "#4b5563" : "#e5e7eb") : "transparent",
-            fontWeight: active ? "bold" : 500,
-            transition: "all 0.2s ease",
-          }}
+        <Popover
+          content={buildPopoverContent(item)}
+          trigger="click"
+          placement="rightTop"
+          overlayClassName="sidebar-flyout-popover"
+          visible={openMenu === item.key}
+          onVisibleChange={(visible) => setOpenMenu(visible ? item.key : null)}
         >
-          <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-            {item.icon}
-          </span>
-          {!collapsed && <span style={{ marginLeft: 8 }}>{item.label}</span>}
-        </div>
+          <div
+            style={{
+              padding: 8,
+              cursor: "pointer",
+              margin: "4px 0",
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "center",
+              color: active ? primaryColor : theme === "dark" ? "#d1d5db" : "#111827",
+              background: active ? (theme === "dark" ? "#4b5563" : "#e5e7eb") : "transparent",
+              fontWeight: active ? "bold" : 500,
+              transition: "all 0.15s ease",
+            }}
+            // prevent default expand behavior; popover handles open state
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+              {item.icon}
+            </span>
+            {!collapsed && <span style={{ marginLeft: 8 }}>{item.label}</span>}
+          </div>
+        </Popover>
       );
     }
 
@@ -147,7 +232,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           color: active ? primaryColor : theme === "dark" ? "#d1d5db" : "#111827",
           backgroundColor: active ? (theme === "dark" ? "#4b5563" : "#e5e7eb") : "transparent",
           fontWeight: active ? "bold" : 500,
-          transition: "all 0.3s ease",
+          transition: "all 0.2s ease",
         }}
       >
         <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
@@ -185,7 +270,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
 
       <AnimatePresence initial={false}>
         {(isMobile ? collapsed : true) && (
-          <>
+          <div ref={containerRef}>
             {isMobile && collapsed && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -223,7 +308,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                 zIndex: 1601,
               }}
             >
-              {/* Top (toggle + optional small logo) */}
+              {/* Top (toggle + small logo) */}
               <div
                 style={{
                   display: "flex",
@@ -277,14 +362,14 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                   <div key={item.key}>
                     {renderParentButton(item)}
 
-                    {/* Submenu inline when open */}
+                    {/* Inline submenu when expanded or on mobile */}
                     <AnimatePresence initial={false}>
                       {item.children && openMenu === item.key && (!collapsed || isMobile) && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
+                          transition={{ duration: 0.18 }}
                           style={{ marginLeft: 24, overflow: "hidden" }}
                         >
                           {item.children.map((child) => {
@@ -298,16 +383,16 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                                   setOpenMenu(null);
                                 }}
                                 style={{
-                                  padding: "4px 8px",
+                                  padding: "6px 8px",
                                   cursor: "pointer",
-                                  margin: "2px 0",
-                                  borderRadius: 4,
+                                  margin: "6px 0",
+                                  borderRadius: 6,
                                   display: "flex",
                                   alignItems: "center",
                                   color: childActive ? primaryColor : theme === "dark" ? "#d1d5db" : "#111827",
-                                  backgroundColor: childActive ? (theme === "dark" ? "#4b5563" : "#e0e7ff") : "transparent",
-                                  fontWeight: childActive ? "bold" : 500,
-                                  transition: "all 0.3s ease",
+                                  backgroundColor: childActive ? (theme === "dark" ? "#111827" : "#eaf2ff") : "transparent",
+                                  fontWeight: childActive ? "700" : 500,
+                                  transition: "all 0.15s ease",
                                 }}
                               >
                                 <span style={{ marginRight: 8 }}>{child.icon}</span>
@@ -322,9 +407,9 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                 ))}
               </div>
 
-              {/* Optional footer settings link (commented out) */}
+              {/* optional footer (commented) */}
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
     </>

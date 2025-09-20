@@ -11,8 +11,8 @@ const presetThemes = {
     layoutType: "full",
     contentBgColor: "#f9fafb",
     headerBgColor: "#0057ff",
-    headerGradient: "linear-gradient(90deg, #0057ff 0%, #0057ff 100%)",
-    sidebarBgColor: "#0057ff",
+    headerGradient: "#E1E6FF",
+    sidebarBgColor: "#E1E6FF",
     footerBgColor: "#0057ff",
   },
   blue: {
