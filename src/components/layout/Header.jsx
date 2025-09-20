@@ -1,15 +1,15 @@
+import React, { useEffect, useState } from "react";
 import {
   LogoutOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
   UserOutlined,
+  BellFilled,
 } from "@ant-design/icons";
-import { Dropdown, message, Menu } from "antd";
+import { Dropdown, message, Menu, Popover, Badge, List, Avatar } from "antd";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import companyLogo from "../assets/Company_logo.png";
 
-const HeaderBar = ({ collapsed, toggleCollapsed }) => {
+const HeaderBar = ({ collapsed /* this is optional */ }) => {
   const { theme, headerBgColor, headerGradient } = useTheme();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -29,7 +29,7 @@ const HeaderBar = ({ collapsed, toggleCollapsed }) => {
     }
   };
 
-  // Menu using AntD v5 Menu
+  // user menu (AntD Menu)
   const userMenu = (
     <Menu
       items={[
@@ -49,21 +49,48 @@ const HeaderBar = ({ collapsed, toggleCollapsed }) => {
     />
   );
 
+  // Dummy recent bills for notifications
+  const recentBills = [
+    { id: 1, customer: "John Doe", amount: 1280.5 },
+    { id: 2, customer: "Alice Rao", amount: 560.0 },
+    { id: 3, customer: "Mohan Kumar", amount: 2300.75 },
+  ];
+
+  const notificationContent = (
+    <div style={{ minWidth: 280 }}>
+      <List
+        size="small"
+        dataSource={recentBills}
+        renderItem={(item) => (
+          <List.Item
+            style={{ display: "flex", justifyContent: "space-between", padding: 8 }}
+            key={item.id}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Avatar style={{ backgroundColor: "#f0f2f5", color: "#000" }}>
+                {item.customer.charAt(0)}
+              </Avatar>
+              <div>
+                <div style={{ fontSize: 13 }}>{item.customer}</div>
+                <div style={{ fontSize: 11, color: "#888" }}>Recent bill</div>
+              </div>
+            </div>
+            <div style={{ fontWeight: 700 }}>₹{item.amount.toFixed(2)}</div>
+          </List.Item>
+        )}
+      />
+      <div style={{ textAlign: "center", padding: 8, borderTop: "1px solid #f0f0f0" }}>
+        <a onClick={() => message.info("Open all notifications")}>View all</a>
+      </div>
+    </div>
+  );
+
   const isGradient = headerGradient && headerGradient.includes("gradient");
-  const textColor =
-    theme === "dark" || isGradient ? "text-white" : "text-black";
-  const hoverColor =
-    theme === "dark" || isGradient
-      ? "hover:text-gray-300"
-      : "hover:text-gray-600";
-
-  const iconBgColor = theme === "dark" ? "bg-gray-700" : "bg-gray-200";
-  const iconHoverColor =
-    theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-300";
-
   const headerStyle = isGradient
     ? { background: headerGradient }
     : { backgroundColor: headerBgColor || "#ffffff" };
+
+  const textColor = theme === "dark" || isGradient ? "#fff" : "#000";
 
   return (
     <div
@@ -75,28 +102,53 @@ const HeaderBar = ({ collapsed, toggleCollapsed }) => {
         zIndex: 1000,
       }}
     >
-      {/* Left side - Collapse/Expand Button */}
-      <div className="flex items-center">
-        {!isMobile && toggleCollapsed && (
-          <button
-            onClick={toggleCollapsed}
-            // added inline style to force white color and bold text, and kept existing classes
-            style={{ color: "#ffffff", fontWeight: 700 }}
-            className={`text-lg font-bold transition-transform duration-200 p-2 
-            ${hoverColor} transform
-            ${collapsed ? "hover:translate-x-1" : "hover:-translate-x-1"}`}
-          >
-            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          </button>
-        )}
+      {/* Left side: Logo */}
+      <div className="flex items-center gap-3">
+        <img
+          src={companyLogo}
+          alt="Logo"
+          style={{ height: 36, width: "auto", cursor: "pointer" }}
+          onClick={() => navigate("/dashboard")}
+        />
+        <div style={{ color: textColor, fontWeight: 700 }}>Your App Name</div>
       </div>
 
-      {/* Right side - User Menu */}
-      <div className="flex items-center">
+      {/* Right side: notifications + user */}
+      <div className="flex items-center gap-4">
+        {/* Notifications */}
+        <Popover
+          content={notificationContent}
+          trigger="click"
+          placement="bottomRight"
+        >
+          <Badge count={recentBills.length}>
+            <div
+              className="cursor-pointer p-2 rounded-full"
+              style={{
+                background: theme === "dark" ? "#374151" : "#f3f4f6",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <BellFilled style={{ fontSize: 18, color: textColor }} />
+            </div>
+          </Badge>
+        </Popover>
+
+        {/* User dropdown */}
         <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
-          <UserOutlined
-            className={`cursor-pointer text-lg ${iconBgColor} p-2 rounded-3xl ${iconHoverColor} transition-colors`}
-          />
+          <div
+            className="cursor-pointer p-2 rounded-full"
+            style={{
+              background: theme === "dark" ? "#374151" : "#f3f4f6",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <UserOutlined style={{ fontSize: 18, color: textColor }} />
+          </div>
         </Dropdown>
       </div>
     </div>

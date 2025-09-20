@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   Layout,
   ConfigProvider,
@@ -8,7 +9,6 @@ import {
   Tooltip,
   Card,
 } from "antd";
-import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import HeaderBar from "./Header";
@@ -26,7 +26,8 @@ const { Sider, Content } = Layout;
 const { TabPane } = Tabs;
 
 const MainLayout = ({ menuItems }) => {
-  const [collapsed, setCollapsed] = useState(false);
+  // 🔁 Default collapsed is true as requested
+  const [collapsed, setCollapsed] = useState(true);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [activeColorPicker, setActiveColorPicker] = useState(null);
   const [selectedParent, setSelectedParent] = useState(null);
@@ -144,7 +145,7 @@ const MainLayout = ({ menuItems }) => {
     setPrimaryColor(color.hex);
   };
 
-  // ✅ Added missing function referenced in UI
+  // Added missing function referenced in UI
   const handleGradientSelect = (gradient) => {
     setHeaderGradient(gradient);
     setActiveColorPicker(null);
@@ -163,7 +164,7 @@ const MainLayout = ({ menuItems }) => {
           margin: layoutType === "boxed" ? "0 auto" : 0,
         }}
       >
-        {/* ✅ Desktop Sidebar */}
+        {/* Desktop Sidebar */}
         {!isMobile && (
           <Sider
             trigger={null}
@@ -191,7 +192,7 @@ const MainLayout = ({ menuItems }) => {
           </Sider>
         )}
 
-        {/* ✅ Mobile Sidebar in Drawer */}
+        {/* Mobile Sidebar in Drawer */}
         {isMobile && (
           <Drawer
             placement="left"
@@ -229,14 +230,10 @@ const MainLayout = ({ menuItems }) => {
             backgroundColor: contentBgColor,
           }}
         >
-          {/* ✅ Header (no toggle button on mobile) */}
-          <HeaderBar
-            collapsed={collapsed}
-            toggleCollapsed={!isMobile ? toggleCollapsed : null}
-            closeSubMenu={closeSubMenu}
-          />
+          {/* Header (logo moved to header) */}
+          <HeaderBar collapsed={collapsed} />
 
-          {/* ✅ Mobile Floating Hamburger */}
+          {/* Mobile Floating Hamburger */}
           {isMobile && !collapsed && (
             <Button
               type="primary"
@@ -281,7 +278,7 @@ const MainLayout = ({ menuItems }) => {
         </Layout>
       </Layout>
 
-      {/* ✅ Theme Settings Drawer (unchanged except formatting) */}
+      {/* Theme Settings Drawer */}
       <Drawer
         title={
           <div className="flex items-center">
@@ -478,7 +475,6 @@ const MainLayout = ({ menuItems }) => {
             <div className="mb-6">
               <h4 className="text-base font-medium mb-3">Header Gradient</h4>
               <div className="grid grid-cols-1 gap-3">
-                {/* Dynamic gradient based on primary color */}
                 <div
                   className="h-10 rounded cursor-pointer border hover:border-primary flex items-center justify-center"
                   style={{ background: createGradientFromColor(primaryColor) }}
@@ -518,7 +514,7 @@ const MainLayout = ({ menuItems }) => {
               </h4>
               <div
                 className="flex justify-between items-center p-3 border rounded hover:border-primary cursor-pointer"
-                onClick={toggleColorPicker}
+                onClick={() => setActiveColorPicker(activeColorPicker ? null : "customGradient")}
               >
                 <div className="flex items-center">
                   <div
@@ -576,9 +572,7 @@ const MainLayout = ({ menuItems }) => {
               <div className="grid grid-cols-2 gap-3">
                 <Card
                   hoverable
-                  className={`text-center cursor-pointer ${
-                    !collapsed ? "border-primary" : ""
-                  }`}
+                  className={`text-center cursor-pointer ${!collapsed ? "border-primary" : ""}`}
                   onClick={() => setCollapsed(false)}
                 >
                   <div className="flex h-20">
@@ -589,9 +583,7 @@ const MainLayout = ({ menuItems }) => {
                 </Card>
                 <Card
                   hoverable
-                  className={`text-center cursor-pointer ${
-                    collapsed ? "border-primary" : ""
-                  }`}
+                  className={`text-center cursor-pointer ${collapsed ? "border-primary" : ""}`}
                   onClick={() => setCollapsed(true)}
                 >
                   <div className="flex h-20">
