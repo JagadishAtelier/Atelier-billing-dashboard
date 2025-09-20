@@ -217,8 +217,8 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
               borderRadius: 6,
               display: "flex",
               alignItems: "center",
-              color: active ? primaryColor : theme === "dark" ? "#d1d5db" : "#111827",
-              background: active ? (theme === "dark" ? "#4b5563" : "#e5e7eb") : "transparent",
+              color: active ? primaryColor : theme === "dark" ? "#ffffff" : "#111827",
+              background: active ? (theme === "dark" ? "#1C2244" : "#e5e7eb") : "transparent",
               fontWeight: active ? "bold" : 500,
               transition: "all 0.15s ease",
             }}
@@ -255,8 +255,8 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           borderRadius: 4,
           display: "flex",
           alignItems: "center",
-          color: active ? primaryColor : theme === "dark" ? "#ffffff" : "#ffffff",
-          backgroundColor: active ? (theme === "dark" ? "#1c2244" : "#1c2244") : "transparent",
+          color: active ? primaryColor : theme === "dark" ? "#d1d5db" : "#111827",
+          backgroundColor: active ? (theme === "dark" ? "#4b5563" : "#e5e7eb") : "transparent",
           fontWeight: active ? "bold" : 500,
           transition: "all 0.2s ease",
         }}
