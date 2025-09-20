@@ -41,11 +41,21 @@ const Sidebar = ({ collapsed = false, setCollapsed = () => {} }) => {
     const menuItems = [
     { key: "/dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
     {
-      key: "Customers Billing",
-      label: "Customers Billing",
-      icon: <UserOutlined />,
-      children: [{ key: "/billing/customer-add", label: "Add Customer Billing", icon: <PlusOutlined /> }],
+      key: "Billing",
+      label: "Casier Billing",
+      icon: <FileTextOutlined />,
+      children: [
+        { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
+        { key: "/billing/add", label: "Add Billing", icon: <PlusOutlined /> },
+      ],
     },
+    { key: "/billing/customer-add", label: "Self Checkout", icon: <PlusOutlined /> },
+    // {
+    //   key: "Self Checkout",
+    //   label: "Customers Billing",
+    //   icon: <UserOutlined />,
+    //   children: [{ key: "/billing/customer-add", label: "Add Customer Billing", icon: <PlusOutlined /> }],
+    // },
     {
       key: "Product",
       label: "Product",
@@ -59,15 +69,7 @@ const Sidebar = ({ collapsed = false, setCollapsed = () => {} }) => {
         { key: "/subcategory/add", label: "Add Subcategory", icon: <PlusOutlined /> },
       ],
     },
-    {
-      key: "Billing",
-      label: "Billing",
-      icon: <FileTextOutlined />,
-      children: [
-        { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
-        { key: "/billing/add", label: "Add Billing", icon: <PlusOutlined /> },
-      ],
-    },
+    
     {
       key: "Inward",
       label: "Inward",
