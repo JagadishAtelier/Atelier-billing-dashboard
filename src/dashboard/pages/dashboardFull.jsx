@@ -151,7 +151,7 @@ const DashboardFull = () => {
                         background: gradient,
                         color: "#fff",
                         cursor: "pointer",
-                        padding: "14px 18px",
+                        padding: "14px 10px",
                     }}
                 >
                     {/* Shine Effect */}
