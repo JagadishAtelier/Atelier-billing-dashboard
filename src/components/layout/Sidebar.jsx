@@ -349,7 +349,6 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                       cursor: "pointer",
                       display: "inline-flex",
                       alignItems: "center",
-                      justifyContent: "center",
                       width: 36,
                       height: 36,
                       color: "#ffffff",
