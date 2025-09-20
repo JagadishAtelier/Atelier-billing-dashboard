@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 // import companyLogo from "../assets/Company_logo.png";
 // import logo from "../assets/Dark Logo.png";
+import settingsIcon from "../assets/technology.png";
 import { useTheme } from "../../context/ThemeContext";
 import {
   DownOutlined,
@@ -30,6 +31,8 @@ import { Popover } from "antd";
  * Visual rules (as requested):
  * - Active: background #1C2244, text & icon color #ffffff
  * - Inactive: text & icon color #1C2244, background transparent
+ *
+ * Behavior change: when collapsed === true (desktop), icons show centered.
  */
 
 const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, setSelectedParent }) => {
@@ -212,10 +215,11 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
             style={{
               padding: 8,
               cursor: "pointer",
-              margin: "4px 0",
-              borderRadius: 6,
+              margin: "8px 0", // slightly larger vertical spacing when collapsed for better centering
+              borderRadius: 8,
               display: "flex",
               alignItems: "center",
+              justifyContent: "center", // centered when collapsed
               color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
               background: active ? ACTIVE_BG : INACTIVE_BG,
               fontWeight: active ? "bold" : 500,
@@ -225,10 +229,9 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
               e.stopPropagation();
             }}
           >
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
               {item.icon}
             </span>
-            {!collapsed && <span style={{ marginLeft: 8 }}>{item.label}</span>}
           </div>
         </Popover>
       );
@@ -250,9 +253,10 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           padding: collapsed && !isMobile ? 8 : "8px 16px",
           cursor: "pointer",
           margin: "4px 0",
-          borderRadius: 4,
+          borderRadius: 6,
           display: "flex",
           alignItems: "center",
+          justifyContent: collapsed && !isMobile ? "center" : "flex-start", // center icon when collapsed
           color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
           backgroundColor: active ? ACTIVE_BG : INACTIVE_BG,
           fontWeight: active ? "bold" : 500,
@@ -262,7 +266,8 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
         <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
           {item.icon}
         </span>
-        {(!collapsed || isMobile) && <span style={{ marginLeft: 8 }}>{item.label}</span>}
+        {/* show label only when not collapsed OR on mobile */}
+        {(!collapsed || isMobile) && <span style={{ marginLeft: 10 }}>{item.label}</span>}
         {item.children && (!collapsed || isMobile) && (
           <span style={{ marginLeft: "auto", fontSize: 16, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>{openMenu === item.key ? <UpOutlined /> : <DownOutlined />}</span>
         )}
@@ -332,13 +337,13 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                 zIndex: 1601,
               }}
             >
-              {/* Top (toggle + small logo) */}
+              {/* Top (toggle) */}
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: collapsed && !isMobile ? "center" : "space-between",
-                  padding: "8px 10px",
+                  padding: "10px 12px",
                 }}
               >
                 <div>
@@ -349,8 +354,8 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: 36,
-                      height: 36,
+                      width: 40,
+                      height: 40,
                       color: "#ffffff",
                       background: primaryColor,
                       borderRadius: 8,
@@ -370,7 +375,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
               </div>
 
               {/* Menu items */}
-              <div style={{ flexGrow: 1, overflowY: "auto", padding: 8 }}>
+              <div style={{ flexGrow: 1, overflowY: "auto", padding: collapsed && !isMobile ? "8px 4px" : 8 }}>
                 {menuItems.map((item) => (
                   <div key={item.key}>
                     {renderParentButton(item)}
@@ -420,7 +425,8 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                   </div>
                 ))}
               </div>
-               {/* Settings */}
+
+              {/* Settings */}
               <div
                 style={{
                   padding: 12,
@@ -441,12 +447,11 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                     width: 22,
                     height: 22,
                     marginRight: collapsed && !isMobile ? 0 : 8,
+                    filter: collapsed && !isMobile ? "none" : undefined,
                   }}
                 />
-                {(!collapsed || isMobile) && <span>Settings</span>}
+                {(!collapsed || isMobile) && <span style={{ color: INACTIVE_TEXT }}>Settings</span>}
               </div>
-
-              {/* optional footer (commented) */}
             </motion.div>
           </div>
         )}
