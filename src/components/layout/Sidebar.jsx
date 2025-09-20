@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import companyLogo from "../assets/Company_logo.png";
 import logo from "../assets/Dark Logo.png";
-import settingsIcon from "../assets/technology.png";
 import { useTheme } from "../../context/ThemeContext";
 import {
   DownOutlined,
@@ -24,22 +23,12 @@ import {
 
 /**
  * Sidebar component
- *
- * Changes made:
- * 1. Removed the FilledIcon wrapper so icons render normally (no artificial filled background).
- * 2. When the sidebar is collapsed (desktop) and a parent with children is clicked,
- *    we now expand the sidebar (setCollapsed(false)) and open the submenu inline.
- *    This gives a direct click experience rather than popover.
- * 3. Icons/colors rely on theme / primaryColor for active state, and default theme colors otherwise.
+ * - Always uses the static menuItems you provided (ignores parentMenuItems prop).
+ * - No artificial filled backgrounds for icons.
+ * - Clicking a parent when sidebar is collapsed (desktop) expands sidebar and opens submenu inline.
  */
 
-const Sidebar = ({
-  collapsed = true,
-  setCollapsed = () => {},
-  menuItems: parentMenuItems = [],
-  selectedParent,
-  setSelectedParent,
-}) => {
+const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, setSelectedParent }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { theme, primaryColor, sidebarBgColor } = useTheme();
@@ -53,48 +42,46 @@ const Sidebar = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Local menu structure (fallback)
-  const menuItems =
-    parentMenuItems && parentMenuItems.length
-      ? parentMenuItems
-      : [
-          { key: "/dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
-          {
-            key: "Billing",
-            label: "Casier Billing",
-            icon: <FileTextOutlined />,
-            children: [
-              { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
-              { key: "/billing/add", label: "Add Billing", icon: <PlusOutlined /> },
-            ],
-          },
-          { key: "/billing/customer-add", label: "Self Checkout", icon: <PlusOutlined /> },
-          {
-            key: "Product",
-            label: "Product",
-            icon: <DropboxOutlined />,
-            children: [
-              { key: "/product/list", label: "Product List", icon: <UnorderedListOutlined /> },
-              { key: "/product/add", label: "Add Product", icon: <PlusOutlined /> },
-              { key: "/category/list", label: "Category List", icon: <UnorderedListOutlined /> },
-              { key: "/category/add", label: "Add Category", icon: <PlusOutlined /> },
-              { key: "/subcategory/list", label: "Subcategory List", icon: <UnorderedListOutlined /> },
-              { key: "/subcategory/add", label: "Add Subcategory", icon: <PlusOutlined /> },
-            ],
-          },
-          {
-            key: "Inward",
-            label: "Inward",
-            icon: <ShoppingCartOutlined />,
-            children: [
-              { key: "/inward/list", label: "Inward List", icon: <UnorderedListOutlined /> },
-              { key: "/inward/add", label: "Add Inward", icon: <PlusOutlined /> },
-            ],
-          },
-          { key: "/stock/list", label: "Stocks", icon: <DatabaseOutlined /> },
-        ];
+  // === ALWAYS SHOW ONLY THIS MENU ===
+  const menuItems = [
+    { key: "/dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
+    {
+      key: "Billing",
+      label: "Casier Billing",
+      icon: <FileTextOutlined />,
+      children: [
+        { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
+        { key: "/billing/add", label: "Add Billing", icon: <PlusOutlined /> },
+      ],
+    },
+    { key: "/billing/customer-add", label: "Self Checkout", icon: <PlusOutlined /> },
+    {
+      key: "Product",
+      label: "Product",
+      icon: <DropboxOutlined />,
+      children: [
+        { key: "/product/list", label: "Product List", icon: <UnorderedListOutlined /> },
+        { key: "/product/add", label: "Add Product", icon: <PlusOutlined /> },
+        { key: "/category/list", label: "Category List", icon: <UnorderedListOutlined /> },
+        { key: "/category/add", label: "Add Category", icon: <PlusOutlined /> },
+        { key: "/subcategory/list", label: "Subcategory List", icon: <UnorderedListOutlined /> },
+        { key: "/subcategory/add", label: "Add Subcategory", icon: <PlusOutlined /> },
+      ],
+    },
+    {
+      key: "Inward",
+      label: "Inward",
+      icon: <ShoppingCartOutlined />,
+      children: [
+        { key: "/inward/list", label: "Inward List", icon: <UnorderedListOutlined /> },
+        { key: "/inward/add", label: "Add Inward", icon: <PlusOutlined /> },
+      ],
+    },
+    { key: "/stock/list", label: "Stocks", icon: <DatabaseOutlined /> },
+  ];
+  // =================================
 
-  // Check active menu / child
+  // Determine if a menu or submenu is active
   const isActive = (key) => {
     if (!key) return false;
     if (key === "Product")
@@ -106,11 +93,10 @@ const Sidebar = ({
     );
   };
 
-  // Parent rendering: if collapsed on desktop, click will expand and open submenu inline.
+  // Render parent item. If collapsed on desktop and parent has children => expand + open submenu.
   const renderParentButton = (item) => {
     const active = isActive(item.key);
 
-    // If collapsed on desktop and item has children, clicking should expand sidebar and open submenu.
     if (collapsed && !isMobile && item.children) {
       return (
         <div
@@ -131,18 +117,15 @@ const Sidebar = ({
             transition: "all 0.2s ease",
           }}
         >
-          {/* icon only (no filled background) */}
           <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
             {item.icon}
           </span>
-
-          {/* show label only after expansion (we are expanding immediately) */}
           {!collapsed && <span style={{ marginLeft: 8 }}>{item.label}</span>}
         </div>
       );
     }
 
-    // Normal behavior (either not collapsed, or mobile)
+    // Normal behavior (not collapsed or mobile)
     return (
       <div
         onClick={() => {
@@ -180,7 +163,7 @@ const Sidebar = ({
 
   return (
     <>
-      {/* Mobile hamburger / close */}
+      {/* Mobile Hamburger / Close */}
       {isMobile && (
         <div
           style={{
@@ -294,7 +277,7 @@ const Sidebar = ({
                   <div key={item.key}>
                     {renderParentButton(item)}
 
-                    {/* Submenu inline when open (works after we expand) */}
+                    {/* Submenu inline when open */}
                     <AnimatePresence initial={false}>
                       {item.children && openMenu === item.key && (!collapsed || isMobile) && (
                         <motion.div
@@ -340,29 +323,6 @@ const Sidebar = ({
               </div>
 
               {/* Optional footer settings link (commented out) */}
-              {/* <div
-                style={{
-                  padding: 12,
-                  display: "flex",
-                  justifyContent: collapsed && !isMobile ? "center" : "flex-start",
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  navigate("/settings");
-                  if (isMobile) setCollapsed(false);
-                }}
-              >
-                <img
-                  src={settingsIcon}
-                  alt="Settings"
-                  style={{
-                    width: 22,
-                    height: 22,
-                    marginRight: collapsed && !isMobile ? 0 : 8,
-                  }}
-                />
-                {(!collapsed || isMobile) && <span>Settings</span>}
-              </div> */}
             </motion.div>
           </>
         )}
