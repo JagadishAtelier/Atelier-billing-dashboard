@@ -253,7 +253,6 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           borderRadius: 4,
           display: "flex",
           alignItems: "center",
-          justifyContent:"center",
           color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
           backgroundColor: active ? ACTIVE_BG : INACTIVE_BG,
           fontWeight: active ? "bold" : 500,
