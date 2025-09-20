@@ -420,6 +420,31 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                   </div>
                 ))}
               </div>
+               {/* Settings */}
+              <div
+                style={{
+                  padding: 12,
+                  display: "flex",
+                  justifyContent: collapsed && !isMobile ? "center" : "flex-start",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  navigate("/settings");
+                  // Close mobile drawer when navigating to settings
+                  if (isMobile) setCollapsed(false);
+                }}
+              >
+                <img
+                  src={settingsIcon}
+                  alt="Settings"
+                  style={{
+                    width: 22,
+                    height: 22,
+                    marginRight: collapsed && !isMobile ? 0 : 8,
+                  }}
+                />
+                {(!collapsed || isMobile) && <span>Settings</span>}
+              </div>
 
               {/* optional footer (commented) */}
             </motion.div>
