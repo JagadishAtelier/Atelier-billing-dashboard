@@ -7,7 +7,7 @@ const AppFooter = ({ theme = 'light', bgColor }) => {
 
   return (
     <Footer style={{ backgroundColor: bgColor, textAlign: "center" }}>
-      <span className={`${textColor} text-sm`}>
+      <span className={`text-white text-sm`}>
         © 2025 Atelier. All rights reserved.
       </span>
     </Footer>
