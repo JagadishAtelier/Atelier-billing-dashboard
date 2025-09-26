@@ -27,7 +27,7 @@ import {
   PlusOutlined
 } from "@ant-design/icons";
 import { useTheme } from "../../context/ThemeContext";
-import ComapanyForm from "../../Hotel/components/HotelForm";
+// import ComapanyForm from "../../Hotel/components/HotelForm";
 // import AddMachineType from "../../ssms/pages/Subfields/AddMachineType";
 
 const { Option } = Select;
@@ -127,7 +127,7 @@ const Settings = () => {
                 </Space>
               </div>
 
-              <ComapanyForm />
+              {/* <ComapanyForm /> */}
 
               {/* <Row gutter={16}>
                 <Col span={12}>

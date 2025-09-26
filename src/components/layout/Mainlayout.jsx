@@ -267,7 +267,7 @@ const MainLayout = ({ menuItems }) => {
             }}
             onClick={handleContentClick}
           >
-            <div className="bg-white rounded-lg shadow p-6 min-h-full">
+            <div className="rounded-lg shadow p-6 min-h-full" style={{ backgroundColor: "#f3f4f6" }}>
               <Outlet />
             </div>
           </Content>

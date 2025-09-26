@@ -1,9 +1,10 @@
 // billingService.js
 import axios from "axios";
+import BASE_API from "../../api/api.js";
 
 const API_BASE =
   import.meta.env.VITE_API_URL ||
-  "https://billing-backend-9hrh.onrender.com/api/v1/billing/billing";
+  `${BASE_API}/billing`;
 
 // Function to get token from localStorage
 const getAuthToken = () => localStorage.getItem("token");

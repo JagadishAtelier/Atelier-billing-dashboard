@@ -9,7 +9,7 @@ const presetThemes = {
     primaryColor: "#1C2244",
     backgroundColor: "#ffffff",
     layoutType: "full",
-    contentBgColor: "#f9fafb",
+    contentBgColor: "#ffffff",
     headerBgColor: "#E1E6FF",
     headerGradient: "#E1E6FF",
     sidebarBgColor: "#E1E6FF",

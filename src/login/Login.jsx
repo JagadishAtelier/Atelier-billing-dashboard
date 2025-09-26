@@ -5,6 +5,7 @@ import x_logo from "../components/assets/Dark Logo.png";
 import { FaEnvelope, FaEye, FaEyeSlash, FaPhone } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import BASE_API from "../api/api.js";
 import { message, Spin } from "antd"; // ✅ use AntD message directly
 import Loading from "../utils/Loading";
 
@@ -96,7 +97,7 @@ const Login = () => {
       };
 
       const res = await axios.post(
-        "https://billing-backend-9hrh.onrender.com/api/v1/billing/user/login",
+        `${BASE_API}/user/login`,
         payload,
         {
           headers: {
