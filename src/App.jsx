@@ -11,6 +11,12 @@ import ProtectedRoute from "./context/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import Loading from "./utils/Loading";
 import Settings from "./components/pages/Settings";
+import UserPage from "./components/layout/SideBarPages/UserPage";
+import AddUser from "./components/layout/SideBarPages/AddUser";
+import VendorPage from "./components/layout/SideBarPages/VendorPage";
+import AddVendor from "./components/layout/SideBarPages/AddVendor";
+import OrderPage from "./components/layout/SideBarPages/OrderPage";
+import AddOrder from "./components/layout/SideBarPages/AddOrder";
 // import master from "./components/assets/cloud.png";
 const routeModules = import.meta.glob("./*/AppRoutes.jsx", { eager: true });
 
@@ -77,6 +83,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        
 
         {/* Routes WITH sidebar/header */}
         <Route element={<MainLayout menuItems={menuItems} />}>
@@ -94,6 +101,54 @@ const App = () => {
               }
             />
           ))}
+<Route
+  path="/user"
+  element={
+    <ProtectedRoute>
+      <UserPage />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/user/add"
+  element={
+    <ProtectedRoute>
+      <AddUser />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/vendor"
+  element={
+    <ProtectedRoute>
+      <VendorPage />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/vendor/add"
+  element={
+    <ProtectedRoute>
+      <AddVendor />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/order"
+  element={
+    <ProtectedRoute>
+      <OrderPage />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/order/add"
+  element={
+    <ProtectedRoute>
+      <AddOrder />
+    </ProtectedRoute>
+  }
+/>
 
           <Route
             path="/settings"

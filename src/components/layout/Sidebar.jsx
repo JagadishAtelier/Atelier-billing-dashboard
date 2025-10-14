@@ -20,6 +20,7 @@ import {
   SettingFilled,
 } from "@ant-design/icons";
 import { Popover } from "antd";
+import { BarChart, Box, ChevronDown, ChevronUp, Download, ListOrdered, RotateCcw, Truck, User, User2Icon, Users } from "lucide-react";
 
 /**
  * Sidebar component
@@ -69,30 +70,33 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
   // === static menu ===
   const menuItems = [
     { key: "/dashboard", label: "Dashboard", icon: <DashboardFilled /> },
-    {
-      key: "Billing",
-      label: "Casier Billing",
-      icon: <FileTextFilled />,
-      children: [
-        { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
-        { key: "/billing/add", label: "Add Billing", icon: <PlusOutlined /> },
-      ],
-    },
-    { key: "/billing/customer-add", label: "Self Checkout", icon: <PlusOutlined /> },
-    {
+    { key: "/user", label: "User", icon: <User2Icon /> },
+    { key: "/vendor", label: "Vendor", icon: <Users /> },
+        {
       key: "Product",
       label: "Product",
       icon: <DropboxCircleFilled />,
       children: [
         { key: "/product/list", label: "Product List", icon: <UnorderedListOutlined /> },
-        { key: "/product/add", label: "Add Product", icon: <PlusOutlined /> },
         { key: "/category/list", label: "Category List", icon: <UnorderedListOutlined /> },
-        { key: "/category/add", label: "Add Category", icon: <PlusOutlined /> },
         { key: "/subcategory/list", label: "Subcategory List", icon: <UnorderedListOutlined /> },
-        { key: "/subcategory/add", label: "Add Subcategory", icon: <PlusOutlined /> },
       ],
     },
-    {
+    { key: "/order", label: "Orders", icon: <Truck /> },
+    { key: "/inward", label: "Inward", icon: <Download /> },
+    { key: "/stock/list", label: "Stocks", icon: <Box /> },
+            {
+      key: "Billing",
+      label: "Billing",
+      icon: <FileTextFilled />,
+      children: [
+        { key: "/product/list", label: "Create Billing", icon: <PlusOutlined /> },
+        { key: "/category/list", label: "Billing List", icon: <UnorderedListOutlined /> },
+      ],
+    },
+    { key: "/return", label: "Return", icon: <RotateCcw /> },
+    { key: "/report", label: "Report", icon: <BarChart /> },
+        {
       key: "Inward",
       label: "Inward",
       icon: <ShoppingCartOutlined />,
@@ -101,7 +105,39 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
         { key: "/inward/add", label: "Add Inward", icon: <PlusOutlined /> },
       ],
     },
-    { key: "/stock/list", label: "Stocks", icon: <DatabaseFilled /> },
+    // {
+    //   key: "Billing",
+    //   label: "Casier Billing",
+    //   icon: <FileTextFilled />,
+    //   children: [
+    //     { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
+    //     { key: "/billing/add", label: "Add Billing", icon: <PlusOutlined /> },
+    //   ],
+    // },
+    // { key: "/billing/customer-add", label: "Self Checkout", icon: <PlusOutlined /> },
+    // {
+    //   key: "Product",
+    //   label: "Product",
+    //   icon: <DropboxCircleFilled />,
+    //   children: [
+    //     { key: "/product/list", label: "Product List", icon: <UnorderedListOutlined /> },
+    //     { key: "/product/add", label: "Add Product", icon: <PlusOutlined /> },
+    //     { key: "/category/list", label: "Category List", icon: <UnorderedListOutlined /> },
+    //     { key: "/category/add", label: "Add Category", icon: <PlusOutlined /> },
+    //     { key: "/subcategory/list", label: "Subcategory List", icon: <UnorderedListOutlined /> },
+    //     { key: "/subcategory/add", label: "Add Subcategory", icon: <PlusOutlined /> },
+    //   ],
+    // },
+    // {
+    //   key: "Inward",
+    //   label: "Inward",
+    //   icon: <ShoppingCartOutlined />,
+    //   children: [
+    //     { key: "/inward/list", label: "Inward List", icon: <UnorderedListOutlined /> },
+    //     { key: "/inward/add", label: "Add Inward", icon: <PlusOutlined /> },
+    //   ],
+    // },
+    // { key: "/stock/list", label: "Stocks", icon: <DatabaseFilled /> },
   ];
   // ===================
 
@@ -265,7 +301,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
         {/* show label only when not collapsed OR on mobile */}
         {(!collapsed || isMobile) && <span style={{ marginLeft: 10 }}>{item.label}</span>}
         {item.children && (!collapsed || isMobile) && (
-          <span style={{ marginLeft: "auto", fontSize: 16, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>{openMenu === item.key ? <UpOutlined /> : <DownOutlined />}</span>
+          <span style={{ marginLeft: "auto", fontSize: 16, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>{openMenu === item.key ? <ChevronUp /> : <ChevronDown />}</span>
         )}
       </div>
     );
