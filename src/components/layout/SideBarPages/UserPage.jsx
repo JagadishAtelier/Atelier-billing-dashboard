@@ -1,128 +1,259 @@
-import { ChevronDown, Plus, Search } from 'lucide-react'
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { ChevronDown, Plus, Search, Sliders, Edit, Trash2 } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import userService from "./services/userService";
 
-const columns = ["ID", "Name", "Email", "Phone", "Role", "Status"];
-
-const data = [
-  { ID: 1, Name: "Alice", Email: "alice@example.com", Phone: "9876543210", Role: "Admin", Status: "Active" },
-  { ID: 2, Name: "Bob", Email: "bob@example.com", Phone: "9876500011", Role: "User", Status: "Inactive" },
-  { ID: 3, Name: "Charlie", Email: "charlie@example.com", Phone: "9876522233", Role: "Moderator", Status: "Active" },
-  { ID: 4, Name: "David", Email: "david@example.com", Phone: "9876544455", Role: "User", Status: "Active" },
-  { ID: 5, Name: "Eve", Email: "eve@example.com", Phone: "9876566677", Role: "Admin", Status: "Inactive" },
-  { ID: 6, Name: "Frank", Email: "frank@example.com", Phone: "9876588899", Role: "User", Status: "Active" },
-  { ID: 7, Name: "Grace", Email: "grace@example.com", Phone: "9876511122", Role: "Moderator", Status: "Active" },
-  { ID: 8, Name: "Hannah", Email: "hannah@example.com", Phone: "9876533344", Role: "User", Status: "Inactive" },
-  { ID: 9, Name: "Ian", Email: "ian@example.com", Phone: "9876555566", Role: "Admin", Status: "Active" },
-  { ID: 10, Name: "Jack", Email: "jack@example.com", Phone: "9876577788", Role: "User", Status: "Active" },
-];
+const columns = ["S.No", "Name", "Email", "Phone", "Role", "Status", "Actions"];
 
 function UserPage() {
-  const [dropDownOpen, setDropDownOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const filterRef = useRef();
   const navigate = useNavigate();
 
-  // Filter data by searchTerm (Name or Phone)
-  const filteredData = data.filter((user) =>
-    user.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.Phone.includes(searchTerm)
-  );
+  // Fetch users with filters
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+
+      const params = {
+        search: searchTerm,
+        page,
+        limit: 10,
+      };
+      if (roleFilter) params.role_id = roleFilter;
+      if (statusFilter) params.is_active = statusFilter === "Active";
+
+      const response = await userService.getAll(params);
+      setUsers(response.data);
+      setTotalPages(response.meta.total_pages || 1);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setLoading(false);
+    }
+  };
+
+  // Fetch roles for filter dropdown
+  const fetchRoles = async () => {
+    try {
+      const res = await userService.getAll({});
+      const uniqueRoles = [...new Map(res.data.map(u => [u.role?.id, u.role?.role_name])).entries()];
+      setRoles(uniqueRoles);
+    } catch (err) {
+      console.error("Error fetching roles:", err);
+    }
+  };
+
+  useEffect(() => { fetchUsers(); }, [searchTerm, roleFilter, statusFilter, page]);
+  useEffect(() => { fetchRoles(); }, []);
+
+  // Reset filters
+  const resetFilters = () => {
+    setRoleFilter("");
+    setStatusFilter("");
+    setSearchTerm("");
+    setPage(1);
+    setFilterOpen(false);
+  };
+
+  // Close filter popup on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) {
+        setFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Handle edit
+  const handleEdit = (id) => {
+    navigate(`/user/edit/${id}`);
+  };
+
+  // Handle delete
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      try {
+        await userService.remove(id);
+        fetchUsers(); // refresh list
+      } catch (err) {
+        console.error("Error deleting user:", err);
+      }
+    }
+  };
 
   return (
     <div>
-      <div className='flex items-center justify-between relative'>
-        {/* Dropdown Section */}
-        <div
-          className='relative flex items-center gap-2 cursor-pointer'
-          onClick={() => setDropDownOpen(!dropDownOpen)}
-        >
-          <p className='text-2xl font-semibold my-0'>All Users</p>
-          <div className='mt-2'><ChevronDown /></div>
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 mb-6">
+        {/* Search + Filter */}
+        <div className="flex items-center gap-2 relative">
+          <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
+            <Search size={16} className="text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search by name or phone..."
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
+              className="outline-none text-sm"
+            />
+          </div>
+
+          {/* Filter button */}
+          <button
+            onClick={() => setFilterOpen(!filterOpen)}
+            className="flex items-center gap-1 border border-gray-300 rounded-md px-2 py-1 text-sm bg-white"
+          >
+            <Sliders size={16} />
+            Filter
+          </button>
+
+          {/* Filter popup */}
+          {filterOpen && (
+            <div
+              ref={filterRef}
+              className="absolute top-10 left-0 bg-white border border-gray-300 rounded-md p-4 shadow-lg z-50 w-64"
+            >
+              {/* Role Filter */}
+              <div className="mb-2">
+                <label className="text-sm font-medium">Role:</label>
+                <select
+                  value={roleFilter}
+                  onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
+                  className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
+                >
+                  <option value="">All Roles</option>
+                  {roles.map(([id, name]) => (
+                    <option key={id} value={id}>{name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Status Filter */}
+              <div className="mb-2">
+                <label className="text-sm font-medium">Status:</label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+                  className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
+                >
+                  <option value="">All</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-2 mt-2">
+                <button
+                  onClick={() => setFilterOpen(false)}
+                  className="px-3 py-1 bg-gray-200 rounded text-sm"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={resetFilters}
+                  className="px-3 py-1 bg-red-500 text-white rounded text-sm"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Dropdown Menu */}
-        {dropDownOpen && (
-          <div className='absolute bg-white shadow-lg w-60 top-12 left-0 rounded-lg border border-gray-200 p-3 z-10'>
-            <div className='flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1'>
-              <Search size={16} className='text-gray-500' />
-              <input
-                type='text'
-                placeholder='Search by name or phone...'
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className='w-full outline-none text-sm'
-              />
-            </div>
-
-            <div className='mt-2 max-h-48 overflow-y-auto'>
-              {filteredData.length > 0 ? (
-                filteredData.map((user) => (
-                  <p
-                    key={user.ID}
-                    className='p-2 hover:bg-[#E1E6FF] cursor-pointer rounded-md text-base'
-                    onClick={() => {
-                      setSearchTerm(user.Name);
-                      setDropDownOpen(false);
-                    }}
-                  >
-                    {user.Name}
-                  </p>
-                ))
-              ) : (
-                <p className='p-2 text-gray-500 text-sm'>No results found</p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Add Users Button */}
+        {/* Add Users */}
         <div
-          className='bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer'
-          onClick={() => navigate('/user/add')}
+          className="bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
+          onClick={() => navigate("/user/add")}
         >
           <Plus size={16} />
-          <button>Add Users</button>
+          Add Users
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto mt-10">
+      <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
           <thead className="bg-[#1C2244] text-white">
             <tr>
               {columns.map((col, idx) => (
-                <th
-                  key={idx}
-                  className="py-4 px-4 text-left text-white font-semibold border-b"
-                >
+                <th key={idx} className="py-4 px-4 text-left text-white font-semibold border-b">
                   {col}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {filteredData && filteredData.length > 0 ? (
-              filteredData.map((row, rowIndex) => (
-                <tr key={rowIndex} className="hover:bg-[#E1E6FF]">
-                  {columns.map((col, colIndex) => (
-                    <td key={colIndex} className="py-4 px-4 border-b border-gray-300">
-                      {row[col]}
-                    </td>
-                  ))}
+            {loading ? (
+              <tr>
+                <td colSpan={columns.length} className="py-4 text-center">Loading...</td>
+              </tr>
+            ) : users.length > 0 ? (
+              users.map((row, index) => (
+                <tr key={row.id} className="hover:bg-[#E1E6FF]">
+                  <td className="py-4 px-4 border-b border-gray-300">{(page - 1) * 10 + index + 1}</td>
+                  <td className="py-4 px-4 border-b border-gray-300">{row.username}</td>
+                  <td className="py-4 px-4 border-b border-gray-300">{row.email}</td>
+                  <td className="py-4 px-4 border-b border-gray-300">{row.phone}</td>
+                  <td className="py-4 px-4 border-b border-gray-300">{row.role?.role_name || "-"}</td>
+                  <td className="py-4 px-4 border-b border-gray-300">{row.is_active ? "Active" : "Inactive"}</td>
+                  <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
+                    <button
+                      onClick={() => handleEdit(row.id)}
+                      className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                    >
+                      <Edit size={16} className="text-white" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(row.id)}
+                      className="flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded text-sm"
+                    >
+                      <Trash2 size={16} className="text-white" />
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length} className="py-4 text-center text-gray-500">
-                  No data available
-                </td>
+                <td colSpan={columns.length} className="py-4 text-center text-gray-500">No data available</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-3 mt-4">
+        <button
+          disabled={page <= 1}
+          onClick={() => setPage(page - 1)}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span>Page {page} of {totalPages}</span>
+        <button
+          disabled={page >= totalPages}
+          onClick={() => setPage(page + 1)}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
-  )
+  );
 }
 
 export default UserPage;
