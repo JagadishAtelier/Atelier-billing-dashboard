@@ -17,6 +17,7 @@ import VendorPage from "./components/layout/SideBarPages/VendorPage";
 import AddVendor from "./components/layout/SideBarPages/AddVendor";
 import OrderPage from "./components/layout/SideBarPages/OrderPage";
 import AddOrder from "./components/layout/SideBarPages/AddOrder";
+import ViewOrderDetails from "./components/layout/SideBarPages/ViewOrderDetails";
 // import master from "./components/assets/cloud.png";
 const routeModules = import.meta.glob("./*/AppRoutes.jsx", { eager: true });
 
@@ -146,6 +147,14 @@ const App = () => {
   element={
     <ProtectedRoute>
       <AddOrder />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/view-order-details"
+  element={
+    <ProtectedRoute>
+      <ViewOrderDetails />
     </ProtectedRoute>
   }
 />

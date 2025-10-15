@@ -11,6 +11,7 @@ const columns = [
   "Total Amount",
   "Tax Amount",
   "Status",
+  "Datails",
   "Action"
 ];
 
@@ -185,7 +186,9 @@ function OrderPage() {
                   >
                     {order.status}
                   </td>
-
+                  <td className="py-4 px-4 ">
+                        <p onClick={()=>navigate('/view-order-details')} className='bg-[#1C2244] text-white text-center py-1 rounded-sm text-xs font-semibold cursor-pointer'>View Details</p>
+                  </td>
                   {/* Action Menu */}
                   <td className="py-4 px-4 text-center relative">
                     <div
