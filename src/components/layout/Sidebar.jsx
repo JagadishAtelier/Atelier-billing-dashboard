@@ -83,7 +83,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
       ],
     },
     { key: "/order", label: "Orders", icon: <Truck /> },
-    { key: "/inward", label: "Inward", icon: <Download /> },
+    { key: "/inward/list", label: "Inward", icon: <Download /> },
     { key: "/stock/list", label: "Stocks", icon: <Box /> },
             {
       key: "Billing",
@@ -96,15 +96,15 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
     },
     { key: "/return", label: "Return", icon: <RotateCcw /> },
     { key: "/report", label: "Report", icon: <BarChart /> },
-        {
-      key: "Inward",
-      label: "Inward",
-      icon: <ShoppingCartOutlined />,
-      children: [
-        { key: "/inward/list", label: "Inward List", icon: <UnorderedListOutlined /> },
-        { key: "/inward/add", label: "Add Inward", icon: <PlusOutlined /> },
-      ],
-    },
+    //     {
+    //   key: "Inward",
+    //   label: "Inward",
+    //   icon: <ShoppingCartOutlined />,
+    //   children: [
+    //     { key: "/inward/list", label: "Inward List", icon: <UnorderedListOutlined /> },
+    //     { key: "/inward/add", label: "Add Inward", icon: <PlusOutlined /> },
+    //   ],
+    // },
     // {
     //   key: "Billing",
     //   label: "Casier Billing",

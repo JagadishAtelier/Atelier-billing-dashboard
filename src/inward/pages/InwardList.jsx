@@ -153,6 +153,13 @@ const InwardList = () => {
       fixed: "right",
       render: (_, record) => (
         <Space>
+                    <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => navigate(`/inward/edit/${record.id}`)}
+          >
+            View Products
+          </Button>
           <Button
             type="primary"
             icon={<EditOutlined />}
@@ -168,6 +175,7 @@ const InwardList = () => {
               Delete
             </Button>
           </Popconfirm>
+
         </Space>
       ),
     },
@@ -212,31 +220,31 @@ const InwardList = () => {
         loading={loading}
         onChange={handleTableChange}
         bordered
-        expandable={{
-          expandedRowRender: (record) => (
-            <Table
-              columns={[
-                { title: "Product", dataIndex: ["product", "product_name"], key: "product_name" },
-                { title: "Code", dataIndex: ["product", "product_code"], key: "product_code" },
-                { title: "Quantity", dataIndex: "quantity", key: "quantity" },
-                { title: "Unit Price", dataIndex: "unit_price", key: "unit_price", render: (v) => `₹${v}` },
-                { title: "Total", dataIndex: "total_price", key: "total_price", render: (v) => `₹${v}` },
-                { title: "Batch", dataIndex: "batch_number", key: "batch_number" },
-                {
-                  title: "Expiry Date",
-                  dataIndex: "expiry_date",
-                  key: "expiry_date",
-                  render: (date) =>
-                    date ? new Date(date).toLocaleDateString() : "-",
-                },
-              ]}
-              dataSource={record.items || []}
-              pagination={false}
-              rowKey={(item) => item.id}
-              size="small"
-            />
-          ),
-        }}
+        // expandable={{
+        //   expandedRowRender: (record) => (
+        //     <Table
+        //       columns={[
+        //         { title: "Product", dataIndex: ["product", "product_name"], key: "product_name" },
+        //         { title: "Code", dataIndex: ["product", "product_code"], key: "product_code" },
+        //         { title: "Quantity", dataIndex: "quantity", key: "quantity" },
+        //         { title: "Unit Price", dataIndex: "unit_price", key: "unit_price", render: (v) => `₹${v}` },
+        //         { title: "Total", dataIndex: "total_price", key: "total_price", render: (v) => `₹${v}` },
+        //         { title: "Batch", dataIndex: "batch_number", key: "batch_number" },
+        //         {
+        //           title: "Expiry Date",
+        //           dataIndex: "expiry_date",
+        //           key: "expiry_date",
+        //           render: (date) =>
+        //             date ? new Date(date).toLocaleDateString() : "-",
+        //         },
+        //       ]}
+        //       dataSource={record.items || []}
+        //       pagination={false}
+        //       rowKey={(item) => item.id}
+        //       size="small"
+        //     />
+        //   ),
+        // }}
         scroll={{ x: true }}
       />
     </div>
