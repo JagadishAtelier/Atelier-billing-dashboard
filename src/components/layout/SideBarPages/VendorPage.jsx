@@ -1,173 +1,99 @@
-import { ChevronDown, Plus, Search } from 'lucide-react';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import vendorService from "./services/vendorService";
 
-const columns = ["ID", "Name", "Contact Person", "Email", "Phone", "Address", "Gst Number"];
-
-const data = [
-  { 
-    ID: 1, 
-    Name: "A-One Traders", 
-    "Contact Person": "Alice Johnson", 
-    Email: "alice@aonetraders.com", 
-    Phone: "9876543210", 
-    Address: "12, MG Road, Bengaluru, Karnataka", 
-    "Gst Number": "29ABCDE1234F1Z5" 
-  },
-  { 
-    ID: 2, 
-    Name: "Bright Supplies", 
-    "Contact Person": "Bob Smith", 
-    Email: "bob@brightsupplies.com", 
-    Phone: "9876500011", 
-    Address: "45, Mount Road, Chennai, Tamil Nadu", 
-    "Gst Number": "33ABCDS7890G2Z3" 
-  },
-  { 
-    ID: 3, 
-    Name: "City Hardware", 
-    "Contact Person": "Charlie Davis", 
-    Email: "charlie@cityhardware.com", 
-    Phone: "9876522233", 
-    Address: "22, Park Street, Kolkata, West Bengal", 
-    "Gst Number": "19ABCDE4567H3Z9" 
-  },
-  { 
-    ID: 4, 
-    Name: "Delta Enterprises", 
-    "Contact Person": "David Miller", 
-    Email: "david@deltaent.com", 
-    Phone: "9876544455", 
-    Address: "101, FC Road, Pune, Maharashtra", 
-    "Gst Number": "27ABCDF2345K4Z1" 
-  },
-  { 
-    ID: 5, 
-    Name: "Elite Stationers", 
-    "Contact Person": "Eve Brown", 
-    Email: "eve@elitestationers.com", 
-    Phone: "9876566677", 
-    Address: "8, Connaught Place, Delhi", 
-    "Gst Number": "07ABCDE6789P5Z2" 
-  },
-  { 
-    ID: 6, 
-    Name: "Fresh Mart", 
-    "Contact Person": "Frank Wilson", 
-    Email: "frank@freshmart.com", 
-    Phone: "9876588899", 
-    Address: "11, Lalbagh Road, Bengaluru, Karnataka", 
-    "Gst Number": "29ABCDW5678Q6Z8" 
-  },
-  { 
-    ID: 7, 
-    Name: "Global Distributors", 
-    "Contact Person": "Grace Lee", 
-    Email: "grace@globaldist.com", 
-    Phone: "9876511122", 
-    Address: "201, Gariahat, Kolkata, West Bengal", 
-    "Gst Number": "19ABCDE8901R7Z5" 
-  },
-  { 
-    ID: 8, 
-    Name: "Hitech Equipments", 
-    "Contact Person": "Hannah Clark", 
-    Email: "hannah@hitechequip.com", 
-    Phone: "9876533344", 
-    Address: "17, Nungambakkam, Chennai, Tamil Nadu", 
-    "Gst Number": "33ABCFG3456S8Z0" 
-  },
-  { 
-    ID: 9, 
-    Name: "Innova Traders", 
-    "Contact Person": "Ian Taylor", 
-    Email: "ian@innovatraders.com", 
-    Phone: "9876555566", 
-    Address: "77, Sector 22, Chandigarh", 
-    "Gst Number": "04ABCDT4567U9Z4" 
-  },
-  { 
-    ID: 10, 
-    Name: "Jupiter Tools", 
-    "Contact Person": "Jack Martin", 
-    Email: "jack@jupitertools.com", 
-    Phone: "9876577788", 
-    Address: "9, Banjara Hills, Hyderabad, Telangana", 
-    "Gst Number": "36ABCDE2345V1Z3" 
-  },
+const columns = [
+  "S.No",
+  "Name",
+  "Contact Person",
+  "Email",
+  "Phone",
+  "Address",
+  "GST Number",
+  "Status",
+  "Actions",
 ];
 
 function VendorPage() {
-  const [dropDownOpen, setDropDownOpen] = useState(false);
+  const [vendors, setVendors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
-  // Filter data by searchTerm (Name, Contact Person, or Phone)
-  const filteredData = data.filter((vendor) =>
-    vendor.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vendor["Contact Person"].toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vendor.Phone.includes(searchTerm)
-  );
+  // 🔹 Fetch vendors
+  const fetchVendors = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        search: searchTerm,
+        page,
+        limit: 10,
+      };
+      const response = await vendorService.getAll(params);
+      setVendors(response.data || []);
+      setTotalPages(response.meta?.total_pages || 1);
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVendors();
+  }, [searchTerm, page]);
+
+  // 🔹 Handle Delete
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this vendor?")) {
+      try {
+        await vendorService.remove(id);
+        fetchVendors(); // Refresh list
+      } catch (err) {
+        console.error("Error deleting vendor:", err);
+      }
+    }
+  };
+
+  // 🔹 Handle Edit
+  const handleEdit = (id) => {
+    navigate(`/vendor/edit/${id}`);
+  };
 
   return (
     <div>
-      <div className='flex items-center justify-between relative'>
-        {/* Dropdown Section */}
-        <div
-          className='relative flex items-center gap-2 cursor-pointer'
-          onClick={() => setDropDownOpen(!dropDownOpen)}
-        >
-          <p className='text-2xl font-semibold my-0'>All Vendors</p>
-          <div className='mt-2'><ChevronDown /></div>
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 mb-6">
+        {/* Search */}
+        <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
+          <Search size={16} className="text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search by name, contact, or phone..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            }}
+            className="outline-none text-sm"
+          />
         </div>
 
-        {/* Dropdown Menu */}
-        {dropDownOpen && (
-          <div className='absolute bg-white shadow-lg w-60 top-12 left-0 rounded-lg border border-gray-200 p-3 z-10'>
-            <div className='flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1'>
-              <Search size={16} className='text-gray-500' />
-              <input
-                type='text'
-                placeholder='Search vendor...'
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className='w-full outline-none text-sm'
-              />
-            </div>
-
-            <div className='mt-2 max-h-48 overflow-y-auto'>
-              {filteredData.length > 0 ? (
-                filteredData.map((vendor) => (
-                  <p
-                    key={vendor.ID}
-                    className='p-2 hover:bg-[#E1E6FF] cursor-pointer rounded-md text-base'
-                    onClick={() => {
-                      setSearchTerm(vendor.Name);
-                      setDropDownOpen(false);
-                    }}
-                  >
-                    {vendor.Name}
-                  </p>
-                ))
-              ) : (
-                <p className='p-2 text-gray-500 text-sm'>No results found</p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Add Vendor Button */}
+        {/* Add Vendor */}
         <div
-          className='bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer'
-          onClick={() => navigate('/vendor/add')}
+          className="bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
+          onClick={() => navigate("/vendor/add")}
         >
           <Plus size={16} />
-          <button>Add Vendor</button>
+          Add Vendor
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto mt-10">
+      <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
           <thead className="bg-[#1C2244] text-white">
             <tr>
@@ -182,25 +108,88 @@ function VendorPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredData && filteredData.length > 0 ? (
-              filteredData.map((row, rowIndex) => (
-                <tr key={rowIndex} className="hover:bg-[#E1E6FF]">
-                  {columns.map((col, colIndex) => (
-                    <td key={colIndex} className="py-4 px-4 border-b border-gray-300">
-                      {row[col] || "-"}
-                    </td>
-                  ))}
+            {loading ? (
+              <tr>
+                <td colSpan={columns.length} className="py-4 text-center">
+                  Loading...
+                </td>
+              </tr>
+            ) : vendors.length > 0 ? (
+              vendors.map((row, index) => (
+                <tr key={row.id} className="hover:bg-[#E1E6FF]">
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {(page - 1) * 10 + index + 1}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {row.name}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {row.contact_person || "-"}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {row.email || "-"}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {row.phone || "-"}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {row.address || "-"}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {row.gst_number || "-"}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {row.is_active ? "Active" : "Inactive"}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
+                    <button
+                      onClick={() => handleEdit(row.id)}
+                      className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                    >
+                      <Edit size={16} className="text-white" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(row.id)}
+                      className="flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded text-sm"
+                    >
+                      <Trash2 size={16} className="text-white" />
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length} className="py-4 text-center text-gray-500">
-                  No data available
+                <td
+                  colSpan={columns.length}
+                  className="py-4 text-center text-gray-500"
+                >
+                  No vendors found
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-3 mt-4">
+        <button
+          disabled={page <= 1}
+          onClick={() => setPage(page - 1)}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          disabled={page >= totalPages}
+          onClick={() => setPage(page + 1)}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

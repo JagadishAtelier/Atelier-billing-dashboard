@@ -1,24 +1,27 @@
-// roleService.js
+// vendorService.js
 import axios from "axios";
 import BASE_API from "../../../../api/api.js";
 
-const API_BASE = import.meta.env.VITE_API_URL || `${BASE_API}/user/role`;
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  `${BASE_API}/vendor/vendor`;
 
-// 🔐 Function to get token from localStorage
+// 🔐 Get token from localStorage
 const getAuthToken = () => localStorage.getItem("token");
 
-const roleService = {
-  // 🔹 Get all roles
-  async getAll() {
+const vendorService = {
+  // 🔹 Get all vendors (supports filters, pagination, etc.)
+  async getAll(params = {}) {
     const res = await axios.get(`${API_BASE}`, {
+      params,
       headers: {
         Authorization: `Bearer ${getAuthToken()}`,
       },
     });
-    return res.data; // returns an array of roles
+    return res.data;
   },
 
-  // 🔹 Get role by ID
+  // 🔹 Get vendor by ID
   async getById(id) {
     const res = await axios.get(`${API_BASE}/${id}`, {
       headers: {
@@ -28,7 +31,7 @@ const roleService = {
     return res.data;
   },
 
-  // 🔹 Create role
+  // 🔹 Create a new vendor
   async create(data) {
     const res = await axios.post(`${API_BASE}`, data, {
       headers: {
@@ -38,7 +41,7 @@ const roleService = {
     return res.data;
   },
 
-  // 🔹 Update role
+  // 🔹 Update vendor by ID
   async update(id, data) {
     const res = await axios.put(`${API_BASE}/${id}`, data, {
       headers: {
@@ -48,7 +51,7 @@ const roleService = {
     return res.data;
   },
 
-  // 🔹 Delete role
+  // 🔹 Delete vendor by ID
   async remove(id) {
     const res = await axios.delete(`${API_BASE}/${id}`, {
       headers: {
@@ -59,4 +62,4 @@ const roleService = {
   },
 };
 
-export default roleService;
+export default vendorService;
