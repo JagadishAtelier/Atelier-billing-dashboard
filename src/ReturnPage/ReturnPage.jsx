@@ -3,77 +3,68 @@ import React, { useState } from "react";
 
 const columns = [
   "S.No",
-  "Product",
-  "Code",
-  "Quantity",
-  "Unit Price",
-  "Total",
-  "Batch",
-  "Expiry Date",
+  "Vendor Name",
+  "Order Date",
+  "Total Quantity",
+  "Total Amount",
+  "Tax Amount",
+  "Status",
+  "Details",
   "Actions",
 ];
 
 const dummyData = [
   {
     id: 1,
-    product: {
-      product_name: "Paracetamol 500mg",
-      product_code: "PRC500",
-    },
-    quantity: 50,
-    unit_price: 25,
-    total_price: 1250,
-    batch_number: "BATCH001",
-    expiry_date: "2026-05-12",
+    vendor_name: "A-One Traders",
+    order_date: "2025-10-12",
+    total_quantity: 50,
+    total_amount: 1250,
+    tax_amount: 150,
+    status: "Completed",
+    details: "Order delivered",
   },
   {
     id: 2,
-    product: {
-      product_name: "Amoxicillin 250mg",
-      product_code: "AMX250",
-    },
-    quantity: 100,
-    unit_price: 15,
-    total_price: 1500,
-    batch_number: "BATCH002",
-    expiry_date: "2027-02-28",
+    vendor_name: "MediCare Supplies",
+    order_date: "2025-10-10",
+    total_quantity: 100,
+    total_amount: 3000,
+    tax_amount: 360,
+    status: "Pending",
+    details: "Awaiting delivery",
   },
   {
     id: 3,
-    product: {
-      product_name: "Cough Syrup 100ml",
-      product_code: "CFS100",
-    },
-    quantity: 25,
-    unit_price: 60,
-    total_price: 1500,
-    batch_number: "BATCH003",
-    expiry_date: "2025-12-30",
+    vendor_name: "HealthPlus Pharma",
+    order_date: "2025-10-08",
+    total_quantity: 25,
+    total_amount: 750,
+    tax_amount: 90,
+    status: "Cancelled",
+    details: "Order cancelled by vendor",
   },
 ];
+
 function ReturnPage() {
-const [items, setItems] = useState(dummyData);
+  const [items, setItems] = useState(dummyData);
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredItems = items.filter(
     (item) =>
-      item.product.product_name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      item.product.product_code
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      item.batch_number.toLowerCase().includes(searchTerm.toLowerCase())
+      item.vendor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
+    if (window.confirm("Are you sure you want to delete this order?")) {
       setItems(items.filter((item) => item.id !== id));
     }
   };
 
   const handleEdit = (id) => {
-    alert(`Edit product with ID: ${id}`);
+    alert(`Edit order with ID: ${id}`);
   };
 
   return (
@@ -85,20 +76,20 @@ const [items, setItems] = useState(dummyData);
           <Search size={16} className="text-gray-500" />
           <input
             type="text"
-            placeholder="Search by product, code, or batch..."
+            placeholder="Search by vendor, status, or details..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="outline-none text-sm"
           />
         </div>
 
-        {/* Add Product */}
+        {/* Add Order */}
         <div
           className="bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
-          onClick={() => alert("Add Product clicked")}
+          onClick={() => alert("Add Order clicked")}
         >
           <Plus size={16} />
-          Add Return Product
+          Add Order
         </div>
       </div>
 
@@ -125,27 +116,25 @@ const [items, setItems] = useState(dummyData);
                     {index + 1}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300">
-                    {row.product.product_name}
+                    {row.vendor_name}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300">
-                    {row.product.product_code}
+                    {new Date(row.order_date).toLocaleDateString()}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300">
-                    {row.quantity}
+                    {row.total_quantity}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300">
-                    ₹{row.unit_price}
+                    ₹{row.total_amount}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300">
-                    ₹{row.total_price}
+                    ₹{row.tax_amount}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300">
-                    {row.batch_number}
+                    {row.status}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300">
-                    {row.expiry_date
-                      ? new Date(row.expiry_date).toLocaleDateString()
-                      : "-"}
+                    {row.details}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
                     <button
@@ -169,7 +158,7 @@ const [items, setItems] = useState(dummyData);
                   colSpan={columns.length}
                   className="py-4 text-center text-gray-500"
                 >
-                  No products found
+                  No orders found
                 </td>
               </tr>
             )}
@@ -177,7 +166,7 @@ const [items, setItems] = useState(dummyData);
         </table>
       </div>
     </div>
-  )
+  );
 }
 
-export default ReturnPage
+export default ReturnPage;
