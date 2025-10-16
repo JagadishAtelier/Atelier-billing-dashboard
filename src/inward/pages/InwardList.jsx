@@ -1,86 +1,61 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Input, Button, Space, Popconfirm, Tag, message } from "antd";
+import { Table, Input, Button, Space, Popconfirm, Tag, message, Modal } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import inwardService from "../service/inwardService.js";
-import debounce from "lodash.debounce";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
+import { Plus, Search, Edit, Trash2, Eye } from "lucide-react";
 
-const { Search } = Input;
+const dummyInwards = [
+  {
+    id: 1,
+    inward_no: "INW-001",
+    supplier_name: "ABC Traders",
+    received_date: "2025-10-10",
+    total_quantity: 50,
+    total_amount: 5000,
+    status: "completed",
+    items: [
+      {
+        id: 101,
+        product: { product_name: "Product A", product_code: "PA-001" },
+        quantity: 10,
+        unit_price: 100,
+        total_price: 1000,
+        batch_number: "B001",
+        expiry_date: "2026-12-31",
+      },
+      {
+        id: 102,
+        product: { product_name: "Product B", product_code: "PB-002" },
+        quantity: 40,
+        unit_price: 100,
+        total_price: 4000,
+        batch_number: "B002",
+        expiry_date: "2026-06-30",
+      },
+    ],
+  },
+];
 
 const InwardList = () => {
   const navigate = useNavigate();
   const [inwards, setInwards] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
-  const [searchText, setSearchText] = useState("");
-  const [sorter, setSorter] = useState({ field: null, order: null });
-
-  const fetchInwards = useCallback(
-    async (params = {}) => {
-      setLoading(true);
-      try {
-        const data = await inwardService.getAll({
-          page: params.current || pagination.current,
-          limit: params.pageSize || pagination.pageSize,
-          search: params.search || searchText,
-          sortField: params.sortField || sorter.field,
-          sortOrder: params.sortOrder || sorter.order,
-        });
-
-        setInwards(data.data || []);
-        setPagination((prev) => ({
-          ...prev,
-          current: data.page || params.current || 1,
-          total: data.total || 0,
-          pageSize: data.limit || params.pageSize || 10,
-        }));
-      } catch (err) {
-        console.error(err);
-        message.error("Failed to fetch inwards");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [pagination.current, pagination.pageSize, searchText, sorter]
-  );
-
-  const handleSearch = debounce((value) => {
-    setPagination((prev) => ({ ...prev, current: 1 }));
-    setSearchText(value);
-  }, 500);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalItems, setModalItems] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    fetchInwards();
-  }, [fetchInwards]);
+    setLoading(true);
+    setTimeout(() => {
+      setInwards(dummyInwards);
+      setLoading(false);
+    }, 500);
+  }, []);
 
-  const handleTableChange = (pag, filters, sort) => {
-    setPagination(pag);
-    setSorter({
-      field: sort.field,
-      order:
-        sort.order === "ascend"
-          ? "asc"
-          : sort.order === "descend"
-          ? "desc"
-          : null,
-    });
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await inwardService.remove(id);
-      message.success("Inward deleted successfully");
-      fetchInwards();
-    } catch (err) {
-      console.error(err);
-      message.error("Failed to delete inward");
-    }
+  const handleDelete = (id) => {
+    message.success(`Deleted inward ${id} (dummy)`);
   };
 
   const exportPDF = () => {
@@ -97,47 +72,48 @@ const InwardList = () => {
     ]);
 
     doc.autoTable({
-      head: [
-        ["Inward No", "Supplier", "Date", "Quantity", "Amount", "Status"],
-      ],
+      head: [["Inward No", "Supplier", "Date", "Quantity", "Amount", "Status"]],
       body: tableData,
     });
 
     doc.save("inwards.pdf");
   };
 
+  const openModal = (items) => {
+    setModalItems(items);
+    setModalVisible(true);
+  };
+
+  const filteredItems = modalItems.filter(
+    (item) =>
+      item.product.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.product.product_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.batch_number.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleItemDelete = (id) => {
+    setModalItems(modalItems.filter((item) => item.id !== id));
+  };
+
+  const handleItemEdit = (id) => {
+    alert(`Edit product with ID: ${id}`);
+  };
+
   const columns = [
-    {
-      title: "Inward No",
-      dataIndex: "inward_no",
-      key: "inward_no",
-      sorter: true,
-    },
-    {
-      title: "Supplier",
-      dataIndex: "supplier_name",
-      key: "supplier_name",
-      sorter: true,
-    },
+    { title: "Inward No", dataIndex: "inward_no", key: "inward_no" },
+    { title: "Supplier", dataIndex: "supplier_name", key: "supplier_name" },
     {
       title: "Received Date",
       dataIndex: "received_date",
       key: "received_date",
       render: (date) => new Date(date).toLocaleDateString(),
-      sorter: true,
     },
-    {
-      title: "Quantity",
-      dataIndex: "total_quantity",
-      key: "total_quantity",
-      sorter: true,
-    },
+    { title: "Quantity", dataIndex: "total_quantity", key: "total_quantity" },
     {
       title: "Amount",
       dataIndex: "total_amount",
       key: "total_amount",
       render: (amount) => `₹${amount}`,
-      sorter: true,
     },
     {
       title: "Status",
@@ -150,32 +126,25 @@ const InwardList = () => {
     {
       title: "Actions",
       key: "actions",
-      fixed: "right",
       render: (_, record) => (
         <Space>
-                    <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => navigate(`/inward/edit/${record.id}`)}
-          >
-            View Products
-          </Button>
+          <Button
+            icon={<Eye />}
+            onClick={() => openModal(record.items)}
+          />
           <Button
             type="primary"
             icon={<EditOutlined />}
             onClick={() => navigate(`/inward/edit/${record.id}`)}
           >
-            Edit
           </Button>
           <Popconfirm
             title="Are you sure to delete this inward?"
             onConfirm={() => handleDelete(record.id)}
           >
             <Button danger icon={<DeleteOutlined />}>
-              Delete
             </Button>
           </Popconfirm>
-
         </Space>
       ),
     },
@@ -183,70 +152,90 @@ const InwardList = () => {
 
   return (
     <div className="p-4">
-      <Space
-        style={{
-          marginBottom: 16,
-          width: "100%",
-          justifyContent: "space-between",
-        }}
-      >
-        <Search
-          placeholder="Search inwards..."
-          onSearch={handleSearch}
-          onChange={(e) => handleSearch(e.target.value)}
-          enterButton
-          allowClear
-          style={{ width: 300 }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => navigate("/inward/add")}
-          >
-            Add Inward
-          </Button>
-          <Button type="default" onClick={exportPDF}>
-            Export PDF
-          </Button>
-        </Space>
+      <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/inward/add")}>
+          Add Inward
+        </Button>
+        <Button type="default" onClick={exportPDF}>
+          Export PDF
+        </Button>
       </Space>
 
       <Table
         columns={columns}
         rowKey={(record) => record.id}
         dataSource={inwards}
-        pagination={pagination}
         loading={loading}
-        onChange={handleTableChange}
         bordered
-        // expandable={{
-        //   expandedRowRender: (record) => (
-        //     <Table
-        //       columns={[
-        //         { title: "Product", dataIndex: ["product", "product_name"], key: "product_name" },
-        //         { title: "Code", dataIndex: ["product", "product_code"], key: "product_code" },
-        //         { title: "Quantity", dataIndex: "quantity", key: "quantity" },
-        //         { title: "Unit Price", dataIndex: "unit_price", key: "unit_price", render: (v) => `₹${v}` },
-        //         { title: "Total", dataIndex: "total_price", key: "total_price", render: (v) => `₹${v}` },
-        //         { title: "Batch", dataIndex: "batch_number", key: "batch_number" },
-        //         {
-        //           title: "Expiry Date",
-        //           dataIndex: "expiry_date",
-        //           key: "expiry_date",
-        //           render: (date) =>
-        //             date ? new Date(date).toLocaleDateString() : "-",
-        //         },
-        //       ]}
-        //       dataSource={record.items || []}
-        //       pagination={false}
-        //       rowKey={(item) => item.id}
-        //       size="small"
-        //     />
-        //   ),
-        // }}
         scroll={{ x: true }}
       />
+
+      <Modal
+        title="Inward Items"
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+        width={900}
+      >
+        {/* Search */}
+        <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-3 mb-4 w-1/2 bg-white">
+          <Search size={16} className="text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search by product, code, or batch..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="outline-none text-sm w-full"
+          />
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+            <thead className="bg-[#1C2244] text-white">
+              <tr>
+                {[
+                  "S.No",
+                  "Product",
+                  "Code",
+                  "Quantity",
+                  "Unit Price",
+                  "Total",
+                  "Batch",
+                  "Expiry Date",
+                ].map((col, idx) => (
+                  <th key={idx} className="py-4 px-4 text-left text-white font-semibold border-b">
+                    {col}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.length > 0 ? (
+                filteredItems.map((row, index) => (
+                  <tr key={row.id} className="hover:bg-[#E1E6FF] border-b border-gray-300">
+                    <td className="py-4 px-4 ">{index + 1}</td>
+                    <td className="py-4 px-4 ">{row.product.product_name}</td>
+                    <td className="py-4 px-4 ">{row.product.product_code}</td>
+                    <td className="py-4 px-4 ">{row.quantity}</td>
+                    <td className="py-4 px-4 ">₹{row.unit_price}</td>
+                    <td className="py-4 px-4 ">₹{row.total_price}</td>
+                    <td className="py-4 px-4 ">{row.batch_number}</td>
+                    <td className="py-4 px-4 ">
+                      {row.expiry_date ? new Date(row.expiry_date).toLocaleDateString() : "-"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={9} className="py-4 text-center text-gray-500">
+                    No products found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Modal>
     </div>
   );
 };
