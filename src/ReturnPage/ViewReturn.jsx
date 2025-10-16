@@ -46,7 +46,7 @@ function ViewReturn() {
     let totalTax = 0;
     items.forEach((it) => {
       totalQty += Number(it.quantity || 0);
-      totalAmount += Number(it.unit_price || 0) * Number(it.quantity || 0);
+      totalAmount += Number(it.product?.selling_price || 0) * Number(it.quantity || 0);
       totalTax += Number(it.tax_amount || 0);
     });
     return { totalQty, totalAmount, totalTax, grandTotal: totalAmount + totalTax };
@@ -158,7 +158,7 @@ function ViewReturn() {
                 <th style={{ padding: "8px", border: "1px solid #ccc" }}>Product Name</th>
                 <th style={{ padding: "8px", border: "1px solid #ccc", textAlign: "right" }}>Quantity</th>
                 <th style={{ padding: "8px", border: "1px solid #ccc", textAlign: "right" }}>Unit Price</th>
-                <th style={{ padding: "8px", border: "1px solid #ccc", textAlign: "right" }}>Tax</th>
+                {/* <th style={{ padding: "8px", border: "1px solid #ccc", textAlign: "right" }}>Tax</th> */}
                 <th style={{ padding: "8px", border: "1px solid #ccc", textAlign: "right" }}>Amount</th>
               </tr>
             </thead>
@@ -168,9 +168,9 @@ function ViewReturn() {
                   <td style={{ padding: "8px" }}>{item.product?.product_code || "N/A"}</td>
                   <td style={{ padding: "8px" }}>{item.product?.product_name || "N/A"}</td>
                   <td style={{ padding: "8px", textAlign: "right" }}>{item.quantity || 0}</td>
-                  <td style={{ padding: "8px", textAlign: "right" }}>₹{item.unit_price || 0}</td>
-                  <td style={{ padding: "8px", textAlign: "right" }}>₹{item.tax_amount || 0}</td>
-                  <td style={{ padding: "8px", textAlign: "right" }}>₹{(item.quantity || 0) * parseFloat(item.unit_price || 0) + parseFloat(item.tax_amount || 0)}</td>
+                  <td style={{ padding: "8px", textAlign: "right" }}>₹{item.product?.selling_price || 0}</td>
+                  {/* <td style={{ padding: "8px", textAlign: "right" }}>₹{item.tax_amount || 0}</td> */}
+                  <td style={{ padding: "8px", textAlign: "right" }}>₹{(item.quantity || 0) * parseFloat(item.product?.selling_price || 0) + parseFloat(item.tax_amount || 0)}</td>
                 </tr>
               ))}
             </tbody>
