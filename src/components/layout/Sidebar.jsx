@@ -90,8 +90,8 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
       label: "Billing",
       icon: <FileTextFilled />,
       children: [
-        { key: "/product/list", label: "Create Billing", icon: <PlusOutlined /> },
-        { key: "/category/list", label: "Billing List", icon: <UnorderedListOutlined /> },
+        { key: "/billing/add", label: "Create Billing", icon: <PlusOutlined /> },
+        { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
       ],
     },
     { key: "/return", label: "Return", icon: <RotateCcw /> },

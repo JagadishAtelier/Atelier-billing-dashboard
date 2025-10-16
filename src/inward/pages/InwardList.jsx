@@ -2,8 +2,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Plus, Search, Sliders, Edit, Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import inwardService from "../service/inwardService"; // adjust path if needed
-import vendorService from "../../components/layout/SideBarPages/services/vendorService"; // adjust path if needed
+import inwardService from "../service/inwardService";
+import vendorService from "../../components/layout/SideBarPages/services/vendorService";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 
@@ -131,24 +131,23 @@ function InwardList() {
   const handleAdd = () => navigate("/inward/add");
 
   // -------------------------
-  // View modal: fetch a single inward and show items
+  // View modal: use data from the already-loaded list (don't call getById)
   // -------------------------
-  const handleView = async (id) => {
-    try {
-      setLoading(true);
-      const res = await inwardService.getById(id);
-      const data = res?.data ?? res;
-      setModalInward(data || null);
-      // items shape is data.items
-      setModalItems(Array.isArray(data?.items) ? data.items : []);
-      setModalSearch("");
-      setModalVisible(true);
-    } catch (err) {
-      console.error("Failed to fetch inward details:", err);
-      alert("Failed to load inward details");
-    } finally {
-      setLoading(false);
+  const handleView = (id) => {
+    // find the inward in the loaded list
+    const found = inwards.find((inv) => String(inv.id) === String(id));
+    if (!found) {
+      // if not found (shouldn't happen if list is current), inform user
+      console.warn("Inward not found in in-memory list:", id);
+      alert("Inward details not found locally. Refresh the list and try again.");
+      return;
     }
+
+    // set modal data directly from the list result (includes .items and .order)
+    setModalInward(found);
+    setModalItems(Array.isArray(found.items) ? found.items : []);
+    setModalSearch("");
+    setModalVisible(true);
   };
 
   const closeModal = () => {
@@ -158,9 +157,10 @@ function InwardList() {
     setModalSearch("");
   };
 
+  // make searching robust (handle product.product_name or product_name fallback)
   const filteredModalItems = modalItems.filter((item) => {
-    const pname = item?.product?.product_name?.toString()?.toLowerCase() ?? "";
-    const pcode = item?.product?.product_code?.toString()?.toLowerCase() ?? "";
+    const pname = (item?.product?.product_name ?? item?.product_name ?? "").toString().toLowerCase();
+    const pcode = (item?.product?.product_code ?? item?.product_code ?? "").toString().toLowerCase();
     const batch = (item?.batch_number ?? "").toString().toLowerCase();
     const q = modalSearch.toLowerCase();
     return pname.includes(q) || pcode.includes(q) || batch.includes(q);
@@ -185,7 +185,7 @@ function InwardList() {
 
     const tableBody = inwards.map((inv) => [
       inv.inward_no ?? "-",
-      inv.order_id ?? (inv.order?.po_no ?? "-"),
+      inv.order?.po_no ?? inv.po_no ?? inv.order_id ?? "-",
       getVendorName(inv.vendor_id),
       inv.received_date ? new Date(inv.received_date).toLocaleDateString() : "-",
       inv.total_quantity ?? 0,
@@ -323,12 +323,12 @@ function InwardList() {
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-          <thead className="bg-[#1C2244] text-white">
+          <thead className="bg-[#E5E7FB] text-[#475467]">
             <tr>
               {columns.map((col, idx) => (
                 <th
                   key={idx}
-                  className="py-4 px-4 text-left text-white font-semibold border-b"
+                  className="py-4 px-4 text-left text-[#475467] font-semibold border-b"
                 >
                   {col}
                 </th>
@@ -353,8 +353,9 @@ function InwardList() {
                     {inv.inward_no || "-"}
                   </td>
 
+                  {/* PO column: check inv.po_no first (if server flattened it), otherwise inv.order?.po_no */}
                   <td className="py-4 px-4 border-b border-gray-300">
-                    {inv.po_no || (inv.order?.po_no ?? "-")}
+                    {inv.po_no ?? inv.order?.po_no ?? inv.order_id ?? "-"}
                   </td>
 
                   <td className="py-4 px-4 border-b border-gray-300">
@@ -453,7 +454,7 @@ function InwardList() {
       {/* ---------- Modal (simple custom modal) ---------- */}
       {modalVisible && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 overflow-auto"
+          className="fixed inset-0 z-500 flex items-start justify-center bg-black/40 p-4 overflow-auto"
           onClick={closeModal}
         >
           <div
@@ -465,31 +466,34 @@ function InwardList() {
                 <h3 className="text-lg font-semibold">
                   Inward Items - {modalInward?.inward_no || ""}
                 </h3>
-                <p className="text-sm text-gray-600">
+                {/* <p className="text-sm text-gray-600">
                   Supplier: {modalInward?.supplier_name || getVendorName(modalInward?.vendor_id)}
-                </p>
+                </p> */}
+                {/* <p className="text-sm text-gray-600">
+                  PO: {modalInward?.po_no ?? modalInward?.order?.po_no ?? "-"}
+                </p> */}
               </div>
               <div className="flex items-center gap-2">
-                <input
+                {/* <input
                   type="text"
                   placeholder="Search product/code/batch..."
                   value={modalSearch}
                   onChange={(e) => setModalSearch(e.target.value)}
                   className="outline-none border border-gray-300 rounded px-3 py-2 text-sm"
-                />
-                <button
+                /> */}
+                {/* <button
                   onClick={closeModal}
                   className="bg-gray-200 px-3 py-2 rounded text-sm"
                 >
                   Close
-                </button>
+                </button> */}
               </div>
             </div>
 
             <div className="p-4">
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-                  <thead className="bg-[#1C2244] text-white">
+                  <thead className="bg-[#E5E7FB] text-[#475467]">
                     <tr>
                       {[
                         "S.No",
@@ -498,10 +502,9 @@ function InwardList() {
                         "Quantity",
                         "Unit Price",
                         "Total",
-                        "Batch",
                         "Expiry Date",
                       ].map((col, idx) => (
-                        <th key={idx} className="py-3 px-3 text-left text-white font-semibold border-b">
+                        <th key={idx} className="py-3 px-3 text-left text-[#475467] font-semibold border-b">
                           {col}
                         </th>
                       ))}
@@ -512,12 +515,19 @@ function InwardList() {
                       filteredModalItems.map((row, idx) => (
                         <tr key={row.id ?? idx} className="hover:bg-[#E1E6FF] border-b">
                           <td className="py-3 px-3">{idx + 1}</td>
-                          <td className="py-3 px-3">{row.items?.product_name ?? "-"}</td>
-                          <td className="py-3 px-3">{row.product?.product_code ?? "-"}</td>
+
+                          {/* robust fallback: nested product or flat product_name */}
+                          <td className="py-3 px-3">
+                            {row?.product?.product_name ?? row?.product_name ?? "-"}
+                          </td>
+
+                          <td className="py-3 px-3">
+                            {row?.product?.product_code ?? row?.product_code ?? "-"}
+                          </td>
+
                           <td className="py-3 px-3">{row.quantity ?? 0}</td>
                           <td className="py-3 px-3">₹{row.unit_price ?? "0.00"}</td>
                           <td className="py-3 px-3">₹{row.total_price ?? "0.00"}</td>
-                          <td className="py-3 px-3">{row.batch_number ?? "-"}</td>
                           <td className="py-3 px-3">
                             {row.expiry_date ? new Date(row.expiry_date).toLocaleDateString() : "-"}
                           </td>
@@ -536,15 +546,15 @@ function InwardList() {
             </div>
 
             <div className="flex items-center justify-end gap-2 p-4 border-t">
-              <button
+              {/* <button
                 onClick={() => {
                   // Export selected inward items to PDF
                   const doc = new jsPDF();
                   doc.text(`Inward Items - ${modalInward?.inward_no || ""}`, 14, 16);
 
                   const tableData = (filteredModalItems || []).map((it) => [
-                    it.product?.product_name ?? "-",
-                    it.product?.product_code ?? "-",
+                    it.product?.product_name ?? it.product_name ?? "-",
+                    it.product?.product_code ?? it.product_code ?? "-",
                     it.quantity ?? 0,
                     it.unit_price ?? 0,
                     it.total_price ?? 0,
@@ -565,7 +575,7 @@ function InwardList() {
                 className="bg-[#1C2244] text-white px-4 py-2 rounded"
               >
                 Export Items PDF
-              </button>
+              </button> */}
 
               <button onClick={closeModal} className="bg-gray-200 px-4 py-2 rounded">
                 Close
