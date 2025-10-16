@@ -1,191 +1,237 @@
-import React from 'react'
-import logo from '../../assets/Company_logo1.png'
-import { FileText, Minus } from 'lucide-react'
-
-const columns = [
-  "Product Id",
-  "Product Name",
-  "Total Quantity",
-  "Tax Amount",
-  "Total Amount",
-];
-
-const orders = [
-  {
-    po_no: "PO-001",
-    vendor_name: "A-One Traders",
-    order_date: "2025-10-10",
-    total_quantity: 120,
-    total_amount: 54000,
-    tax_amount: 2700,
-    status: "pending",
-    productId: "PROD-1"
-  },
-  {
-    po_no: "PO-002",
-    vendor_name: "Bright Supplies",
-    order_date: "2025-10-12",
-    total_quantity: 80,
-    total_amount: 41000,
-    tax_amount: 2050,
-    status: "completed",
-    productId: "PROD-2"
-  },
-  {
-    po_no: "PO-003",
-    vendor_name: "City Hardware",
-    order_date: "2025-10-13",
-    total_quantity: 60,
-    total_amount: 30500,
-    tax_amount: 1525,
-    status: "approval",
-    productId: "PROD-3"
-  },
-  {
-    po_no: "PO-004",
-    vendor_name: "Delta Enterprises",
-    order_date: "2025-10-13",
-    total_quantity: 200,
-    total_amount: 105000,
-    tax_amount: 5250,
-    status: "cancelled",
-    productId: "PROD-4"
-  },
-];
+import React, { useEffect, useRef, useState } from "react";
+import html2pdf from "html2pdf.js";
+import logo from "../../assets/Company_logo1.png";
+import orderService from "./services/orderService";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function ViewOrderDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [order, setOrder] = useState(null);
+  const componentRef = useRef();
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const response = await orderService.getById(id);
+        console.log("API response:", response); // <-- debug here
+        setOrder(response);
+      } catch (error) {
+        console.error("Failed to fetch order:", error);
+      }
+    };
+
+    fetchOrder();
+  }, [id]);
+
+
+  const handleDownload = () => {
+    if (!componentRef.current || !order) return alert("Nothing to download");
+
+    html2pdf()
+      .set({
+        margin: 10,
+        filename: `Purchase_Order_${order.po_no}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, logging: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      })
+      .from(componentRef.current)
+      .save();
+  };
+
+  if (!order) return <p>Loading...</p>;
+
+  // Safely compute totals
+  const computeTotals = (items = []) => {
+    let subTotal = 0;
+    let totalTax = 0;
+    items.forEach((item) => {
+      subTotal += (item.quantity || 0) * parseFloat(item.unit_price || 0);
+      totalTax += parseFloat(item.tax_amount || 0);
+    });
+    return { subTotal, totalTax, grandTotal: subTotal + totalTax };
+  };
+
+  const { subTotal, totalTax, grandTotal } = computeTotals(order.items || []);
+
   return (
-    <div>
-              {/* Add Order Button */}
-        <div
-          className=" text-black border border-gray-400 py-3 my-5  px-6 w-fit font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer ms-auto"
-          onClick={() => navigate("/order/add")}
+    <div style={{ backgroundColor: "#F7F8FC", minHeight: "100vh", padding: "40px" }}>
+      {/* Download Button */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}>
+        <button
+          onClick={handleDownload}
+          style={{
+            backgroundColor: "#1C2244",
+            color: "#fff",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
         >
-          <FileText/>
-          <button>Add Order</button>
-        </div>
-    <div className='bg-[#F7F8FC]'>
-      {/* HEADER */}
-      <div className='bg-[#1C2244] p-6 md:p-10 lg:p-24 text-white'>
-        <div className='flex flex-col lg:flex-row justify-between items-center gap-6 lg:gap-0'>
-          <div className='flex flex-col gap-3 text-center lg:text-left'>
-            <h1 className='text-3xl md:text-4xl lg:text-5xl font-bold'>INVOICE</h1>
-            <div className='flex justify-center lg:justify-start gap-2 items-center'>
-              <p className='text-base md:text-lg font-semibold'>Invoice Number</p>
-              <Minus />
-              <p className='text-base md:text-lg font-semibold'>01234</p>
-            </div>
-            <div className='flex justify-center lg:justify-start gap-2 items-center'>
-              <p className='text-base md:text-lg font-semibold'>Date</p>
-              <Minus />
-              <p className='text-base md:text-lg font-semibold'>15 October 2025</p>
-            </div>
-          </div>
-
-          <div className='text-center'>
-            <img src={logo} className='w-32 md:w-40 lg:w-50 h-auto mx-auto' alt="Company Logo" />
-            <p className='text-sm md:text-base font-semibold mt-2'>ATELIER CREATION</p>
-          </div>
-        </div>
+          Download PDF
+        </button>
       </div>
 
-      {/* FROM - TO SECTION */}
-      <div className='flex flex-col md:flex-row gap-8 md:gap-20 px-6 md:px-12 lg:px-24 py-10 bg-white justify-between'>
-        <div>
-          <h1 className='text-2xl md:text-3xl font-bold mb-1'>From</h1>
-          <p className='text-base md:text-lg'>Atelier creation</p>
-          <p className='text-base md:text-lg'>Coimbatore</p>
-        </div>
-        <div>
-          <h1 className='text-2xl md:text-3xl font-bold mb-1'>To</h1>
-          <p className='text-base md:text-lg'>Mr. Howard Ong</p>
-          <p className='text-base md:text-lg'>Coimbatore</p>
-        </div>
-      </div>
+      {/* Purchase Order */}
+      <div
+        ref={componentRef}
+        style={{
+          backgroundColor: "#fff",
+          padding: "40px",
+          borderRadius: "10px",
+          boxShadow: "0 0 15px rgba(0,0,0,0.1)",
+        }}
+      >
+        {/* Header */}
+        {/* Header */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "20px",
+    backgroundColor: "#1C2244", // <-- header background color
+    color: "#fff",              // text color to contrast
+    padding: "20px 30px",
+    borderRadius: "10px",
+  }}
+>
+  <h1 style={{ fontSize: "32px", fontWeight: "bold", margin: 0 }}>PURCHASE ORDER</h1>
+  <div style={{ textAlign: "center" }}>
+    <img
+      src={logo}
+      alt="Company Logo"
+      style={{
+        width: "140px",
+        height: "auto",
+        margin: "0 auto",
+        borderRadius: "5px",
+        backgroundColor: "#fff", // optional: white background behind logo
+        padding: "5px",
+      }}
+    />
+    <p style={{ fontWeight: "600", marginTop: "5px", color: "#fff" }}>ATELIER CREATION</p>
+  </div>
+</div>
 
-      {/* TABLE SECTION */}
-      <div className='bg-white pb-10'>
-        <div className="overflow-x-auto bg-white w-[95%] md:w-[90%] mx-auto rounded-lg">
-          <table className="min-w-full bg-white rounded-lg">
-            <thead className="bg-[#1C2244] text-white">
+
+        {/* From - To */}
+        {/* From - To */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+          {/* From */}
+          <div style={{ width: "45%" }}>
+            <h2 style={{ fontWeight: "bold", marginBottom: "10px" }}>From</h2>
+            <p><strong>Company:</strong> Atelier Creation</p>
+            <p><strong>Location:</strong> Coimbatore</p>
+            <p><strong>Contact:</strong> {order.created_by_name || "N/A"}</p>
+            <p><strong>Email:</strong> {order.created_by_email || "N/A"}</p>
+          </div>
+
+          {/* To */}
+          <div style={{ width: "30%" }}>
+            <h2 style={{ fontWeight: "bold", marginBottom: "10px" }}>To</h2>
+            <p><strong>Vendor:</strong> {order.vendor?.name || "N/A"}</p>
+            <p><strong>Contact Person:</strong> {order.vendor?.contact_person || "N/A"}</p>
+            <p><strong>Address:</strong> {order.vendor?.address || order.vendor?.location || "N/A"}</p>
+            <p><strong>Phone:</strong> {order.vendor?.phone || "N/A"}</p>
+            <p><strong>Email:</strong> {order.vendor?.email || "N/A"}</p>
+            <p><strong>GST:</strong> {order.vendor?.gst_number || "N/A"}</p>
+          </div>
+        </div>
+
+
+        {/* Order Info */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+          <div>
+            <p style={{ fontWeight: "600" }}>Purchase Order Number: {order.po_no || "N/A"}</p>
+            <p style={{ fontWeight: "600" }}>
+              Order Date: {order.order_date ? new Date(order.order_date).toLocaleDateString() : "N/A"}
+            </p>
+          </div>
+          <div>
+            <p style={{ fontWeight: "600" }}>Status: {order.status || "N/A"}</p>
+          </div>
+        </div>
+
+        {/* Items Table */}
+        <div style={{ overflowX: "auto", marginBottom: "20px" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead style={{ backgroundColor: "#1C2244", color: "#fff" }}>
               <tr>
-                {columns.map((col, idx) => (
-                  <th
-                    key={idx}
-                    className="py-4 px-3 md:py-5 md:px-4 text-left text-sm md:text-base font-semibold"
-                  >
-                    {col}
-                  </th>
-                ))}
+                <th style={{ padding: "8px", textAlign: "left", border: "1px solid #ccc" }}>Product ID</th>
+                <th style={{ padding: "8px", textAlign: "left", border: "1px solid #ccc" }}>Product Name</th>
+                <th style={{ padding: "8px", textAlign: "right", border: "1px solid #ccc" }}>Quantity</th>
+                <th style={{ padding: "8px", textAlign: "right", border: "1px solid #ccc" }}>Unit Price</th>
+                <th style={{ padding: "8px", textAlign: "right", border: "1px solid #ccc" }}>Tax</th>
+                <th style={{ padding: "8px", textAlign: "right", border: "1px solid #ccc" }}>Amount</th>
               </tr>
             </thead>
             <tbody>
-              {orders.length > 0 ? (
-                orders.map((order, index) => (
-                  <tr key={index} className="hover:bg-[#E1E6FF]">
-                    <td className="py-3 px-3 md:py-4 md:px-4 text-sm md:text-base">{order.productId}</td>
-                    <td className="py-3 px-3 md:py-4 md:px-4 text-sm md:text-base">{order.vendor_name}</td>
-                    <td className="py-3 px-3 md:py-4 md:px-4 text-sm md:text-base">{order.total_quantity}</td>
-                    <td className="py-3 px-3 md:py-4 md:px-4 text-sm md:text-base">₹{order.tax_amount}</td>
-                    <td className="py-3 px-3 md:py-4 md:px-4 text-sm md:text-base">₹{order.total_amount}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={columns.length} className="py-4 text-center text-gray-500 text-sm md:text-base">
-                    No orders found
+              {(order.items || []).map((item, idx) => (
+                <tr key={idx} style={{ borderBottom: "1px solid #ccc" }}>
+                  <td style={{ padding: "8px" }}>{item.product?.product_code || "N/A"}</td>
+                  <td style={{ padding: "8px" }}>{item.product?.product_name || "N/A"}</td>
+                  <td style={{ padding: "8px", textAlign: "right" }}>{item.quantity || 0}</td>
+                  <td style={{ padding: "8px", textAlign: "right" }}>₹{item.unit_price || 0}</td>
+                  <td style={{ padding: "8px", textAlign: "right" }}>₹{item.tax_amount || 0}</td>
+                  <td style={{ padding: "8px", textAlign: "right" }}>
+                    ₹{(item.quantity || 0) * parseFloat(item.unit_price || 0) + parseFloat(item.tax_amount || 0)}
                   </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>
 
-        {/* SUMMARY SECTION */}
-        <div className='flex flex-col gap-2 w-[90%] lg:w-[67%] mx-auto mt-5'>
-          <div className='flex flex-row gap-2 sm:gap-3 ms-auto text-right'>
-            <p className='font-semibold text-base md:text-lg'>Sub Total :</p>
-            <p className='font-semibold text-base md:text-lg'>₹ 50,000</p>
+        {/* Totals */}
+        <div style={{ width: "50%", marginLeft: "auto", marginBottom: "20px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <p style={{ fontWeight: "600" }}>Sub Total:</p>
+            <p style={{ fontWeight: "600" }}>₹{subTotal}</p>
           </div>
-          <div className='flex flex-row gap-2 sm:gap-3 ms-auto text-right'>
-            <p className='font-semibold text-base md:text-lg'>Total Tax :</p>
-            <p className='font-semibold text-base md:text-lg'>₹ 38,000</p>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <p style={{ fontWeight: "600" }}>Total Tax:</p>
+            <p style={{ fontWeight: "600" }}>₹{totalTax}</p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              color: "#000",
+              padding: "1px",
+              fontWeight: "600",
+              borderRadius: "5px",
+            }}
+          >
+            <p>Grand Total:</p>
+            <p>₹{grandTotal}</p>
           </div>
         </div>
 
-        {/* GRAND TOTAL */}
-        <div className='w-[95%] lg:w-[70%] mx-auto mt-4'>
-          <div className='bg-[#1C2244] text-white py-4 px-5 md:py-5 md:px-6 font-semibold flex items-center justify-start gap-2 rounded-md w-fit ms-auto'>
-            <p className='text-base md:text-lg'>Total :</p>
-            <p className='text-base md:text-lg'>₹ 88,000</p>
-          </div>
-        </div>
-
-        {/* NOTES */}
-        <div className='lg:px-20 px-3'>
-          <p className='text-lg font font-semibold mt-10 mb-5'>Notes</p>
-          <ul className='ms-5 list-disc list-inside'>
-            <li className='text-base mb-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-            <li className='text-base mb-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-            <li className='text-base mb-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-            <li className='text-base mb-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-            <li className='text-base mb-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+        {/* Notes */}
+        <div style={{ marginBottom: "40px" }}>
+          <p style={{ fontWeight: "600", fontSize: "18px", marginBottom: "8px" }}>Notes:</p>
+          <ul style={{ paddingLeft: "20px" }}>
+            <li>Payment due within 30 days.</li>
+            <li>Goods once sold will not be taken back.</li>
+            <li>Delivery expected within 7 days.</li>
           </ul>
         </div>
 
-      {/* Signature */}
-      <div className='flex justify-between lg:px-20 px-3 mt-40'>
-        <div>
-          <p>Manager Signature</p>
-        </div>
-        <div>
-          <p>Client Signature</p>
+        {/* Signature */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "80px" }}>
+          <div>
+            <p>Manager Signature</p>
+          </div>
+          <div>
+            <p>Client Signature</p>
+          </div>
         </div>
       </div>
-      </div>
     </div>
-    </div>
-  )
+  );
 }
 
-export default ViewOrderDetails
+export default ViewOrderDetails;

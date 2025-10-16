@@ -72,9 +72,12 @@ function AddOrder() {
 
         form.setFieldsValue({
           vendor_id: orderData.vendor_id,
-          order_date: orderData.order_date ? dayjs(orderData.order_date) : null,
+          order_date: orderData.order_date
+            ? dayjs(orderData.order_date).format("YYYY-MM-DD")
+            : null,
           items,
         });
+
 
         updateSummary(items, -1);
       } catch (err) {
@@ -155,7 +158,7 @@ function AddOrder() {
         message.success("Order created successfully");
       }
 
-      navigate("/order/list");
+      navigate("/order");
     } catch (err) {
       console.error("Save error:", err);
       message.error("Failed to save order");
@@ -209,7 +212,7 @@ function AddOrder() {
           <Space>
             <button
               className="bg-[#1C2244] !text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
-              onClick={() => navigate("/order/list")}
+              onClick={() => navigate("/order")}
             >
               Back to list
             </button>

@@ -10,6 +10,7 @@ const columns = [
   "Vendor Name",
   "Order Date",
   "Total Quantity",
+  "Total Penning Quantity",
   "Total Amount",
   "Tax Amount",
   "Status",
@@ -256,6 +257,9 @@ function OrderPage() {
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300">
                     {order.total_quantity || 0}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {order.total_penning_quantity || 0}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300">
                     ₹{order.total_amount || 0}

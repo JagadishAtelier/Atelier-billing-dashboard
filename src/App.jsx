@@ -178,7 +178,7 @@ const App = () => {
   }
 />
 <Route
-  path="/view-order-details"
+  path="/order/view/:id"
   element={
     <ProtectedRoute>
       <ViewOrderDetails />
