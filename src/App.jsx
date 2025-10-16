@@ -20,6 +20,7 @@ import AddOrder from "./components/layout/SideBarPages/AddOrder";
 import ViewOrderDetails from "./components/layout/SideBarPages/ViewOrderDetails";
 import ViewInwardData from "./inward/pages/ViewInwardData";
 import ReturnPage from "./ReturnPage/ReturnPage";
+import ReportPage from "./ReportPage/ReportPage";
 // import master from "./components/assets/cloud.png";
 const routeModules = import.meta.glob("./*/AppRoutes.jsx", { eager: true });
 
@@ -197,6 +198,14 @@ const App = () => {
   element={
     <ProtectedRoute>
       <ReturnPage />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/report"
+  element={
+    <ProtectedRoute>
+      <ReportPage />
     </ProtectedRoute>
   }
 />
