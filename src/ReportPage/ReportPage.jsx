@@ -52,7 +52,7 @@ export default function ReportPageTailwindStyled() {
           <button
             key={tab}
             className={`px-4 py-2 rounded ${
-              activeTab === tab ? "bg-[#1C2244] text-white" : "bg-gray-200 text-gray-700"
+              activeTab === tab ? "bg-[#0E1680] text-white" : "bg-gray-200 text-gray-700"
             }`}
             onClick={() => setActiveTab(tab)}
           >
@@ -67,7 +67,7 @@ export default function ReportPageTailwindStyled() {
           <h3 className="text-xl font-semibold mb-2">User Report</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-              <thead className="bg-[#1C2244] text-white">
+              <thead className="bg-[#E5E7FB] text-[#475467]">
                 <tr>
                   {["S.No", "Name", "Email", "Phone", "Role", "Status"].map((col, idx) => (
                     <th key={idx} className="py-4 px-4 text-left font-semibold border-b">
@@ -78,8 +78,8 @@ export default function ReportPageTailwindStyled() {
               </thead>
               <tbody>
                 {userData.map((user) => (
-                  <tr key={user.id} className="hover:bg-[#E1E6FF] border-b border-gray-300">
-                    <td className="py-4 px-4">{user.sno}</td>
+                  <tr key={user.id} className="hover:bg-[#E1E6FF] border-b border-gray-300 text-[#475467]">
+                    <td className="py-4 px-4 text-[#475467]">{user.sno}</td>
                     <td className="py-4 px-4">{user.name}</td>
                     <td className="py-4 px-4">{user.email}</td>
                     <td className="py-4 px-4">{user.phone}</td>
@@ -122,7 +122,7 @@ export default function ReportPageTailwindStyled() {
                   </option>
                 ))}
               </select>
-              <button className="bg-[#1C2244] text-white py-2 px-4 flex items-center gap-1 rounded">
+              <button className="bg-[#0E1680] text-white py-2 px-4 flex items-center gap-1 rounded">
                 <Plus size={16} /> Add Billing
               </button>
             </div>
@@ -165,7 +165,7 @@ export default function ReportPageTailwindStyled() {
                     <td className="py-4 px-4">
                       <button
                         onClick={() => handleView(bill.id)}
-                        className="bg-[#1C2244] text-white py-1 px-3 text-xs rounded flex items-center justify-center"
+                        className="bg-[#0E1680] text-white py-1 px-3 text-xs rounded flex items-center justify-center"
                       >
                         <Eye size={14} />
                       </button>

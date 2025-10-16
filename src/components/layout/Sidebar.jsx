@@ -41,9 +41,9 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
   const containerRef = useRef(null);
 
   // Colors requested
-  const ACTIVE_BG = "#1C2244";
-  const ACTIVE_TEXT = "#ffffff";
-  const INACTIVE_TEXT = "#1C2244";
+  const ACTIVE_BG = "#E5E7FB";
+  const ACTIVE_TEXT = "#011D4A";
+  const INACTIVE_TEXT = "#667085";
   const INACTIVE_BG = "transparent";
 
   // Handle window resize
@@ -362,14 +362,15 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
               style={{
                 height: "100%",
                 width: collapsed && !isMobile ? 60 : isMobile ? 200 : 200,
-                backgroundColor: theme === "dark" ? "#1f2937" : sidebarBgColor,
-                boxShadow: "2px 0 5px rgba(0,0,0,0.1)",
+                backgroundColor: "white",
+    boxShadow: "2px 0 5px rgba(0,0,0,0.1), -2px 0 5px rgba(0,0,0,0.1)",
                 display: "flex",
                 flexDirection: "column",
                 position: isMobile ? "fixed" : "relative",
-                top: 0,
-                left: 0,
+                top: 10,
+                left: 10,
                 zIndex: 1601,
+                borderRadius:"10px"
               }}
             >
               {/* Top (toggle) */}

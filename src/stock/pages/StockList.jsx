@@ -121,13 +121,13 @@ function StockListTailwind() {
         {/* Buttons */}
         <div className="flex gap-2 flex-wrap">
           <div
-            className="bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
+            className="bg-[#0E1680] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
             onClick={() => setShowColumnModal(true)}
           >
             <Settings size={16} /> Customize Columns
           </div>
           <div
-            className="bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
+            className="bg-[#0E1680] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
             onClick={() => setShowUploadModal(true)}
           >
             <Upload size={16} /> Bulk Upload Excel
@@ -138,7 +138,7 @@ function StockListTailwind() {
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-          <thead className="bg-[#1C2244] text-white">
+          <thead className="bg-[#E5E7FB] text-[#475467]">
             <tr>
               {selectedColumns.map((col) => (
                 <th key={col} className="py-4 px-4 text-left font-semibold border-b">
@@ -151,7 +151,7 @@ function StockListTailwind() {
           <tbody>
             {filteredItems.length > 0 ? (
               filteredItems.map((row) => (
-                <tr key={row.id} className="hover:bg-[#E1E6FF] border-b border-gray-300">
+                <tr key={row.id} className="hover:bg-[#E1E6FF] border-b border-gray-300 text-[#475467]">
                   {selectedColumns.map((col) => (
                     <td key={col} className="py-4 px-4 ">
                       {row[col] !== undefined
@@ -164,7 +164,7 @@ function StockListTailwind() {
                   <td className="py-4 px-4  flex gap-2">
                     <button
                       onClick={() => handleEdit(row.id)}
-                      className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                      className="flex items-center gap-1 px-2 py-1 bg-[#0E1680] text-white rounded text-sm"
                     >
                       <Edit size={16} />
                     </button>
@@ -223,7 +223,7 @@ function StockListTailwind() {
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-[#1C2244] text-white rounded"
+                className="px-4 py-2 bg-[#0E1680] text-white rounded"
                 onClick={() => setShowColumnModal(false)}
               >
                 Apply
@@ -256,7 +256,7 @@ function StockListTailwind() {
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-[#1C2244] text-white rounded"
+                className="px-4 py-2 bg-[#0E1680] text-white rounded"
                 onClick={saveBulkUpload}
               >
                 Save

@@ -207,7 +207,7 @@ function OrderPage() {
 
         {/* Add Order */}
         <div
-          className="bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
+          className="bg-[#0E1680] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
           onClick={() => navigate("/order/add")}
         >
           <Plus size={16} />
@@ -218,12 +218,12 @@ function OrderPage() {
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-          <thead className="bg-[#1C2244] text-white">
+          <thead className="bg-[#E5E7FB] text-[#475467]">
             <tr>
               {columns.map((col, idx) => (
                 <th
                   key={idx}
-                  className="py-4 px-4 text-left text-white font-semibold border-b"
+                  className="py-4 px-4 text-left text-[#475467] font-semibold border-b"
                 >
                   {col}
                 </th>
@@ -239,7 +239,7 @@ function OrderPage() {
               </tr>
             ) : orders.length > 0 ? (
               orders.map((order, index) => (
-                <tr key={order.id} className="hover:bg-[#E1E6FF]">
+                <tr key={order.id} className="hover:bg-[#E1E6FF] text-[#475467]">
                   <td className="py-4 px-4 border-b border-gray-300">
                     {(page - 1) * 10 + index + 1}
                   </td>

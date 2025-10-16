@@ -380,7 +380,7 @@ function AddOrder() {
         <div className="flex justify-end mt-10">
           <Space>
             <button
-              className="bg-[#1C2244] !text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
+              className="bg-[#0E1680] !text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
               type="submit"
               disabled={loading}
             >

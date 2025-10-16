@@ -94,9 +94,10 @@ const HeaderBar = ({ collapsed /* this is optional */ }) => {
 
   return (
     <div
-      className="flex justify-between items-center shadow-lg h-14 px-4 py-2"
+      className="flex justify-between items-center h-14 px-4 py-2 "
       style={{
-        ...headerStyle,
+        // ...headerStyle,
+        backgroundColor:"white",
         position: "sticky",
         top: 0,
         zIndex: 1000,
@@ -110,7 +111,7 @@ const HeaderBar = ({ collapsed /* this is optional */ }) => {
           style={{ height: 36, width: "auto", cursor: "pointer" }}
           onClick={() => navigate("/dashboard")}
         />
-        <div style={{ color: textColor, fontWeight: 700 }}>Billing Software</div>
+        <div style={{ color: "#011D4A", fontWeight: 700 }}>Atelier Portal</div>
       </div>
 
       {/* Right side: notifications + user */}

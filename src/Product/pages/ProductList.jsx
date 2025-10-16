@@ -165,7 +165,7 @@ const ProductList = () => {
           style={{ width: 300 }}
         />
         <Space>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/product/add")}>
+          <Button style={{backgroundColor:"#0E1680"}} type="primary" icon={<PlusOutlined />} onClick={() => navigate("/product/add")}>
             Add Product
           </Button>
           <Button type="default" icon={<DownloadOutlined />} onClick={downloadAllQRPDF}>

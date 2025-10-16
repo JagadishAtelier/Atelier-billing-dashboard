@@ -179,7 +179,8 @@ const MainLayout = ({ menuItems }) => {
               top: 0,
               bottom: 0,
               zIndex: 100,
-              backgroundColor: theme === "dark" ? "#001529" : sidebarBgColor,
+              marginTop:56.3,
+              backgroundColor: "#fbf9fa",
             }}
           >
             <Sidebar
@@ -224,8 +225,8 @@ const MainLayout = ({ menuItems }) => {
                 ? 230
                 : 400
               : collapsed
-              ? 60
-              : 200,
+              ? 0
+              : 0,
             transition: "margin-left 0.3s",
             backgroundColor: contentBgColor,
           }}
@@ -260,14 +261,16 @@ const MainLayout = ({ menuItems }) => {
           <Content
             style={{
               padding: "6px",
-              backgroundColor: contentBgColor,
+              backgroundColor: "#fbf9fa",
               minHeight: "calc(100vh - 112px)",
               overflow: "auto",
               position: "relative",
+    marginLeft: isMobile ? 0 : collapsed ? 60 : 200,
+    transition: "margin-left 0.3s",
             }}
             onClick={handleContentClick}
           >
-            <div className="rounded-lg shadow p-6 min-h-full" style={{ backgroundColor: "#f3f4f6" }}>
+            <div className="rounded-lg p-6 min-h-full bg-gray-50" >
               <Outlet />
             </div>
           </Content>

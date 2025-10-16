@@ -85,7 +85,7 @@ function ReturnPage() {
 
         {/* Add Order */}
         <div
-          className="bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
+          className="bg-[#0E1680] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
           onClick={() => alert("Add Order clicked")}
         >
           <Plus size={16} />
@@ -96,12 +96,12 @@ function ReturnPage() {
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-          <thead className="bg-[#1C2244] text-white">
+          <thead className="bg-[#E5E7FB] text-[#475467]">
             <tr>
               {columns.map((col, idx) => (
                 <th
                   key={idx}
-                  className="py-4 px-4 text-left text-white font-semibold border-b"
+                  className="py-4 px-4 text-left text-[#475467] font-semibold border-b"
                 >
                   {col}
                 </th>
@@ -111,7 +111,7 @@ function ReturnPage() {
           <tbody>
             {filteredItems.length > 0 ? (
               filteredItems.map((row, index) => (
-                <tr key={row.id} className="hover:bg-[#E1E6FF]">
+                <tr key={row.id} className="hover:bg-[#E1E6FF] text-[#475467]">
                   <td className="py-4 px-4 border-b border-gray-300">
                     {index + 1}
                   </td>
@@ -139,7 +139,7 @@ function ReturnPage() {
                   <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
                     <button
                       onClick={() => handleEdit(row.id)}
-                      className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                      className="flex items-center gap-1 px-2 py-1 bg-[#0E1680] text-white rounded text-sm"
                     >
                       <Edit size={16} />
                     </button>

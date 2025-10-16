@@ -451,7 +451,7 @@ const ProductForm = () => {
 
                 <div>
                   {current < STEP_COLORS.length - 1 && (
-                    <Button type="primary" onClick={next} icon={<RightOutlined />}>
+                    <Button style={{backgroundColor:"#0E1680"}} type="primary" onClick={next} icon={<RightOutlined />}>
                       Next
                     </Button>
                   )}

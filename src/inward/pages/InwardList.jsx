@@ -133,6 +133,7 @@ const InwardList = () => {
             onClick={() => openModal(record.items)}
           />
           <Button
+          style={{backgroundColor:"#0E1680"}}
             type="primary"
             icon={<EditOutlined />}
             onClick={() => navigate(`/inward/edit/${record.id}`)}
@@ -153,7 +154,7 @@ const InwardList = () => {
   return (
     <div className="p-4">
       <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/inward/add")}>
+        <Button  style={{backgroundColor:"#0E1680"}} type="primary" icon={<PlusOutlined />} onClick={() => navigate("/inward/add")}>
           Add Inward
         </Button>
         <Button type="default" onClick={exportPDF}>
@@ -191,7 +192,7 @@ const InwardList = () => {
 
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-            <thead className="bg-[#1C2244] text-white">
+            <thead className="bg-[#E5E7FB] text-white">
               <tr>
                 {[
                   "S.No",

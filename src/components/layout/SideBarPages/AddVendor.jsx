@@ -162,7 +162,7 @@ function AddVendor() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-[#1C2244] !text-white py-2 px-8 font-semibold rounded-md hover:opacity-90"
+            className="bg-[#0E1680] !text-white py-2 px-8 font-semibold rounded-md hover:opacity-90"
           >
             {loading ? "Saving..." : "Save"}
           </button>
