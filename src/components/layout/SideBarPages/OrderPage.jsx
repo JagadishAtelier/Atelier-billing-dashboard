@@ -1,150 +1,107 @@
-import { ChevronDown, Plus, Search, MoreVertical } from 'lucide-react';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import orderService from "./services/orderService";
 
 const columns = [
+  "S.No",
   "PO-No",
   "Vendor Name",
   "Order Date",
-  "Product Id",
   "Total Quantity",
   "Total Amount",
   "Tax Amount",
   "Status",
-  "Datails",
-  "Action"
-];
-
-const orders = [
-  {
-    po_no: "PO-001",
-    vendor_name: "A-One Traders",
-    order_date: "2025-10-10",
-    total_quantity: 120,
-    total_amount: 54000,
-    tax_amount: 2700,
-    status: "pending",
-    productId: "PROD-1"
-  },
-  {
-    po_no: "PO-002",
-    vendor_name: "Bright Supplies",
-    order_date: "2025-10-12",
-    total_quantity: 80,
-    total_amount: 41000,
-    tax_amount: 2050,
-    status: "completed",
-    productId: "PROD-2"
-  },
-  {
-    po_no: "PO-003",
-    vendor_name: "City Hardware",
-    order_date: "2025-10-13",
-    total_quantity: 60,
-    total_amount: 30500,
-    tax_amount: 1525,
-    status: "approval",
-    productId: "PROD-3"
-  },
-  {
-    po_no: "PO-004",
-    vendor_name: "Delta Enterprises",
-    order_date: "2025-10-13",
-    total_quantity: 200,
-    total_amount: 105000,
-    tax_amount: 5250,
-    status: "cancelled",
-    productId: "PROD-4"
-  },
+  "Details",
+  "Actions",
 ];
 
 function OrderPage() {
-  const [dropDownOpen, setDropDownOpen] = useState(false);
+  const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [actionMenu, setActionMenu] = useState(null); // Track which row’s menu is open
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
-  // Filter orders by search term
-  const filteredOrders = orders.filter(
-    (order) =>
-      order.po_no.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.vendor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // 🔹 Fetch Orders
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        search: searchTerm,
+        page,
+        limit: 10,
+      };
 
-  const handleEdit = (order) => {
-    navigate(`/order/edit/${order.po_no}`);
+      const response = await orderService.getAll(params);
+      setOrders(response.data || []);
+      setTotalPages(response.meta?.total_pages || 1);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (order) => {
-    if (window.confirm(`Are you sure you want to delete order ${order.po_no}?`)) {
-      console.log("Deleted:", order.po_no);
-      // Here you can call your API to delete the order
+  useEffect(() => {
+    fetchOrders();
+  }, [searchTerm, page]);
+
+  // 🔹 Handle Delete
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this order?")) {
+      try {
+        await orderService.remove(id);
+        fetchOrders(); // Refresh list
+      } catch (err) {
+        console.error("Error deleting order:", err);
+      }
     }
+  };
+
+  // 🔹 Handle Edit
+  const handleEdit = (id) => {
+    navigate(`/order/edit/${id}`);
+  };
+
+  // 🔹 Handle View Details
+  const handleViewDetails = (id) => {
+    navigate(`/order/view/${id}`);
   };
 
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between relative">
-        <div
-          className="relative flex items-center gap-2 cursor-pointer"
-          onClick={() => setDropDownOpen(!dropDownOpen)}
-        >
-          <p className="text-2xl font-semibold my-0">All Orders</p>
-          <div className="mt-2">
-            <ChevronDown />
-          </div>
+      <div className="flex items-center justify-between gap-4 mb-6">
+        {/* Search */}
+        <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
+          <Search size={16} className="text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search by PO, vendor, or status..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            }}
+            className="outline-none text-sm"
+          />
         </div>
 
-        {/* Search Dropdown */}
-        {dropDownOpen && (
-          <div className="absolute bg-white shadow-lg w-60 top-12 left-0 rounded-lg border border-gray-200 p-3 z-10">
-            <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
-              <Search size={16} className="text-gray-500" />
-              <input
-                type="text"
-                placeholder="Search orders..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full outline-none text-sm"
-              />
-            </div>
-
-            <div className="mt-2 max-h-48 overflow-y-auto">
-              {filteredOrders.length > 0 ? (
-                filteredOrders.map((order, i) => (
-                  <p
-                    key={i}
-                    className="p-2 hover:bg-[#E1E6FF] cursor-pointer rounded-md text-base"
-                    onClick={() => {
-                      setSearchTerm(order.vendor_name);
-                      setDropDownOpen(false);
-                    }}
-                  >
-                    {order.vendor_name}
-                  </p>
-                ))
-              ) : (
-                <p className="p-2 text-gray-500 text-sm">No results found</p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Add Order Button */}
+        {/* Add Order */}
         <div
           className="bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
           onClick={() => navigate("/order/add")}
         >
           <Plus size={16} />
-          <button>Add Order</button>
+          Add Order
         </div>
       </div>
 
-      {/* Orders Table */}
-      <div className="overflow-x-auto mt-10">
-        <table className="min-w-full bg-white border border-gray-200 rounded-lg relative">
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-200 rounded-lg">
           <thead className="bg-[#1C2244] text-white">
             <tr>
               {columns.map((col, idx) => (
@@ -158,23 +115,40 @@ function OrderPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.length > 0 ? (
-              filteredOrders.map((order, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-[#E1E6FF] border-b border-gray-300 relative"
-                >
-                  <td className="py-4 px-4 ">{order.po_no}</td>
-                  <td className="py-4 px-4 ">{order.vendor_name}</td>
-                  <td className="py-4 px-4 ">
-                    {new Date(order.order_date).toLocaleDateString()}
+            {loading ? (
+              <tr>
+                <td colSpan={columns.length} className="py-4 text-center">
+                  Loading...
+                </td>
+              </tr>
+            ) : orders.length > 0 ? (
+              orders.map((order, index) => (
+                <tr key={order.id} className="hover:bg-[#E1E6FF]">
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {(page - 1) * 10 + index + 1}
                   </td>
-                  <td className="py-4 px-4 ">{order.productId}</td>
-                  <td className="py-4 px-4 ">{order.total_quantity}</td>
-                  <td className="py-4 px-4 ">₹{order.total_amount}</td>
-                  <td className="py-4 px-4 ">₹{order.tax_amount}</td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {order.po_no || "-"}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {order.vendor_name || order.vendor?.name || "-"}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {order.order_date
+                      ? new Date(order.order_date).toLocaleDateString()
+                      : "-"}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    {order.total_quantity || 0}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    ₹{order.total_amount || 0}
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    ₹{order.tax_amount || 0}
+                  </td>
                   <td
-                    className={`py-4 px-4 capitalize font-medium ${
+                    className={`py-4 px-4 border-b border-gray-300 capitalize font-medium ${
                       order.status === "pending"
                         ? "text-yellow-600"
                         : order.status === "completed"
@@ -184,39 +158,29 @@ function OrderPage() {
                         : "text-blue-600"
                     }`}
                   >
-                    {order.status}
+                    {order.status || "-"}
                   </td>
-                  <td className="py-4 px-4 ">
-                        <p onClick={()=>navigate('/view-order-details')} className='bg-[#1C2244] text-white text-center py-1 rounded-sm text-xs font-semibold cursor-pointer'>View Details</p>
-                  </td>
-                  {/* Action Menu */}
-                  <td className="py-4 px-4 text-center relative">
-                    <div
-                      className="inline-block cursor-pointer"
-                      onClick={() =>
-                        setActionMenu(actionMenu === index ? null : index)
-                      }
+                  <td className="py-4 px-4 border-b border-gray-300">
+                    <button
+                      onClick={() => handleViewDetails(order.id)}
+                      className="bg-[#1C2244] text-white py-1 px-3 text-xs font-semibold rounded-sm hover:opacity-90"
                     >
-                      <MoreVertical size={20} />
-                    </div>
-
-                    {/* Dropdown for Edit/Delete */}
-                    {actionMenu === index && (
-                      <div className="absolute right-4 top-12 bg-white border border-gray-300 rounded-md shadow-md w-28 z-20">
-                        <p
-                          className="p-2 hover:bg-[#E1E6FF] cursor-pointer text-gray-800 text-sm"
-                          onClick={() => handleEdit(order)}
-                        >
-                          Edit
-                        </p>
-                        <p
-                          className="p-2 hover:bg-red-100 cursor-pointer text-red-600 text-sm"
-                          onClick={() => handleDelete(order)}
-                        >
-                          Delete
-                        </p>
-                      </div>
-                    )}
+                      View
+                    </button>
+                  </td>
+                  <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
+                    <button
+                      onClick={() => handleEdit(order.id)}
+                      className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                    >
+                      <Edit size={16} className="text-white" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(order.id)}
+                      className="flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded text-sm"
+                    >
+                      <Trash2 size={16} className="text-white" />
+                    </button>
                   </td>
                 </tr>
               ))
@@ -232,6 +196,27 @@ function OrderPage() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-3 mt-4">
+        <button
+          disabled={page <= 1}
+          onClick={() => setPage(page - 1)}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          disabled={page >= totalPages}
+          onClick={() => setPage(page + 1)}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
