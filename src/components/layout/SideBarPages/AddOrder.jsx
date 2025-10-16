@@ -72,9 +72,13 @@ function AddOrder() {
 
         form.setFieldsValue({
           vendor_id: orderData.vendor_id,
-          order_date: orderData.order_date ? dayjs(orderData.order_date) : null,
+          order_date: orderData.order_date
+            ? dayjs(orderData.order_date).format("YYYY-MM-DD")
+            : null,
+          status: orderData.status || "",
           items,
         });
+
 
         updateSummary(items, -1);
       } catch (err) {
@@ -143,7 +147,7 @@ function AddOrder() {
         order_date: values.order_date
           ? dayjs(values.order_date).toDate()
           : new Date(),
-        status: id ? undefined : "pending",
+        status: id ? values.status : "pending",
         items: formattedItems,
       };
 
@@ -155,7 +159,7 @@ function AddOrder() {
         message.success("Order created successfully");
       }
 
-      navigate("/order/list");
+      navigate("/order");
     } catch (err) {
       console.error("Save error:", err);
       message.error("Failed to save order");
@@ -209,7 +213,7 @@ function AddOrder() {
           <Space>
             <button
               className="bg-[#1C2244] !text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
-              onClick={() => navigate("/order/list")}
+              onClick={() => navigate("/order")}
             >
               Back to list
             </button>
@@ -256,6 +260,23 @@ function AddOrder() {
               />
             </Form.Item>
           </Col>
+          {id && (
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label="Status"
+                name="status"
+                rules={[{ required: true, message: "Please select status" }]}
+              >
+                <select className="w-full outline-none text-sm border border-gray-300 py-4 px-4 rounded-md bg-white">
+                  <option value="">Select Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </Form.Item>
+            </Col>
+          )}
 
           {/* Product Code Input */}
           <Col xs={24}>
