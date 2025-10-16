@@ -1,7 +1,8 @@
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import { Plus, Search, Sliders, Edit, Trash2 } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import orderService from "./services/orderService";
+import vendorService from "./services/vendorService";
 
 const columns = [
   "S.No",
@@ -18,13 +19,19 @@ const columns = [
 
 function OrderPage() {
   const [orders, setOrders] = useState([]);
+  const [vendors, setVendors] = useState([]);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [vendorFilter, setVendorFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const navigate = useNavigate();
 
-  // 🔹 Fetch Orders
+  const navigate = useNavigate();
+  const filterRef = useRef();
+
+  // 🔹 Fetch orders with filters
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -33,6 +40,8 @@ function OrderPage() {
         page,
         limit: 10,
       };
+      if (vendorFilter) params.vendor_id = vendorFilter;
+      if (statusFilter) params.status = statusFilter;
 
       const response = await orderService.getAll(params);
       setOrders(response.data || []);
@@ -44,16 +53,50 @@ function OrderPage() {
     }
   };
 
+  // 🔹 Fetch vendors for filter dropdown
+  const fetchVendors = async () => {
+    try {
+      const res = await vendorService.getAll();
+      setVendors(res?.data || res || []);
+    } catch (err) {
+      console.error("Error fetching vendors:", err);
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
-  }, [searchTerm, page]);
+  }, [searchTerm, vendorFilter, statusFilter, page]);
+
+  useEffect(() => {
+    fetchVendors();
+  }, []);
+
+  // 🔹 Reset filters
+  const resetFilters = () => {
+    setVendorFilter("");
+    setStatusFilter("");
+    setSearchTerm("");
+    setPage(1);
+    setFilterOpen(false);
+  };
+
+  // 🔹 Close filter popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) {
+        setFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // 🔹 Handle Delete
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this order?")) {
       try {
         await orderService.remove(id);
-        fetchOrders(); // Refresh list
+        fetchOrders();
       } catch (err) {
         console.error("Error deleting order:", err);
       }
@@ -74,19 +117,92 @@ function OrderPage() {
     <div>
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6">
-        {/* Search */}
-        <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
-          <Search size={16} className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search by PO, vendor, or status..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(1);
-            }}
-            className="outline-none text-sm"
-          />
+        {/* Search + Filter */}
+        <div className="flex items-center gap-2 relative">
+          <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
+            <Search size={16} className="text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search by PO, vendor, or status..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+              className="outline-none text-sm"
+            />
+          </div>
+
+          {/* Filter button */}
+          <button
+            onClick={() => setFilterOpen(!filterOpen)}
+            className="flex items-center gap-1 border border-gray-300 rounded-md px-2 py-1 text-sm bg-white"
+          >
+            <Sliders size={16} />
+            Filter
+          </button>
+
+          {/* Filter popup */}
+          {filterOpen && (
+            <div
+              ref={filterRef}
+              className="absolute top-10 left-0 bg-white border border-gray-300 rounded-md p-4 shadow-lg z-50 w-64"
+            >
+              {/* Vendor Filter */}
+              <div className="mb-2">
+                <label className="text-sm font-medium">Vendor:</label>
+                <select
+                  value={vendorFilter}
+                  onChange={(e) => {
+                    setVendorFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
+                >
+                  <option value="">All Vendors</option>
+                  {vendors.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.vendor_name || v.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Status Filter */}
+              <div className="mb-2">
+                <label className="text-sm font-medium">Status:</label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => {
+                    setStatusFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
+                >
+                  <option value="">All</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-2 mt-2">
+                <button
+                  onClick={() => setFilterOpen(false)}
+                  className="px-3 py-1 bg-gray-200 rounded text-sm"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={resetFilters}
+                  className="px-3 py-1 bg-red-500 text-white rounded text-sm"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Add Order */}
@@ -163,7 +279,7 @@ function OrderPage() {
                   <td className="py-4 px-4 border-b border-gray-300">
                     <button
                       onClick={() => handleViewDetails(order.id)}
-                      className="bg-[#1C2244] text-white py-1 px-3 text-xs font-semibold rounded-sm hover:opacity-90"
+                      className="bg-[#1C2244] !text-white py-1 px-3 text-xs font-semibold rounded-sm hover:opacity-90"
                     >
                       View
                     </button>
