@@ -21,6 +21,8 @@ import {
   Badge,
 } from "antd";
 import inwardService from "../service/inwardService";
+import orderService from "../../components/layout/SideBarPages/services/orderService";
+import vendorService from "../../components/layout/SideBarPages/services/vendorService";
 import productService from "../../Product/services/productService";
 import dayjs from "dayjs";
 
@@ -41,6 +43,51 @@ const InwardForm = () => {
     value: 0,
     lastAddedIndex: -1,
   });
+
+  // purchase orders list for selector
+  const [purchaseOrders, setPurchaseOrders] = useState([]);
+  const [poLoading, setPoLoading] = useState(false);
+
+  // vendors for vendor select
+  const [vendors, setVendors] = useState([]);
+  const [vendorsLoading, setVendorsLoading] = useState(false);
+
+  /** 🔹 Fetch purchase orders on mount (for selector) */
+  useEffect(() => {
+    const fetchPOs = async () => {
+      setPoLoading(true);
+      try {
+        const res = await orderService.getAll({ limit: 100, page: 1 });
+        const data = res?.data ?? res;
+        setPurchaseOrders(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to load purchase orders:", err);
+        setPurchaseOrders([]);
+      } finally {
+        setPoLoading(false);
+      }
+    };
+
+    fetchPOs();
+  }, []);
+
+  /** 🔹 Fetch vendors for vendor select */
+  useEffect(() => {
+    const fetchVendors = async () => {
+      setVendorsLoading(true);
+      try {
+        const res = await vendorService.getAll();
+        const data = res?.data ?? res;
+        setVendors(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to load vendors:", err);
+        setVendors([]);
+      } finally {
+        setVendorsLoading(false);
+      }
+    };
+    fetchVendors();
+  }, []);
 
   /** 🔹 Add product by code (unchanged logic) */
   const handleProductCode = async (e) => {
@@ -76,7 +123,7 @@ const InwardForm = () => {
           product_code: product.product_code,
           product_name: product.product_name,
           quantity: 1,
-          unit_price: product.purchase_price || 0,
+          unit_price: Number(product.purchase_price) || 0,
           unit: product.unit || "",
           expiry_date: null,
         });
@@ -90,18 +137,123 @@ const InwardForm = () => {
     }
   };
 
-  /** 🔹 Submit Handler (unchanged) */
+  /** 🔹 When a purchase order is selected: fetch its details and populate form */
+  const handleSelectPO = async (poId) => {
+    if (!poId) {
+      // clear supplier, vendor and items
+      form.setFieldsValue({
+        supplier_name: "",
+        items: [],
+        order_id: undefined,
+        vendor_id: undefined,
+      });
+      updateSummary([], -1);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await orderService.getById(poId);
+      const orderData = res?.data ?? res;
+
+      if (!orderData) {
+        message.error("Selected PO not found");
+        setLoading(false);
+        return;
+      }
+
+      // map order items to form item structure
+      const mappedItems = (orderData.items || []).map((it) => ({
+        product_id: it.product_id,
+        product_code: it.product?.product_code || "",
+        product_name: it.product?.product_name || "",
+        // prefer pending_quantity if available (inward typically receive pending)
+        quantity: Number(it.pending_quantity ?? it.quantity ?? 0),
+        unit_price: Number(it.unit_price ?? it.product?.purchase_price ?? 0),
+        unit: it.product?.unit || "",
+        expiry_date: null,
+      }));
+
+      // set supplier_name from vendor if available
+      const supplierName = orderData.vendor?.name || orderData.vendor_id || "";
+
+      // set received_date to order date (or you can set to today)
+      const receivedDate = orderData.order_date ? dayjs(orderData.order_date) : null;
+
+      // set the fields: include order_id and vendor_id so payload will contain them
+      form.setFieldsValue({
+        supplier_name: supplierName,
+        received_date: receivedDate,
+        items: mappedItems,
+        order_id: orderData.id,
+        vendor_id: orderData.vendor?.id ?? orderData.vendor_id ?? undefined,
+      });
+
+      updateSummary(mappedItems, mappedItems.length - 1);
+    } catch (err) {
+      console.error("Failed to fetch PO details:", err);
+      message.error("Failed to load purchase order details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /** 🔹 Submit Handler (send payload matching DTO: vendor_id + inward_items) */
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
+      // Ensure vendor_id exists (server requires it)
+      const vendorId = values.vendor_id;
+      if (!vendorId) {
+        message.error(
+          "Unable to save: vendor is required. Select a Purchase Order or select a Vendor."
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Map form .items -> server expected inward_items shape
+      const items = (values.items || []).map((it) => {
+        const mapped = {
+          product_id: it.product_id,
+          quantity: Number(it.quantity || 0),
+          unit_price: Number(it.unit_price || 0),
+        };
+
+        // optional fields only when present
+        if (it.unit) mapped.unit = String(it.unit);
+        if (it.total_price !== undefined) mapped.total_price = Number(it.total_price);
+        if (it.batch_number) mapped.batch_number = String(it.batch_number);
+        if (it.unused_quantity !== undefined) mapped.unused_quantity = Number(it.unused_quantity);
+        if (it.excess_quantity !== undefined) mapped.excess_quantity = Number(it.excess_quantity);
+
+        // expiry_date: convert Dayjs/Date to ISO string when present
+        if (it.expiry_date) {
+          try {
+            mapped.expiry_date = typeof it.expiry_date === "string"
+              ? it.expiry_date
+              : it.expiry_date.toISOString();
+          } catch (e) {
+            // ignore invalid expiry_date
+          }
+        }
+
+        return mapped;
+      });
+
+      // Build payload following DTO names
       const payload = {
-        supplier_name: values.supplier_name,
+        order_id: values.order_id || undefined,
+        vendor_id: vendorId,
+        supplier_name: values.supplier_name || undefined,
         received_date: values.received_date
-          ? dayjs(values.received_date).toDate()
-          : new Date(),
-        remarks: values.remarks,
-        status: values.status,
-        items: values.items || [],
+          ? (typeof values.received_date === "string" ? values.received_date : values.received_date.toISOString())
+          : undefined,
+        supplier_invoice: values.supplier_invoice || undefined,
+        total_amount: values.total_amount !== undefined ? Number(values.total_amount) : undefined,
+        total_quantity: values.total_quantity !== undefined ? Number(values.total_quantity) : undefined,
+        status: values.status || "pending",
+        items,
       };
 
       await inwardService.create(payload);
@@ -109,7 +261,16 @@ const InwardForm = () => {
       navigate("/inward/list");
     } catch (err) {
       console.error("Save error:", err);
-      message.error("Failed to save inward entry");
+      if (err?.response?.data) {
+        console.error("Server response:", err.response.data);
+        const serverMsg =
+          err.response.data.message ||
+          err.response.data.error ||
+          (typeof err.response.data === "string" ? err.response.data : null);
+        message.error(serverMsg || "Failed to save inward entry");
+      } else {
+        message.error("Failed to save inward entry");
+      }
     } finally {
       setLoading(false);
     }
@@ -137,8 +298,6 @@ const InwardForm = () => {
   // Called whenever any form value changes — keeps right column live
   const onValuesChange = (_, allValues) => {
     const items = allValues.items || [];
-    // lastAddedIndex remains -1 here because we only know additions via handleProductCode.
-    // But if you want the last changed index, you'd need more logic; keeping -1 is safe.
     updateSummary(items, -1);
   };
 
@@ -262,13 +421,71 @@ const InwardForm = () => {
                 onValuesChange={onValuesChange}
               >
                 <Row gutter={12}>
+                  {/* NEW: Purchase Order selector (optional) */}
+                  <Col xs={24} sm={12}>
+                    <Form.Item label="Purchase Order" name="order_id">
+                      <Select
+                        allowClear
+                        placeholder="Select purchase order (optional)"
+                        loading={poLoading}
+                        showSearch
+                        optionFilterProp="children"
+                        onChange={(value) => handleSelectPO(value)}
+                        filterOption={(input, option) =>
+                          (option?.children ?? "").toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                      >
+                        {purchaseOrders.map((po) => (
+                          <Option key={po.id} value={po.id}>
+                            {po.po_no} {po.vendor?.name ? `— ${po.vendor.name}` : ""}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  {/* NEW: Vendor select (required when PO not selected) */}
+                  <Col xs={24} sm={12}>
+                    <Form.Item
+                      label="Vendor"
+                      name="vendor_id"
+                      rules={[
+                        {
+                          validator: (_, value) => {
+                            const orderId = form.getFieldValue("order_id");
+                            if (!orderId && !value) {
+                              return Promise.reject(
+                                new Error("Please select a Vendor or select a Purchase Order")
+                              );
+                            }
+                            return Promise.resolve();
+                          },
+                        },
+                      ]}
+                    >
+                      <Select
+                        placeholder="Select vendor (or choose PO to auto-fill)"
+                        loading={vendorsLoading}
+                        showSearch
+                        optionFilterProp="children"
+                        allowClear
+                      >
+                        {vendors.map((v) => (
+                          <Option key={v.id} value={v.id}>
+                            {v.name || v.vendor_name}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
                   <Col xs={24} sm={12}>
                     <Form.Item
                       label="Supplier Name"
                       name="supplier_name"
-                      rules={[{ required: true, message: "Please enter supplier name" }]}
+                      // supplier_name is optional now; vendor_id is authoritative
                     >
-                      <Input placeholder="Enter supplier name" />
+                      <Input placeholder="Enter supplier name (optional if vendor selected)" />
                     </Form.Item>
                   </Col>
 
@@ -286,7 +503,8 @@ const InwardForm = () => {
                     <Form.Item label="Status" name="status">
                       <Select>
                         <Option value="pending">Pending</Option>
-                        <Option value="received">Received</Option>
+                        <Option value="completed">Completed</Option>
+                        <Option value="cancelled">Cancelled</Option>
                       </Select>
                     </Form.Item>
                   </Col>
@@ -296,7 +514,7 @@ const InwardForm = () => {
                       <Input
                         placeholder="Scan or type code, press Enter"
                         onPressEnter={(e) => {
-                          e.preventDefault(""); 
+                          e.preventDefault("");
                           handleProductCode(e); // only add/update product
                         }}
                         allowClear
@@ -381,7 +599,7 @@ const InwardForm = () => {
                                 {isLast ? <Badge status="success" text={item.product_name || item.product_code} /> : (item.product_name || item.product_code)}
                               </div>
                               <div style={{ minWidth: 110, textAlign: "right" }}>
-                                <Text>{(item.quantity || 0)} × {(item.unit_price || 0).toFixed ? (item.unit_price || 0).toFixed(2) : item.unit_price}</Text>
+                                <Text>{(item.quantity || 0)} × {typeof item.unit_price === "number" ? item.unit_price.toFixed(2) : item.unit_price}</Text>
                               </div>
                             </div>
                           }
