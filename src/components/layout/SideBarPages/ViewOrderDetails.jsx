@@ -1,6 +1,6 @@
 import React from 'react'
 import logo from '../../assets/Company_logo1.png'
-import { Minus } from 'lucide-react'
+import { FileText, Minus } from 'lucide-react'
 
 const columns = [
   "Product Id",
@@ -55,7 +55,16 @@ const orders = [
 
 function ViewOrderDetails() {
   return (
-    <div className='bg-[#F7F8FC] min-h-screen'>
+    <div>
+              {/* Add Order Button */}
+        <div
+          className=" text-black border border-gray-400 py-3 my-5  px-6 w-fit font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer ms-auto"
+          onClick={() => navigate("/order/add")}
+        >
+          <FileText/>
+          <button>Add Order</button>
+        </div>
+    <div className='bg-[#F7F8FC]'>
       {/* HEADER */}
       <div className='bg-[#1C2244] p-6 md:p-10 lg:p-24 text-white'>
         <div className='flex flex-col lg:flex-row justify-between items-center gap-6 lg:gap-0'>
@@ -133,25 +142,48 @@ function ViewOrderDetails() {
         </div>
 
         {/* SUMMARY SECTION */}
-        <div className='flex flex-col gap-2 w-[90%] md:w-[82%] mx-auto mt-5'>
-          <div className='flex flex-col sm:flex-row gap-2 sm:gap-3 ms-auto text-right'>
+        <div className='flex flex-col gap-2 w-[90%] lg:w-[67%] mx-auto mt-5'>
+          <div className='flex flex-row gap-2 sm:gap-3 ms-auto text-right'>
             <p className='font-semibold text-base md:text-lg'>Sub Total :</p>
             <p className='font-semibold text-base md:text-lg'>₹ 50,000</p>
           </div>
-          <div className='flex flex-col sm:flex-row gap-2 sm:gap-3 ms-auto text-right'>
+          <div className='flex flex-row gap-2 sm:gap-3 ms-auto text-right'>
             <p className='font-semibold text-base md:text-lg'>Total Tax :</p>
             <p className='font-semibold text-base md:text-lg'>₹ 38,000</p>
           </div>
         </div>
 
         {/* GRAND TOTAL */}
-        <div className='w-[95%] md:w-[93%] mx-auto mt-4'>
+        <div className='w-[95%] lg:w-[70%] mx-auto mt-4'>
           <div className='bg-[#1C2244] text-white py-4 px-5 md:py-5 md:px-6 font-semibold flex items-center justify-start gap-2 rounded-md w-fit ms-auto'>
             <p className='text-base md:text-lg'>Total :</p>
             <p className='text-base md:text-lg'>₹ 88,000</p>
           </div>
         </div>
+
+        {/* NOTES */}
+        <div className='lg:px-20 px-3'>
+          <p className='text-lg font font-semibold mt-10 mb-5'>Notes</p>
+          <ul className='ms-5 list-disc list-inside'>
+            <li className='text-base mb-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+            <li className='text-base mb-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+            <li className='text-base mb-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+            <li className='text-base mb-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+            <li className='text-base mb-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+          </ul>
+        </div>
+
+      {/* Signature */}
+      <div className='flex justify-between lg:px-20 px-3 mt-40'>
+        <div>
+          <p>Manager Signature</p>
+        </div>
+        <div>
+          <p>Client Signature</p>
+        </div>
       </div>
+      </div>
+    </div>
     </div>
   )
 }
