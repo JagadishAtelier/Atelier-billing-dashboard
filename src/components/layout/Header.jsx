@@ -111,7 +111,7 @@ const HeaderBar = ({ collapsed /* this is optional */ }) => {
           style={{ height: 36, width: "auto", cursor: "pointer" }}
           onClick={() => navigate("/dashboard")}
         />
-        <div style={{ color: "#011D4A", fontWeight: 700 }}>Atelier Portal</div>
+        <div style={{ color: "#011D4A", fontWeight: 700 }}>Portal</div>
       </div>
 
       {/* Right side: notifications + user */}

@@ -67,7 +67,7 @@ function AddOrder() {
           quantity: Number(it.quantity || 0),
           unit_price: Number(it.unit_price || 0),
           unit: it.product?.unit || "",
-          expiry_date: it.expiry_date ? dayjs(it.expiry_date) : null,
+          isManual: false,
         }));
 
         form.setFieldsValue({
@@ -78,7 +78,6 @@ function AddOrder() {
           status: orderData.status || "",
           items,
         });
-
 
         updateSummary(items, -1);
       } catch (err) {
@@ -120,7 +119,7 @@ function AddOrder() {
           quantity: 1,
           unit_price: Number(product.purchase_price) || 0,
           unit: product.unit || "",
-          expiry_date: null,
+          isManual: false,
         });
       }
 
@@ -132,15 +131,54 @@ function AddOrder() {
     }
   };
 
+  /** Add manual product row */
+  const handleAddManualProduct = () => {
+    const items = form.getFieldValue("items") || [];
+    items.push({
+      product_id: null,
+      product_code: "",
+      product_name: "",
+      quantity: 1,
+      unit_price: 0,
+      unit: "",
+      isManual: true, // 🔹 flag to mark manually added item
+    });
+    form.setFieldsValue({ items });
+    updateSummary(items, items.length - 1);
+  };
+
   /** Submit order */
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const formattedItems = (values.items || []).map((item) => ({
-        ...item,
-        quantity: Number(item.quantity || 0),
-        unit_price: Number(item.unit_price || 0),
-      }));
+      let formattedItems = [];
+
+      for (const item of values.items || []) {
+        // If product added manually, create it in DB first
+        let productId = item.product_id;
+
+        if (item.isManual) {
+          if (!item.product_name || !item.unit_price || !item.unit) {
+            message.error("Please fill all product details for manual items");
+            setLoading(false);
+            return;
+          }
+
+          const newProduct = await productService.create({
+            product_name: item.product_name,
+            purchase_price: item.unit_price,
+            unit: item.unit,
+          });
+
+          productId = newProduct?.data?.id || newProduct?.id;
+        }
+
+        formattedItems.push({
+          product_id: productId,
+          quantity: Number(item.quantity || 0),
+          unit_price: Number(item.unit_price || 0),
+        });
+      }
 
       const payload = {
         vendor_id: values.vendor_id,
@@ -206,7 +244,7 @@ function AddOrder() {
           <Text type="secondary">
             {id
               ? "Update order details"
-              : "Create Order entries quickly using product codes"}
+              : "Create Order entries quickly using product codes or manually"}
           </Text>
         </Col>
         <Col>
@@ -260,6 +298,7 @@ function AddOrder() {
               />
             </Form.Item>
           </Col>
+
           {id && (
             <Col xs={24} sm={12}>
               <Form.Item
@@ -292,6 +331,14 @@ function AddOrder() {
                 }}
               />
             </Form.Item>
+
+            <Button
+              type="dashed"
+              style={{ width: "100%", marginBottom: 10 }}
+              onClick={handleAddManualProduct}
+            >
+              + Add Product Manually
+            </Button>
           </Col>
 
           {/* Items Table */}
@@ -299,6 +346,7 @@ function AddOrder() {
             <Divider style={{ margin: "8px 0 16px 0" }} />
             <Form.List name="items">
               {(fields, { remove }) => {
+                const items = form.getFieldValue("items") || [];
                 const columns = [
                   {
                     title: "Product Code",
@@ -308,7 +356,8 @@ function AddOrder() {
                       <Form.Item name={[index, "product_code"]} style={{ margin: 0 }}>
                         <input
                           className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-gray-100"
-                          disabled
+                          disabled={items[index]?.isManual} // 🔹 disable if manual
+                          placeholder="Auto / Scanned"
                         />
                       </Form.Item>
                     ),
@@ -318,10 +367,14 @@ function AddOrder() {
                     dataIndex: "product_name",
                     key: "product_name",
                     render: (_, record, index) => (
-                      <Form.Item name={[index, "product_name"]} style={{ margin: 0 }}>
+                      <Form.Item
+                        name={[index, "product_name"]}
+                        rules={[{ required: true, message: "Enter product name" }]}
+                        style={{ margin: 0 }}
+                      >
                         <input
-                          className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-gray-100"
-                          disabled
+                          className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-white"
+                          placeholder="Enter name"
                         />
                       </Form.Item>
                     ),
@@ -359,8 +412,15 @@ function AddOrder() {
                     dataIndex: "unit",
                     key: "unit",
                     render: (_, record, index) => (
-                      <Form.Item name={[index, "unit"]} style={{ margin: 0 }}>
-                        <input className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-white" />
+                      <Form.Item
+                        name={[index, "unit"]}
+                        rules={[{ required: true, message: "Enter unit" }]}
+                        style={{ margin: 0 }}
+                      >
+                        <input
+                          className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-white"
+                          placeholder="pcs / kg / box"
+                        />
                       </Form.Item>
                     ),
                   },
@@ -383,7 +443,6 @@ function AddOrder() {
                   },
                 ];
 
-                const items = form.getFieldValue("items") || [];
                 return (
                   <Table
                     dataSource={items.map((item, idx) => ({ ...item, key: idx }))}
