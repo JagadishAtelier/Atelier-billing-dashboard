@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./Login.css";
 import logo from "../components/assets/Company_logo.png";
+import login from "../components/assets/login_image.jpg";
+
 import x_logo from "../components/assets/Dark Logo.png";
 import { FaEnvelope, FaEye, FaEyeSlash, FaPhone } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -151,14 +153,15 @@ const Login = () => {
     <div className="login-container">
       <div className="login-left">
         <div className="welcome-container">
-          <h3 className="welcome-heading">
+          <img src={login} alt="Company Logo" className="logo" width={900} style={{borderRadius:"20px"}} />
+          {/* <h3 className="welcome-heading">
             Welcome to &nbsp;
             <img src={x_logo} alt="XTOWN" />
             Atelier..!
           </h3>
           <span className="welcome-tagline">
             We’re here to turn your ideas into reality.
-          </span>
+          </span> */}
         </div>
       </div>
 
