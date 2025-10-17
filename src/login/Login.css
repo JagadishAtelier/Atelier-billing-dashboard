@@ -18,7 +18,7 @@
 /* Left section for the logo */
 .login-left {
     flex: 2.5;
-    background: radial-gradient(circle,#0057ff 15%,#6195ff 65%,#e3edff 100%);
+    background: radial-gradient(circle,#e3edff 15%,#6195ff 65%,#0057ff 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -39,7 +39,7 @@
 .welcome-heading {
     font-weight: bolder;
     font-size: 36px;
-    color: #ffffff;
+    color: #000;
     /* margin-bottom: 10px; */
     text-align: left;
     display: flex;
@@ -68,7 +68,7 @@
 /* Tagline styling */
 .welcome-tagline {
     font-size: 18px;
-    color: #ffffff;
+    color: #000;
     line-height: 1.2;
 }
 
