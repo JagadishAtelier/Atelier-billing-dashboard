@@ -71,7 +71,7 @@ const LatestPayments = ({ payments, filterKey, setFilterKey, searchQ, setSearchQ
     };
 
     return (
-        <Card size="small" title={<div style={{ fontWeight: 700 }}>Latest Payments</div>} extra={
+        <Card size="small" title={<div style={{ fontWeight: 400 }}>Latest Payments</div>} extra={
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <Input
                     placeholder="Search payment or customer"

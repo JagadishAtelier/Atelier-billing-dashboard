@@ -1,15 +1,19 @@
+// Header.jsx
 import React, { useEffect, useState } from "react";
-import {
-  LogoutOutlined,
-  UserOutlined,
-  BellFilled,
-} from "@ant-design/icons";
-import { Dropdown, message, Menu, Popover, Badge, List, Avatar } from "antd";
+import { Popover, Dropdown, List, Avatar, message } from "antd";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import { Bell, User, LogOut, ChevronDown } from "lucide-react";
+import { motion } from "framer-motion";
 import companyLogo from "../assets/Company_logo.png";
 
-const HeaderBar = ({ collapsed /* this is optional */ }) => {
+/**
+ * Header.jsx
+ * - Matches the visual style used by Sidebar
+ * - Keeps AntD Popover & Dropdown for notifications & user menu
+ */
+
+const HeaderBar = ({ collapsed /* optional */ }) => {
   const { theme, headerBgColor, headerGradient } = useTheme();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -20,6 +24,37 @@ const HeaderBar = ({ collapsed /* this is optional */ }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const recentBills = [
+    { id: 1, customer: "John Doe", amount: 1280.5 },
+    { id: 2, customer: "Alice Rao", amount: 560.0 },
+    { id: 3, customer: "Mohan Kumar", amount: 2300.75 },
+  ];
+
+  const notificationContent = (
+    <div style={{ minWidth: 300 }}>
+      <div style={{ padding: 12, fontWeight: 600 }}>Recent bills</div>
+      <List
+        size="small"
+        dataSource={recentBills}
+        renderItem={(item) => (
+          <List.Item key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: 10 }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <Avatar style={{ backgroundColor: "#eef2ff", color: "#3730a3" }}>{item.customer.charAt(0)}</Avatar>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>{item.customer}</div>
+                <div style={{ fontSize: 12, color: "#6b7280" }}>Recent bill</div>
+              </div>
+            </div>
+            <div style={{ fontWeight: 700 }}>₹{item.amount.toFixed(2)}</div>
+          </List.Item>
+        )}
+      />
+      <div style={{ textAlign: "center", padding: 8, borderTop: "1px solid #f3f4f6" }}>
+        <a onClick={() => message.info("Open all notifications")}>View all</a>
+      </div>
+    </div>
+  );
+
   const handleMenuClick = ({ key }) => {
     if (key === "logout") {
       message.success("Logged out");
@@ -29,130 +64,66 @@ const HeaderBar = ({ collapsed /* this is optional */ }) => {
     }
   };
 
-  // user menu (AntD Menu)
   const userMenu = (
-    <Menu
-      items={[
-        {
-          key: "profile",
-          icon: <UserOutlined />,
-          label: "Profile",
-        },
-        {
-          key: "logout",
-          icon: <LogoutOutlined />,
-          label: "Logout",
-          danger: true,
-        },
-      ]}
-      onClick={handleMenuClick}
-    />
-  );
-
-  // Dummy recent bills for notifications
-  const recentBills = [
-    { id: 1, customer: "John Doe", amount: 1280.5 },
-    { id: 2, customer: "Alice Rao", amount: 560.0 },
-    { id: 3, customer: "Mohan Kumar", amount: 2300.75 },
-  ];
-
-  const notificationContent = (
-    <div style={{ minWidth: 280 }}>
-      <List
-        size="small"
-        dataSource={recentBills}
-        renderItem={(item) => (
-          <List.Item
-            style={{ display: "flex", justifyContent: "space-between", padding: 8 }}
-            key={item.id}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Avatar style={{ backgroundColor: "#f0f2f5", color: "#000" }}>
-                {item.customer.charAt(0)}
-              </Avatar>
-              <div>
-                <div style={{ fontSize: 13 }}>{item.customer}</div>
-                <div style={{ fontSize: 11, color: "#888" }}>Recent bill</div>
-              </div>
-            </div>
-            <div style={{ fontWeight: 700 }}>₹{item.amount.toFixed(2)}</div>
-          </List.Item>
-        )}
-      />
-      <div style={{ textAlign: "center", padding: 8, borderTop: "1px solid #f0f0f0" }}>
-        <a onClick={() => message.info("Open all notifications")}>View all</a>
-      </div>
+    <div style={{ width: 180, background: "#fff", borderRadius: 8, boxShadow: "0 8px 20px rgba(2,6,23,0.08)", overflow: "hidden" }}>
+      <button onClick={() => handleMenuClick({ key: "profile" })} style={{ display: "flex", gap: 8, alignItems: "center", width: "100%", padding: "10px 12px", border: "none", background: "transparent", cursor: "pointer" }}>
+        <User style={{ width: 16, height: 16 }} />
+        <span style={{ fontSize: 14 }}>Profile</span>
+      </button>
+      <div style={{ height: 1, background: "rgba(0,0,0,0.04)" }} />
+      <button onClick={() => handleMenuClick({ key: "logout" })} style={{ display: "flex", gap: 8, alignItems: "center", width: "100%", padding: "10px 12px", border: "none", background: "transparent", color: "#dc2626", cursor: "pointer" }}>
+        <LogOut style={{ width: 16, height: 16 }} />
+        <span style={{ fontSize: 14 }}>Logout</span>
+      </button>
     </div>
   );
 
   const isGradient = headerGradient && headerGradient.includes("gradient");
-  const headerStyle = isGradient
-    ? { background: headerGradient }
-    : { backgroundColor: headerBgColor || "#ffffff" };
-
-  const textColor = theme === "dark" || isGradient ? "#fff" : "#000";
+  const headerStyle = isGradient ? { background: headerGradient } : { backgroundColor: "transparent" };
+  const textColor = theme === "dark" || isGradient ? "#fff" : "#011D4A";
 
   return (
-    <div
-      className="flex justify-between items-center h-14 px-4 py-2 "
+    <header
       style={{
-        // ...headerStyle,
-        backgroundColor:"white",
-        position: "sticky",
+        ...headerStyle,
+        height: 56,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 16px",
+        position: "fixed",
         top: 0,
-        zIndex: 1000,
+        left: collapsed ? 100 : 320,
+        right: 0,
+        zIndex: 100,
       }}
     >
-      {/* Left side: Logo */}
-      <div className="flex items-center gap-3">
-        <img
-          src={companyLogo}
-          alt="Logo"
-          style={{ height: 36, width: "auto", cursor: "pointer" }}
-          onClick={() => navigate("/dashboard")}
-        />
-        <div style={{ color: "#011D4A", fontWeight: 700 }}>Portal</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        
       </div>
 
-      {/* Right side: notifications + user */}
-      <div className="flex items-center gap-4">
-        {/* Notifications */}
-        <Popover
-          content={notificationContent}
-          trigger="click"
-          placement="bottomRight"
-        >
-          <Badge count={recentBills.length}>
-            <div
-              className="cursor-pointer p-2 rounded-full"
-              style={{
-                background: theme === "dark" ? "#374151" : "#f3f4f6",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <BellFilled style={{ fontSize: 18, color: textColor }} />
-            </div>
-          </Badge>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <Popover content={notificationContent} trigger="click" placement="bottomRight">
+          <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.96 }} aria-label="Notifications" style={{ position: "relative", padding: 8, borderRadius: 9999, background: theme === "dark" ? "#374151" : "#f3f4f6", border: "none", cursor: "pointer" }}>
+            <Bell style={{ width: 20, height: 20, color: textColor }} />
+            <span style={{ position: "absolute", top: -6, right: -6, minWidth: 18, height: 18, padding: "0 5px", borderRadius: 9999, background: "#ef4444", color: "#fff", fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.12)" }}>
+              {recentBills.length}
+            </span>
+          </motion.button>
         </Popover>
 
-        {/* User dropdown */}
         <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
-          <div
-            className="cursor-pointer p-2 rounded-full"
-            style={{
-              background: theme === "dark" ? "#374151" : "#f3f4f6",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <UserOutlined style={{ fontSize: 18, color: textColor }} />
-          </div>
+          <motion.button whileHover={{ scale: 1.03 }} style={{ display: "flex", gap: 10, alignItems: "center", padding: 6, borderRadius: 10, background: theme === "dark" ? "#374151" : "#f3f4f6", border: "none", cursor: "pointer" }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#3b82f6,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700 }}>JD</div>
+            <div style={{ display: isMobile ? "none" : "flex", flexDirection: "column", alignItems: "flex-start" }}>
+              <span style={{ color: textColor, fontWeight: 700, fontSize: 14 }}>John Doe</span>
+              <span style={{ color: theme === "dark" ? "#9CA3AF" : "#6B7280", fontSize: 12 }}>Super Admin</span>
+            </div>
+            <ChevronDown style={{ width: 16, height: 16, color: "#9ca3af" }} />
+          </motion.button>
         </Dropdown>
       </div>
-    </div>
+    </header>
   );
 };
 

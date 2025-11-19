@@ -23,6 +23,8 @@ import ReturnPage from "./ReturnPage/ReturnPage";
 import AddReturn from "./ReturnPage/AddReturn"
 import ReportPage from "./ReportPage/ReportPage";
 import ViewReturn from "./ReturnPage/ViewReturn";
+import AIAnalytics from "./components/layout/SideBarPages/AIAnalytics";
+import CRMModule from "./components/layout/SideBarPages/CRMModule";
 // import master from "./components/assets/cloud.png";
 const routeModules = import.meta.glob("./*/AppRoutes.jsx", { eager: true });
 
@@ -233,6 +235,22 @@ element={
   element={
     <ProtectedRoute>
       <ReportPage />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/ai-analytics"
+  element={
+    <ProtectedRoute>
+      <AIAnalytics />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/crm-module"
+  element={
+    <ProtectedRoute>  
+      <CRMModule />
     </ProtectedRoute>
   }
 />

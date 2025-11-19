@@ -1,163 +1,102 @@
 // Sidebar.jsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "../../context/ThemeContext";
 import {
-  DownOutlined,
-  UpOutlined,
-  DashboardFilled,
-  UnorderedListOutlined,
-  PlusOutlined,
-  MenuOutlined,
-  CloseOutlined,
-  ShoppingCartOutlined,
-  FileTextFilled,
-  DropboxCircleFilled,
-  DatabaseFilled,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  SettingFilled,
-} from "@ant-design/icons";
-import { Popover } from "antd";
-import { BarChart, Box, ChevronDown, ChevronUp, Download, ListOrdered, RotateCcw, Truck, User, User2Icon, Users } from "lucide-react";
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Receipt,
+  Users,
+  FileText,
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  Warehouse,
+  LogOut,
+  ChevronDown,
+  Box,
+  Truck,
+  Target
+} from "lucide-react";
+import logo from "../assets/Dark Logo.png"
 
 /**
- * Sidebar component
- * - Collapsed (desktop): parent icons centered; parents with children open a Popover flyout.
- * - Expanded or mobile: inline expand/collapse for parent children.
- * - Visual rules:
- *   Active: background #1C2244, text & icon color #ffffff
- *   Inactive: text & icon color #1C2244, background transparent
- * - Settings button is placed at the bottom and becomes active on the /settings route.
+ * Sidebar
+ * - Header and Footer are static (non-scrolling)
+ * - Center nav is the only scrollable area (overflow-y-auto)
+ * - Removed fixed positioning so it can be used inside AntD Sider/Drawer
+ * - Preserves collapsed behavior (icons-only when collapsed)
+ *
+ * Usage:
+ * <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} ... />
  */
 
 const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, setSelectedParent }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { theme, primaryColor, sidebarBgColor } = useTheme();
-  const [openMenu, setOpenMenu] = useState(null); // stores key of open inline menu OR open popover
+  const [openMenu, setOpenMenu] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const containerRef = useRef(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
-  // Colors requested
-  const ACTIVE_BG = "#E5E7FB";
-  const ACTIVE_TEXT = "#011D4A";
-  const INACTIVE_TEXT = "#667085";
-  const INACTIVE_BG = "transparent";
+  // NEW: drawer state for collapsed mode
+  const [drawerOpen, setDrawerOpen] = useState(null); // store parent key or null
+  const [drawerChildren, setDrawerChildren] = useState([]);
 
-  // Handle window resize
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Close popup when clicking outside (guard). Only closes popover when collapsed & desktop.
+  // close drawer when route changes
   useEffect(() => {
-    const handleDocClick = (e) => {
-      if (!containerRef.current) return;
-      if (!containerRef.current.contains(e.target)) {
-        setOpenMenu((prev) => {
-          return prev && collapsed && !isMobile ? null : prev;
-        });
-      }
-    };
-    document.addEventListener("mousedown", handleDocClick);
-    return () => document.removeEventListener("mousedown", handleDocClick);
-  }, [collapsed, isMobile]);
+    setDrawerOpen(null);
+  }, [pathname]);
 
-  // === static menu ===
   const menuItems = [
-    { key: "/dashboard", label: "Dashboard", icon: <DashboardFilled /> },
-    { key: "/user", label: "User", icon: <User2Icon /> },
-    { key: "/vendor", label: "Vendor", icon: <Users /> },
-        {
-      key: "Product",
-      label: "Product",
-      icon: <DropboxCircleFilled />,
+    { key: "/dashboard", label: "Dashboard", icon: LayoutDashboard, color: "blue" },
+    {
+      key: "/product",
+      label: "Products & Stock",
+      icon: Package,
+      color: "purple",
       children: [
-        { key: "/product/list", label: "Product List", icon: <UnorderedListOutlined /> },
-        { key: "/category/list", label: "Category List", icon: <UnorderedListOutlined /> },
-        { key: "/subcategory/list", label: "Subcategory List", icon: <UnorderedListOutlined /> },
+        { key: "/product/list", label: "Product List" },
+        { key: "/category/list", label: "Category List" },
+        { key: "/subcategory/list", label: "Subcategory List" },
       ],
     },
-    { key: "/order", label: "Orders", icon: <Truck /> },
-    { key: "/inward/list", label: "Inward", icon: <Download /> },
-    { key: "/stock/list", label: "Stocks", icon: <Box /> },
-            {
-      key: "Billing",
-      label: "Billing",
-      icon: <FileTextFilled />,
+    { key: "/order", label: "Purchases / Orders", icon: ShoppingCart, color: "green" },
+    {
+      key: "/billing",
+      label: "Sales & Billing",
+      icon: Receipt,
+      color: "orange",
       children: [
-        { key: "/billing/add", label: "Create Billing", icon: <PlusOutlined /> },
-        { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
+        { key: "/billing/add", label: "Create Billing" },
+        { key: "/billing/list", label: "Billing List" },
       ],
     },
-    { key: "/return", label: "Return", icon: <RotateCcw /> },
-    { key: "/report", label: "Report", icon: <BarChart /> },
-    //     {
-    //   key: "Inward",
-    //   label: "Inward",
-    //   icon: <ShoppingCartOutlined />,
-    //   children: [
-    //     { key: "/inward/list", label: "Inward List", icon: <UnorderedListOutlined /> },
-    //     { key: "/inward/add", label: "Add Inward", icon: <PlusOutlined /> },
-    //   ],
-    // },
-    // {
-    //   key: "Billing",
-    //   label: "Casier Billing",
-    //   icon: <FileTextFilled />,
-    //   children: [
-    //     { key: "/billing/list", label: "Billing List", icon: <UnorderedListOutlined /> },
-    //     { key: "/billing/add", label: "Add Billing", icon: <PlusOutlined /> },
-    //   ],
-    // },
-    // { key: "/billing/customer-add", label: "Self Checkout", icon: <PlusOutlined /> },
-    // {
-    //   key: "Product",
-    //   label: "Product",
-    //   icon: <DropboxCircleFilled />,
-    //   children: [
-    //     { key: "/product/list", label: "Product List", icon: <UnorderedListOutlined /> },
-    //     { key: "/product/add", label: "Add Product", icon: <PlusOutlined /> },
-    //     { key: "/category/list", label: "Category List", icon: <UnorderedListOutlined /> },
-    //     { key: "/category/add", label: "Add Category", icon: <PlusOutlined /> },
-    //     { key: "/subcategory/list", label: "Subcategory List", icon: <UnorderedListOutlined /> },
-    //     { key: "/subcategory/add", label: "Add Subcategory", icon: <PlusOutlined /> },
-    //   ],
-    // },
-    // {
-    //   key: "Inward",
-    //   label: "Inward",
-    //   icon: <ShoppingCartOutlined />,
-    //   children: [
-    //     { key: "/inward/list", label: "Inward List", icon: <UnorderedListOutlined /> },
-    //     { key: "/inward/add", label: "Add Inward", icon: <PlusOutlined /> },
-    //   ],
-    // },
-    // { key: "/stock/list", label: "Stocks", icon: <DatabaseFilled /> },
+    { key: "/stock/list", label: "Stocks", icon: Box, color: "teal" },
+    { key: "/inward/list", label: "Inward", icon: Truck, color: "cyan" },
+    { key: "/return", label: "Returns", icon: Receipt, color: "red" },
+    { key: "/crm-module", label: "CRM Module", icon: Users, color: "purple" },
+    { key: "/ai-analytics", label: "AI Analytics", icon: Target, color: "yellow" },
+    { key: "/report", label: "Reports", icon: FileText, color: "teal" },
   ];
-  // ===================
 
-  // determine active state (parents active when any child matches)
   const isActive = (key) => {
     if (!key) return false;
-
-    // If this key matches a parent item that has children, check children's routes
-    const parentItem = menuItems.find((m) => m.key === key);
-    if (parentItem && parentItem.children && parentItem.children.length > 0) {
-      return parentItem.children.some((c) => {
-        return (
+    const parent = menuItems.find((m) => m.key === key);
+    if (parent && parent.children) {
+      return parent.children.some(
+        (c) =>
           pathname === c.key ||
           pathname.startsWith(c.key + "/") ||
           pathname.includes(c.key.replace("/list", "").replace("/add", ""))
-        );
-      });
+      );
     }
-
-    // Otherwise normal match for direct routes
     return (
       pathname === key ||
       pathname.startsWith(key + "/") ||
@@ -165,331 +104,256 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
     );
   };
 
-  // Build modern popover content for children (uses exact active/inactive colors requested)
-  const buildPopoverContent = (item) => {
-    const bg = theme === "dark" ? "#111827" : "#ffffff";
-    const border = theme === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)";
-    return (
-      <div
-        style={{
-          minWidth: 220,
-          borderRadius: 10,
-          boxShadow: "0 8px 30px rgba(2,6,23,0.2)",
-          background: bg,
-          color: INACTIVE_TEXT,
-          overflow: "hidden",
-          border: `1px solid ${border}`,
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div style={{ padding: "10px 12px", borderBottom: `1px solid ${border}`, fontWeight: 700, color: INACTIVE_TEXT }}>
-          {item.label}
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: 8 }}>
-          {item.children.map((child) => {
-            const active = isActive(child.key);
-            return (
-              <div
-                key={child.key}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // navigate first, then close popover
-                  navigate(child.key);
-                  setOpenMenu(null);
-                  if (isMobile) setCollapsed(false);
-                }}
-                role="button"
-                tabIndex={0}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "8px 10px",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  background: active ? ACTIVE_BG : INACTIVE_BG,
-                  color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
-                  fontWeight: active ? 700 : 500,
-                }}
-              >
-                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
-                  {child.icon}
-                </span>
-                <div style={{ fontSize: 14 }}>{child.label}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  // render parent button: when collapsed + desktop + has children => show popover, else inline expand or navigate
-  const renderParentButton = (item) => {
-    const active = isActive(item.key);
-
-    // Collapsed & Desktop & has children => use Popover (modern flyout)
-    if (collapsed && !isMobile && item.children) {
-      return (
-        <Popover
-          content={buildPopoverContent(item)}
-          trigger="click"
-          placement="rightTop"
-          overlayClassName="sidebar-flyout-popover"
-          visible={openMenu === item.key}
-          onVisibleChange={(visible) => setOpenMenu(visible ? item.key : null)}
-          getPopupContainer={() => containerRef.current || document.body} // render inside sidebar container
-          destroyTooltipOnHide
-          overlayStyle={{ zIndex: 3000 }}
-        >
-          <div
-            style={{
-              padding: 8,
-              cursor: "pointer",
-              margin: "8px 0", // slightly larger vertical spacing when collapsed for better centering
-              borderRadius: 8,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center", // centered when collapsed
-              color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
-              background: active ? ACTIVE_BG : INACTIVE_BG,
-              fontWeight: active ? "bold" : 500,
-              transition: "all 0.15s ease",
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
-              {item.icon}
-            </span>
-          </div>
-        </Popover>
-      );
-    }
-
-    // Normal behavior (not collapsed or mobile)
-    return (
-      <div
-        onClick={() => {
-          if (item.children) {
-            setOpenMenu(openMenu === item.key ? null : item.key);
-          } else {
-            navigate(item.key);
-            if (isMobile) setCollapsed(false);
-            setOpenMenu(null);
-          }
-        }}
-        style={{
-          padding: collapsed && !isMobile ? 8 : "8px 16px",
-          cursor: "pointer",
-          margin: "4px 0",
-          borderRadius: 6,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: collapsed && !isMobile ? "center" : "flex-start", // center icon when collapsed
-          color: active ? ACTIVE_TEXT : INACTIVE_TEXT,
-          backgroundColor: active ? ACTIVE_BG : INACTIVE_BG,
-          fontWeight: active ? "bold" : 500,
-          transition: "all 0.2s ease",
-        }}
-      >
-        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>
-          {item.icon}
-        </span>
-        {/* show label only when not collapsed OR on mobile */}
-        {(!collapsed || isMobile) && <span style={{ marginLeft: 10 }}>{item.label}</span>}
-        {item.children && (!collapsed || isMobile) && (
-          <span style={{ marginLeft: "auto", fontSize: 16, color: active ? ACTIVE_TEXT : INACTIVE_TEXT }}>{openMenu === item.key ? <ChevronUp /> : <ChevronDown />}</span>
-        )}
-      </div>
-    );
-  };
-
-  // Settings active check
-  const settingsActive = pathname === "/settings" || pathname.startsWith("/settings/");
-
   return (
-    <>
-      {/* Mobile Hamburger / Close */}
-      {isMobile && (
+    // The wrapper is full viewport height. Header/footer are flex-shrink-0 so they stay static.
+    <aside
+      aria-label="sidebar"
+      className={`flex flex-col h-screen transition-all duration-300 ${collapsed ? "w-20" : "w-64"}`}
+    >
+      <div className="flex flex-col h-full bg-white border border-gray-100 shadow-lg">
+        {/* Header - static (not part of the scrollable area) */}
         <div
-          style={{
-            position: "fixed",
-            top: 12,
-            left: 12,
-            zIndex: 2100,
-            cursor: "pointer",
-            background: "#fff",
-            borderRadius: "50%",
-            padding: 8,
-            boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-          }}
-          onClick={() => setCollapsed((prev) => !prev)}
+          className={`flex items-center justify-between flex-shrink-0 p-3 ${collapsed ? "px-2" : "px-4"} bg-gradient-to-r from-blue-600 to-purple-600`}
         >
-          {collapsed ? <CloseOutlined /> : <MenuOutlined />}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-11 bg-white rounded-lg flex items-center justify-center shadow-sm">
+              <img src={logo} className="w-5 h-8" />
+            </div>
+
+            {/* Title hides when collapsed */}
+            {!collapsed && <div className="text-white font-semibold truncate">Atlier Inventory</div>}
+          </div>
+
+          <button
+            onClick={() => setCollapsed((p) => !p)}
+            className="p-1.5 hover:bg-white/20 rounded-lg transition-colors !text-white"
+            aria-label={collapsed ? "Open sidebar" : "Close sidebar"}
+          >
+            {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+          </button>
         </div>
-      )}
 
-      <AnimatePresence initial={false}>
-        {(isMobile ? collapsed : true) && (
-          <div ref={containerRef} style={{ height: "100%" }}>
-            {isMobile && collapsed && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                style={{
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  background: "black",
-                  zIndex: 1500,
-                }}
-                onClick={() => setCollapsed(false)}
-              />
-            )}
+        {/* Center nav - scrollable area */}
+        <nav
+          className={`flex-1 overflow-y-auto overflow-x-hidden px-2 py-3 ${collapsed ? "" : "p-3"}`}
+          // Add some a11y attributes
+          aria-label="Main navigation"
+        >
+          <div className="flex flex-col gap-2">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.key);
 
-            <motion.div
-              initial={{ x: isMobile ? -300 : 0, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: isMobile ? -300 : 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                height: "100%",
-                width: collapsed && !isMobile ? 60 : isMobile ? 200 : 200,
-                backgroundColor: "white",
-    boxShadow: "2px 0 5px rgba(0,0,0,0.1), -2px 0 5px rgba(0,0,0,0.1)",
-                display: "flex",
-                flexDirection: "column",
-                position: isMobile ? "fixed" : "relative",
-                top: 10,
-                left: 10,
-                zIndex: 1601,
-                borderRadius:"10px"
-              }}
-            >
-              {/* Top (toggle) */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: collapsed && !isMobile ? "center" : "space-between",
-                  padding: "10px 12px",
-                }}
-              >
-                <div>
-                  <div
-                    onClick={() => setCollapsed((prev) => !prev)}
-                    style={{
-                      cursor: "pointer",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: 40,
-                      height: 40,
-                      color: "#ffffff",
-                      background: primaryColor,
-                      borderRadius: 8,
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              return (
+                <div key={item.key}>
+                  <motion.button
+                    onClick={() => {
+                      // If item has children:
+                      if (item.children) {
+                        // If collapsed -> open drawer/popover for children
+                        if (collapsed) {
+                          // toggle drawer for this parent
+                          if (drawerOpen === item.key) {
+                            setDrawerOpen(null);
+                            setDrawerChildren([]);
+                          } else {
+                            setDrawerChildren(item.children);
+                            setDrawerOpen(item.key);
+                            setSelectedParent && setSelectedParent(item.key);
+                          }
+                        } else {
+                          // normal expanded inline behavior
+                          setOpenMenu(openMenu === item.key ? null : item.key);
+                          setSelectedParent && setSelectedParent(item.key);
+                        }
+                      } else {
+                        // no children -> navigate
+                        navigate(item.key);
+                        setOpenMenu(null);
+                        setSelectedParent && setSelectedParent(item.key);
+                        if (isMobile) setCollapsed(false);
+                      }
                     }}
-                    title={collapsed ? "Open sidebar" : "Close sidebar"}
+                    whileHover={{ scale: collapsed ? 1.02 : 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+                      active ? "bg-gradient-to-r from-blue-500 to-purple-500 !text-white shadow-md" : "text-gray-700 hover:bg-gray-50"
+                    }`}
                   >
-                    {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                  </div>
-                </div>
+                    {Icon ? <Icon className="w-5 h-5 flex-shrink-0" /> : <div className="w-5 h-5" />}
 
-                {(!collapsed || isMobile) && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    {/* small logo intentionally omitted */}
-                  </div>
-                )}
-              </div>
+                    {/* label and chevron shown only when expanded */}
+                    {!collapsed && (
+                      <>
+                        <span className="truncate flex-1 text-sm">{item.label}</span>
+                        {item.children && (
+                          <span className={`text-xs flex-shrink-0 ml-2 ${openMenu === item.key ? "rotate-180" : ""}`}>
+                            <ChevronDown className="w-4 h-4" />
+                          </span>
+                        )}
+                      </>
+                    )}
 
-              {/* Menu items */}
-              <div style={{ flexGrow: 1, overflowY: "auto", padding: collapsed && !isMobile ? "8px 4px" : 8 }}>
-                {menuItems.map((item) => (
-                  <div key={item.key}>
-                    {renderParentButton(item)}
+                    {active && !collapsed && (
+                      <motion.div layoutId="activeTab" className="ml-auto w-1.5 h-1.5 bg-white rounded-full" />
+                    )}
+                  </motion.button>
 
-                    {/* Inline submenu when expanded or on mobile */}
-                    <AnimatePresence initial={false}>
-                      {item.children && openMenu === item.key && (!collapsed || isMobile) && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.18 }}
-                          style={{ marginLeft: 24, overflow: "hidden" }}
-                        >
-                          {item.children.map((child) => {
-                            const childActive = isActive(child.key);
-                            return (
-                              <div
-                                key={child.key}
-                                onClick={() => {
-                                  // navigate and keep parent open (so it's visibly active)
-                                  navigate(child.key);
-                                  setOpenMenu(item.key); // keep parent open / active in inline mode
-                                  if (isMobile) setCollapsed(false);
-                                }}
-                                style={{
-                                  padding: "6px 8px",
-                                  cursor: "pointer",
-                                  margin: "6px 0",
-                                  borderRadius: 6,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  color: childActive ? ACTIVE_TEXT : INACTIVE_TEXT,
-                                  backgroundColor: childActive ? ACTIVE_BG : INACTIVE_BG,
-                                  fontWeight: childActive ? "700" : 500,
-                                  transition: "all 0.15s ease",
-                                }}
-                              >
-                                <span style={{ marginRight: 8, color: childActive ? ACTIVE_TEXT : INACTIVE_TEXT }}>{child.icon}</span>
-                                <span style={{ marginLeft: 8 }}>{child.label}</span>
-                              </div>
-                            );
-                          })}
-                        </motion.div>
-                      )}
+                  {/* submenu (inline) */}
+                  {!collapsed && item.children && openMenu === item.key && (
+                    <AnimatePresence>
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className="mt-2 ml-6 flex flex-col gap-2 overflow-hidden"
+                      >
+                        {item.children.map((child) => {
+                          const childActive = pathname === child.key || pathname.startsWith(child.key + "/");
+                          return (
+                            <button
+                              key={child.key}
+                              onClick={() => {
+                                navigate(child.key);
+                                setSelectedParent && setSelectedParent(item.key);
+                                if (isMobile) setCollapsed(false);
+                              }}
+                              className={`text-sm w-full text-left px-3 py-2 rounded-lg ${
+                                childActive ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-600 hover:bg-gray-50"
+                              }`}
+                            >
+                              {child.label}
+                            </button>
+                          );
+                        })}
+                      </motion.div>
                     </AnimatePresence>
-                  </div>
-                ))}
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* Footer / User area - static (not scrollable) */}
+        <div className={`flex-shrink-0 p-3 border-t bg-white ${collapsed ? "px-2" : ""}`}>
+          {!collapsed ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu((s) => !s)}
+                className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium">JD</div>
+                <div className="flex-1 text-left min-w-0">
+                  <p className="text-gray-900 truncate">John Doe</p>
+                  <p className="text-gray-500 text-xs">Super Admin</p>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showUserMenu ? "rotate-180" : ""}`} />
+              </button>
+
+              <AnimatePresence>
+                {showUserMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-10"
+                  >
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        navigate("/settings");
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-gray-700 transition-colors"
+                    >
+                      <Settings className="w-4 h-4" />
+                      <span>Settings</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        navigate("/logout");
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 transition-colors border-t border-gray-50"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Logout</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center">
+              <button onClick={() => navigate("/logout")} title="Logout" className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600">
+                <LogOut className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* DRAWER for collapsed mode - shows children of clicked parent */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <>
+            {/* backdrop */}
+            <motion.div
+              key="sidebar-drawer-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.12 }}
+              onClick={() => {
+                setDrawerOpen(null);
+                setDrawerChildren([]);
+              }}
+              className="fixed inset-0 bg-black/20 z-40"
+            />
+
+            {/* drawer panel */}
+            <motion.div
+              key="sidebar-drawer-panel"
+              initial={{ x: -8, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -8, opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              // position just to the right of the sidebar. left-20 == 5rem (w-20), left-64 == 16rem (w-64)
+              className={`fixed top-16 z-50 ${collapsed ? "left-20" : "left-64"} w-56 bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden`}
+            >
+              <div className="p-3 border-b">
+                <div className="text-sm font-medium">Options</div>
+                <div className="text-xs text-gray-500 truncate">Select an action</div>
               </div>
 
-              {/* Settings (sticky bottom) */}
-              <div
-                onClick={() => {
-                  navigate("/settings");
-                  if (isMobile) setCollapsed(false);
-                }}
-                role="button"
-                tabIndex={0}
-                style={{
-                  padding: 12,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: collapsed && !isMobile ? "center" : "flex-start",
-                  cursor: "pointer",
-                  marginTop: "auto",
-                  borderTop: `1px solid ${theme === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.04)"}`,
-                  backgroundColor: settingsActive ? ACTIVE_BG : INACTIVE_BG,
-                  color: settingsActive ? ACTIVE_TEXT : INACTIVE_TEXT,
-                }}
-              >
-                <SettingFilled style={{ fontSize: 18, color: settingsActive ? ACTIVE_TEXT : INACTIVE_TEXT }} />
-                {(!collapsed || isMobile) && <span style={{ marginLeft: 8, color: settingsActive ? ACTIVE_TEXT : INACTIVE_TEXT }}>Settings</span>}
+              <div className="flex flex-col p-2">
+                {drawerChildren.map((child) => {
+                  const childActive = pathname === child.key || pathname.startsWith(child.key + "/");
+                  return (
+                    <button
+                      key={child.key}
+                      onClick={() => {
+                        navigate(child.key);
+                        setDrawerOpen(null);
+                        setDrawerChildren([]);
+                        setSelectedParent && setSelectedParent(null);
+                        if (isMobile) setCollapsed(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-lg my-1 text-sm ${
+                        childActive ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      {child.label}
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
-          </div>
+          </>
         )}
       </AnimatePresence>
-    </>
+    </aside>
   );
 };
 

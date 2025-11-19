@@ -6,7 +6,7 @@ const AppFooter = ({ theme = 'light', bgColor }) => {
   const textColor = theme === 'dark' ? 'text-white' : 'text-gray-600';
 
   return (
-    <Footer style={{ backgroundColor: bgColor, textAlign: "center" }}>
+    <Footer style={{ backgroundColor: "transparent", textAlign: "center" }}>
       <span className={`text-black text-sm`}>
         © 2025 Atelier. All rights reserved.
       </span>
