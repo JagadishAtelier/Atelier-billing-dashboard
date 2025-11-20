@@ -39,6 +39,50 @@ const dashboardService = {
     });
     return res.data;
   },
+
+  // 🔹 NEW: Get today/yesterday/week/month statistics
+  async getDashboardStats() {
+    const res = await axios.get(`${API_BASE}/stats`, {
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+    return res.data;
+  },
+
+  async getIncomingPOs() {
+    const res = await axios.get(`${API_BASE}/incoming-pos`, {
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+    return res.data;
+  },
+
+  async getTopProducts() {
+    const res = await axios.get(`${API_BASE}/top-products`, {
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+    return res.data;
+  },
+
+  // in dashboardService.js (frontend)
+async getPOSummary() {
+  const res = await axios.get(`${API_BASE}/po-summary`, {
+    headers: { Authorization: `Bearer ${getAuthToken()}` },
+  });
+  return res.data;
+},
+
+async getMonthlyCollections() {
+  const res = await axios.get(`${API_BASE}/monthly-collections`, {
+    headers: { Authorization: `Bearer ${getAuthToken()}` },
+  });
+  return res.data;
+},
+
 };
 
 export default dashboardService;

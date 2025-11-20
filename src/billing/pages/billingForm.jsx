@@ -93,7 +93,7 @@ function BillingForm() {
           product_code: product.product_code,
           product_name: product.product_name || product.name || "",
           quantity: 1,
-          unit_price: product.selling_price || product.price || 0,
+          unit_price: product.selling_price,
           discount_amount: 0,
           tax_percentage: product.tax_percentage || product.tax || 0,
           tax_amount: 0,

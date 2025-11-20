@@ -12,8 +12,8 @@ const styles = {
 const IncomingPOs = ({ pos }) => {
     return (
         <Card size="small" style={{ ...styles.roundedCard, marginTop: 12, padding: 0 }}>
-            <div style={{ padding: 14, borderBottom: "1px solid #f3f4f6" }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>Incoming purchase orders</div>
+            <div style={{ padding: 3, borderBottom: "1px solid #f3f4f6" }}>
+                <h2 className="text-lg font-semibold text-gray-900">Incoming PO</h2>
             </div>
 
             <div>
@@ -22,18 +22,18 @@ const IncomingPOs = ({ pos }) => {
                         <div style={styles.poLeft}>
                             <span style={styles.poDot(po.color)} />
                             <div>
-                                <div style={{ fontWeight: 700, color: "#0b63d8" }}>{po.id}</div>
+                                <div style={{ fontWeight: 600, color: "#0b63d8" }}>{po.id}</div>
                                 <div style={{ fontSize: 12, color: "#6b7280" }}>{po.label}</div>
                             </div>
                         </div>
 
-                        <div style={{ fontWeight: 800 }}>₹{po.total.toLocaleString()}</div>
+                        <div className="text-gray-900 font-medium">₹{po.total.toLocaleString()}</div>
                     </div>
                 ))}
             </div>
 
             <div style={{ padding: "10px 14px", borderTop: "1px solid #f3f4f6" }}>
-                <a style={{ color: "#2563eb", fontWeight: 700 }}>View all</a>
+                <a style={{ color: "#2563eb", fontWeight: 500 }}>View all</a>
             </div>
         </Card>
     );

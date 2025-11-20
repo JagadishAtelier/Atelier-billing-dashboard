@@ -11,13 +11,13 @@ const TopProducts = ({ products }) => {
     return (
         <Card size="small" style={{ ...styles.roundedCard }}>
             <div style={{ padding: 12 }}>
-                <div style={{ fontWeight: 700, marginBottom: 10 }}>Top selling products</div>
+                <div className="text-lg font-semibold text-gray-900">Top selling products</div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     {products.map((p) => (
                         <div key={p.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "10px 6px", textAlign:"center", minHeight: 120, boxSizing: "border-box", background: "#fff", borderRadius: 8 }}>
                             <Avatar shape="square" size={56} style={{ background: "#f3f4f6", color: "#374151", marginBottom: 8 }}>{p.name.charAt(0)}</Avatar>
-                            <a style={{ color: "#2563eb", textDecoration: "none", marginTop: 6, fontSize: 10 }}>{p.name}</a>
-                            <div style={{ marginTop: 6, fontWeight: 700, color: "#111827" }}>{p.price}</div>
+                            <a className="text-blue-600 font-semibold text-sm" style={{ textDecoration: "none", marginTop: 6}}>{p.name}</a>
+                            <div className="text-gray-900 font-medium">{p.price}</div>
                         </div>
                     ))}
                 </div>

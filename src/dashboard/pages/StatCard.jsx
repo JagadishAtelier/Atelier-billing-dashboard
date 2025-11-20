@@ -1,34 +1,35 @@
 import React from "react";
 import { RightOutlined } from "@ant-design/icons";
 
-const styles = {
-    statGridCardWrap: { borderRadius: 14, overflow: "hidden", minHeight: 96, boxShadow: "0 10px 30px rgba(2,6,23,0.06)" },
-    statInner: { padding: 18, display: "flex", justifyContent: "space-between", alignItems: "center", color: "#fff" },
-    statLeft: { display: "flex", flexDirection: "column", gap: 6 },
-    statTitle: { fontSize: 16, fontWeight: 400, opacity: 0.95 },
-    statValue: { fontSize: 28, fontWeight: 400, lineHeight: 1 },
-    statMeta: { fontSize: 12, opacity: 0.95 },
-    statIconCircle: { width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center" },
-    statChevron: { width: 44, height: 44, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" },
-};
-
 const StatCard = ({ title, value, meta, gradient, icon }) => {
-    return (
-        <div style={{ ...styles.statGridCardWrap }}>
-            <div style={{ ...styles.statInner, background: gradient }}>
-                <div style={styles.statLeft}>
-                    <div style={styles.statTitle}>{title}</div>
-                    <div style={styles.statValue}>{value}</div>
-                    <div style={styles.statMeta}>{meta}</div>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 12 }}>
-                    <div style={styles.statIconCircle}><span style={{ color: "#fff" }}>{icon}</span></div>
-                    <div style={styles.statChevron}><RightOutlined style={{ color: "rgba(255,255,255,0.9)" }} /></div>
-                </div>
-            </div>
+  return (
+    <div
+      className="rounded-xl overflow-hidden min-h-[96px] shadow-[0_10px_30px_rgba(2,6,23,0.06)]"
+      style={{ background: gradient }}
+    >
+      <div className="p-5 flex justify-between items-center text-white">
+        
+        {/* LEFT SECTION */}
+        <div className="flex flex-col gap-1">
+          <p className="">{title}</p>
+          <p className="text-3xl  leading-none">{value}</p>
+          <p className="text-sm opacity-90">{meta}</p>
         </div>
-    );
+
+        {/* RIGHT SECTION */}
+        <div className="flex flex-col items-end gap-3">
+          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+            <span className="text-white">{icon}</span>
+          </div>
+
+          <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center cursor-pointer">
+            <RightOutlined className="text-white/90 text-sm" />
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
 };
 
 export default StatCard;

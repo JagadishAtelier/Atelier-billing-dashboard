@@ -1,63 +1,34 @@
-import React, { useState } from "react";
-import "./Login.css";
-import logo from "../components/assets/Company_logo.png";
-import login from "../components/assets/login_image.jpg";
-
-import x_logo from "../components/assets/Dark Logo.png";
-import { FaEnvelope, FaEye, FaEyeSlash, FaPhone } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { useState } from 'react';
+import { Package, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import BASE_API from "../api/api.js";
-import { message, Spin } from "antd"; // ✅ use AntD message directly
-import Loading from "../utils/Loading";
+import { useNavigate } from "react-router-dom";
+import { message, Spin } from "antd";
+import axios from "axios";
+import logo from "../components/assets/Company_logo.png";
 
-const Login = () => {
+export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
   const navigate = useNavigate();
-
-  const [email, setEmail] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [isMobileLogin, setIsMobileLogin] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [mobileError, setMobileError] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [isMobileLogin, setIsMobileLogin] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isValidMobile = (mobile) => /^\d{10}$/.test(mobile);
+  const isValidEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const routeModules = import.meta.glob("../*/AppRoutes.jsx", { eager: true });
-
-  const modules = Object.entries(routeModules).map(([path, mod]) => {
-    const match = path.match(/\.\/(.*?)\/AppRoutes\.jsx$/);
-    const name = match?.[1];
-    return {
-      name,
-      path: `/${name}/*`,
-      element: mod.default,
-      menuItems: mod[`${name}MenuItems`] || [],
-    };
-  });
-
-  const getDefaultRedirect = () => {
-    const companyModule = modules.find((mod) => mod.name === "company");
-    const filteredModules = modules.filter((mod) => mod.name !== "dashboard");
-
-    if (companyModule) {
-      const nextModule = filteredModules.find((mod) => mod.name !== "company");
-      if (nextModule) {
-        return `/${nextModule.name}/pages/dashboard`;
-      }
-    }
-    return filteredModules.length > 0
-      ? `/${filteredModules[0].name}/pages/dashboard`
-      : "/404";
-  };
+  const isValidMobile = (mobile) =>
+    /^\d{10}$/.test(mobile);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setEmailError("");
     setMobileError("");
     setPasswordError("");
@@ -65,6 +36,7 @@ const Login = () => {
 
     let hasError = false;
 
+    // email / mobile validation
     if (isMobileLogin) {
       if (!mobile.trim()) {
         setMobileError("Mobile number is required");
@@ -109,165 +81,211 @@ const Login = () => {
         }
       );
 
-      // ✅ rename message → responseMessage to avoid conflict
-      const { message: responseMessage, token, refreshToken, user } = res.data;
+      const {
+        message: responseMessage,
+        token,
+        refreshToken,
+        user,
+      } = res.data;
 
       if (token && user) {
         localStorage.setItem("token", token);
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("user", JSON.stringify(user));
 
-        // ✅ AntD success message
         message.success(`${responseMessage} 🎉 Welcome, ${user.username}!`);
 
-        // redirect
+        // Navigate to dashboard
         navigate("/dashboard");
       } else {
         throw new Error("Invalid login response");
       }
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || error.message || "Login failed!";
-      setLoginError(errorMessage);
+        error.response?.data?.message ||
+        error.message ||
+        "Login failed!";
 
-      // ❌ show AntD error toast
+      setLoginError(errorMessage);
       message.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const togglePasswordVisibility = () =>
-    setShowPassword((prev) => !prev);
-
-  const toggleLoginMode = () => {
-    setIsMobileLogin(!isMobileLogin);
-    setEmail("");
-    setMobile("");
-    setEmailError("");
-    setMobileError("");
-    setLoginError("");
-  };
-
   return (
-    <div className="login-container">
-      <div className="login-left">
-        <div className="welcome-container">
-          <img src={login} alt="Company Logo" className="logo" width={900} style={{borderRadius:"20px"}} />
-          {/* <h3 className="welcome-heading">
-            Welcome to &nbsp;
-            <img src={x_logo} alt="XTOWN" />
-            Atelier..!
-          </h3>
-          <span className="welcome-tagline">
-            We’re here to turn your ideas into reality.
-          </span> */}
-        </div>
-      </div>
-
-      <div className="login-right">
-        <img src={logo} alt="Company Logo" className="logo" />
-
-        <form className="login-form" onSubmit={handleSubmit}>
-          <h3>LOGIN TO YOUR ACCOUNT</h3>
-          {loginError && (
-            <div
-              className="login-error-message"
-              style={{ marginBottom: "1rem", textAlign: "center" }}
-            >
-              {loginError}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        {/* Left Side - Branding (hidden on small screens) */}
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="hidden lg:flex flex-col justify-center space-y-8 px-12"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              
+              <div>
+                <img src={logo} style={{height:"100px", left:0}} />
+                <p className="text-sm text-gray-600">Enterprise Inventory System</p>
+              </div>
             </div>
-          )}
+          </div>
 
-          <div
-            className={`form-group ${isMobileLogin ? "mobile" : "email"} ${
-              isMobileLogin ? mobileError : emailError ? "error" : ""
-            } mb-4`}
-          >
-            <div className="input-wrapper">
-              {isMobileLogin ? (
-                <>
-                  <input
-                    id="mobile"
-                    type="tel"
-                    value={mobile}
-                    onChange={(e) => setMobile(e.target.value)}
-                    className={mobile ? "filled" : ""}
-                    placeholder="Mobile Number"
-                    maxLength={10}
-                  />
-                  <label htmlFor="mobile">Mobile Number</label>
-                  <FaEnvelope
-                    className="input-icon toggle-icon"
-                    onClick={toggleLoginMode}
-                    title="Use Email instead"
-                  />
-                </>
-              ) : (
-                <>
+          <div className="space-y-6">
+            <Feature
+              icon={(
+                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+              title="Real-time Inventory Tracking"
+              desc="Track stock levels, movements, and valuations in real-time across multiple warehouses."
+            />
+
+            <Feature
+              icon={(
+                <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              )}
+              title="Advanced Analytics"
+              desc="Make data-driven decisions with comprehensive reports and predictive insights."
+            />
+
+            <Feature
+              icon={(
+                <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              )}
+              title="Enterprise Security"
+              desc="Role-based access control, 2FA, and encrypted data storage for peace of mind."
+            />
+          </div>
+
+          <div className="pt-8 border-t border-gray-200">
+            <p className="text-gray-500 text-sm">Trusted by 10,000+ businesses worldwide</p>
+            <div className="flex gap-6 mt-4 items-center">
+              <div className="flex -space-x-2">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 border-2 border-white" />
+                ))}
+              </div>
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Right Side - Login Form */}
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full"
+        >
+          <div className="bg-white rounded-3xl shadow-2xl p-8 lg:p-12">
+            <div className="text-center mb-8">
+              <div className="lg:hidden flex items-center justify-center gap-3 mb-1">
+                
+                <img src={logo} style={{height:"120px", left:0}} />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-900">Welcome back!</h2>
+              <p className="text-sm text-gray-600 mt-2">Sign in to your account to continue</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     id="email"
-                    type="text"
+                    type="email"
+                    placeholder="you@company.com"
+                    className="pl-11 pr-4 h-12 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className={email ? "filled" : ""}
-                    placeholder="Email"
+                    required
                   />
-                  <label htmlFor="email">Email</label>
-                  <FaPhone
-                    className="input-icon toggle-icon"
-                    onClick={toggleLoginMode}
-                    title="Use Mobile Number instead"
-                  />
-                </>
-              )}
-            </div>
-            {isMobileLogin && mobileError && (
-              <div className="login-error-message">{mobileError}</div>
-            )}
-            {!isMobileLogin && emailError && (
-              <div className="login-error-message">{emailError}</div>
-            )}
-          </div>
-          <div
-            className={`form-group password ${passwordError ? "error" : ""}`}
-          >
-            <div className="input-wrapper">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={password ? "filled" : ""}
-                placeholder="Password"
-              />
-              <label htmlFor="password">Password</label>
-              {showPassword ? (
-                <FaEyeSlash
-                  className="input-icon toggle-icon"
-                  onClick={togglePasswordVisibility}
-                  title="Hide Password"
-                />
-              ) : (
-                <FaEye
-                  className="input-icon toggle-icon"
-                  onClick={togglePasswordVisibility}
-                  title="Show Password"
-                />
-              )}
-            </div>
-            {passwordError && (
-              <div className="login-error-message">{passwordError}</div>
-            )}
-          </div>
+                </div>
+              </div>
 
-          <button type="submit" className="log-button" disabled={loading}>
-            {loading ? <Spin /> : "LOGIN"}
-          </button>
-        </form>
+              <div className="space-y-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    className="pl-11 pr-11 h-12 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <input id="remember" type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
+                  <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer">Remember me</label>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full h-12 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-white font-semibold rounded-lg shadow-md"
+              >
+                Sign In
+                <ArrowRight className="w-5 h-5 ml-1" />
+              </button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                
+              </div>
+
+              
+            </form>
+
+            
+          </div>
+        </motion.div>
       </div>
     </div>
   );
-};
+}
 
-export default Login;
+function Feature({ icon, title, desc }) {
+  return (
+    <div className="flex items-start gap-4">
+      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+        {icon}
+      </div>
+      <div>
+        <h3 className="text-gray-900 font-semibold">{title}</h3>
+        <p className="text-gray-600 mt-1 text-sm">{desc}</p>
+      </div>
+    </div>
+  );
+}
