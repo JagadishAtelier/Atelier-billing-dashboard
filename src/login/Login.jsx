@@ -20,6 +20,9 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
   const [isMobileLogin, setIsMobileLogin] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // NEW: store last response for visibility/debugging
+  const [lastResponse, setLastResponse] = useState(null);
+
   const isValidEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -63,6 +66,7 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
     if (hasError) return;
 
     setLoading(true);
+    setLastResponse(null); // clear previous response
 
     try {
       const payload = {
@@ -80,6 +84,9 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
           },
         }
       );
+
+      // save the raw response for debugging/display
+      setLastResponse(res.data ?? res);
 
       const {
         message: responseMessage,
@@ -108,6 +115,9 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
 
       setLoginError(errorMessage);
       message.error(errorMessage);
+
+      // also store error response for visibility
+      setLastResponse(error.response?.data ?? { error: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -200,6 +210,7 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
                     required
                   />
                 </div>
+                {emailError && <p className="text-xs text-red-600 mt-1">{emailError}</p>}
               </div>
 
               <div className="space-y-2">
@@ -225,6 +236,7 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                {passwordError && <p className="text-xs text-red-600 mt-1">{passwordError}</p>}
               </div>
 
               <div className="flex items-center justify-between">
@@ -236,10 +248,20 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
 
               <button
                 type="submit"
-                className="w-full h-12 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-white font-semibold rounded-lg shadow-md"
+                disabled={loading}
+                className="w-full h-12 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-white font-semibold rounded-lg shadow-md disabled:opacity-60"
               >
-                Sign In
-                <ArrowRight className="w-5 h-5 ml-1" />
+                {loading ? (
+                  <>
+                    <Spin size="small" />
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  <>
+                    Sign In
+                    <ArrowRight className="w-5 h-5 ml-1" />
+                  </>
+                )}
               </button>
 
               <div className="relative">
@@ -252,7 +274,17 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
               
             </form>
 
-            
+            {/* show server response (for debugging / visibility) */}
+            {/* {lastResponse && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-100">
+                <div className="text-sm font-medium text-gray-700 mb-2">Last response</div>
+                <pre className="text-xs text-gray-700 max-h-48 overflow-auto whitespace-pre-wrap">
+                  {JSON.stringify(lastResponse, null, 2)}
+                </pre>
+              </div>
+            )} */}
+
+            {loginError && <div className="mt-3 text-sm text-red-600">{loginError}</div>}
           </div>
         </motion.div>
       </div>

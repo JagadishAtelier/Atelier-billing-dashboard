@@ -97,7 +97,7 @@ const MainLayout = ({ menuItems }) => {
 
   // header height constant
   const HEADER_HEIGHT = 0;
-  const SIDER_WIDTH = 275;
+  const SIDER_WIDTH = 280;
   const COLLAPSED_WIDTH = 80;
 
   // content left margin for desktop

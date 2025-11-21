@@ -108,7 +108,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
     // The wrapper is full viewport height. Header/footer are flex-shrink-0 so they stay static.
     <aside
       aria-label="sidebar"
-      className={`flex flex-col h-screen transition-all duration-300 ${collapsed ? "w-20" : "w-64"}`}
+      className={`flex flex-col h-screen transition-all duration-300 ${collapsed ? "w-20" : "w-67"}`}
     >
       <div className="flex flex-col h-full bg-white border border-gray-100 shadow-lg">
         {/* Header - static (not part of the scrollable area) */}
@@ -121,12 +121,13 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
             </div>
 
             {/* Title hides when collapsed */}
-            {!collapsed && <div className="text-white font-semibold truncate">Atlier Inventory</div>}
+            {!collapsed && <div className="text-white font-semibold truncate">Atelier Inventory</div>}
           </div>
 
           <button
             onClick={() => setCollapsed((p) => !p)}
             className="p-1.5 hover:bg-white/20 rounded-lg transition-colors !text-white"
+            style={{fontSize:"16px !important"}}
             aria-label={collapsed ? "Open sidebar" : "Close sidebar"}
           >
             {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
@@ -174,10 +175,10 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                         if (isMobile) setCollapsed(false);
                       }
                     }}
-                    whileHover={{ scale: collapsed ? 1.02 : 1.01 }}
+                    whileHover={{ scale: collapsed ? 1.05 : 1.03 }}
                     whileTap={{ scale: 0.98 }}
-                    className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
-                      active ? "bg-gradient-to-r from-blue-500 to-purple-500 !text-white shadow-md" : "text-gray-700 hover:bg-gray-50"
+                    className={`w-full text-left !text-[24px] !text-[#364153] flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+                      active ? "bg-gradient-to-r from-blue-500 to-purple-500 !text-white shadow-md" : "text-gray-700 hover:bg-[#f1f6fb]"
                     }`}
                   >
                     {Icon ? <Icon className="w-5 h-5 flex-shrink-0" /> : <div className="w-5 h-5" />}
@@ -185,7 +186,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                     {/* label and chevron shown only when expanded */}
                     {!collapsed && (
                       <>
-                        <span className="truncate flex-1 text-sm">{item.label}</span>
+                        <span className={`truncate text-[#364153] flex-1 !text-[17px] !font-normal hover:font-medium ${active ? "text-white !font-semibold" : ""} `}>{item.label}</span>
                         {item.children && (
                           <span className={`text-xs flex-shrink-0 ml-2 ${openMenu === item.key ? "rotate-180" : ""}`}>
                             <ChevronDown className="w-4 h-4" />
@@ -219,7 +220,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                                 setSelectedParent && setSelectedParent(item.key);
                                 if (isMobile) setCollapsed(false);
                               }}
-                              className={`text-sm w-full text-left px-3 py-2 rounded-lg ${
+                              className={`!text-[16px] w-full !text-[#364153] !font-normal text-left px-3 py-2 rounded-lg ${
                                 childActive ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-600 hover:bg-gray-50"
                               }`}
                             >

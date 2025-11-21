@@ -9,14 +9,11 @@ const allColumns = [
   { title: "Product Name", key: "product_name" },
   { title: "Product Code", key: "product_code" },
   { title: "Quantity", key: "quantity" },
-  { title: "Unit", key: "unit" },
   { title: "Cost Price", key: "cost_price" },
-  { title: "Selling Price", key: "selling_price" },
   // { title: "Warehouse ID", key: "warehouse_id" },
   { title: "Return Qty", key: "return_quantity" },
   { title: "Inward Qty", key: "inward_quantity" },
   { title: "Billing Qty", key: "billing_quantity" },
-  { title: "Customer Billing Qty", key: "customer_billing_quantity" },
 ];
 
 export default function StockListTailwind() {

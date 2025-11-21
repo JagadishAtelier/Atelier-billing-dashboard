@@ -1,7 +1,25 @@
+// ProductList.jsx
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Input, Button, Space, Popconfirm, Tag, message, Dropdown } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined, DownloadOutlined, MoreOutlined } from "@ant-design/icons";
+import {
+  Table,
+  Input,
+  Button,
+  Space,
+  Popconfirm,
+  Tag,
+  message,
+  Modal,
+  Descriptions,
+  Spin,
+} from "antd";
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  DownloadOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import productService from "../services/productService.js";
 import debounce from "lodash.debounce";
 import { QRCodeCanvas } from "qrcode.react";
@@ -19,31 +37,41 @@ const ProductList = () => {
 
   const qrRefs = useRef({});
 
-  const fetchProducts = useCallback(async (params = {}) => {
-    setLoading(true);
-    try {
-      const data = await productService.getAll({
-        page: params.current || pagination.current,
-        limit: params.pageSize || pagination.pageSize,
-        search: params.search || searchText,
-        sortField: params.sortField || sorter.field,
-        sortOrder: params.sortOrder || sorter.order,
-      });
+  // Modal state for viewing a product
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewLoading, setViewLoading] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
 
-      setProducts(data.data || []);
-      setPagination((prev) => ({
-        ...prev,
-        current: data.page || params.current || 1,
-        total: data.total || 0,
-        pageSize: data.limit || params.pageSize || 10,
-      }));
-    } catch (err) {
-      console.error(err);
-      message.error("Failed to fetch products");
-    } finally {
-      setLoading(false);
-    }
-  }, [pagination.current, pagination.pageSize, searchText, sorter]);
+  const fetchProducts = useCallback(
+    async (params = {}) => {
+      setLoading(true);
+      try {
+        const data = await productService.getAll({
+          page: params.current || pagination.current,
+          limit: params.pageSize || pagination.pageSize,
+          search: params.search ?? searchText,
+          sortField: params.sortField || sorter.field,
+          sortOrder: params.sortOrder || sorter.order,
+        });
+
+        // service returns wrapper { total, page, limit, data }
+        const list = data?.data ?? data;
+        setProducts(list || []);
+        setPagination((prev) => ({
+          ...prev,
+          current: data?.page ?? params.current ?? prev.current,
+          total: data?.total ?? prev.total,
+          pageSize: data?.limit ?? params.pageSize ?? prev.pageSize,
+        }));
+      } catch (err) {
+        console.error(err);
+        message.error("Failed to fetch products");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [pagination.current, pagination.pageSize, searchText, sorter]
+  );
 
   const handleSearch = debounce((value) => {
     setPagination((prev) => ({ ...prev, current: 1 }));
@@ -52,6 +80,7 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProducts]);
 
   const handleTableChange = (pag, filters, sort) => {
@@ -59,6 +88,15 @@ const ProductList = () => {
     setSorter({
       field: sort.field,
       order: sort.order === "ascend" ? "asc" : sort.order === "descend" ? "desc" : null,
+    });
+
+    // fetch new page/sort
+    fetchProducts({
+      current: pag.current,
+      pageSize: pag.pageSize,
+      sortField: sort.field,
+      sortOrder: sort.order === "ascend" ? "asc" : sort.order === "descend" ? "desc" : null,
+      search: searchText,
     });
   };
 
@@ -107,45 +145,80 @@ const ProductList = () => {
     pdf.save("product_qrcodes.pdf");
   };
 
+  // Show product modal — fetch fresh details (safer)
+  const openViewModal = async (record) => {
+    setViewModalOpen(true);
+    setViewLoading(true);
+
+    try {
+      // productService.getById may return the raw object or wrapped. handle both.
+      const resp = await productService.getById(record.id);
+      const data = resp?.data ?? resp ?? record;
+      setCurrentProduct(data);
+    } catch (err) {
+      console.error("Failed to fetch product details", err);
+      message.error("Failed to load product details");
+      setCurrentProduct(record); // fallback to existing record
+    } finally {
+      setViewLoading(false);
+    }
+  };
+
+  const closeViewModal = () => {
+    setViewModalOpen(false);
+    setCurrentProduct(null);
+  };
+
+  // Assign explicit widths so table knows the horizontal size
   const columns = [
-    { title: "Name", dataIndex: "product_name", key: "product_name", sorter: true, responsive: ["xs", "sm", "md"] },
-    { title: "Code", dataIndex: "product_code", key: "product_code", responsive: ["md"] },
+    {
+      title: "Name",
+      dataIndex: "product_name",
+      key: "product_name",
+      sorter: true,
+      ellipsis: true,
+    },
+    { title: "Code", dataIndex: "product_code", key: "product_code", width: 140, ellipsis: true },
     {
       title: "QR Code",
       key: "qr_code",
-      responsive: ["lg"],
       render: (_, record) => (
         <div ref={(el) => (qrRefs.current[record.id] = el)} style={{ display: "flex", alignItems: "center" }}>
           <QRCodeCanvas value={record.product_code || ""} size={64} level="H" />
-          <Button size="small" icon={<DownloadOutlined />} onClick={() => downloadQR(record.id, record.product_code)} style={{ marginLeft: 8 }}>
+          <Button
+            size="small"
+            icon={<DownloadOutlined />}
+            onClick={() => downloadQR(record.id, record.product_code)}
+            style={{ marginLeft: 8 }}
+          >
             Download
           </Button>
         </div>
       ),
     },
-    { title: "Brand", dataIndex: "brand", key: "brand", responsive: ["lg"] },
-    { title: "Category", dataIndex: "category_name", key: "category", responsive: ["lg"] },
-    { title: "Price", dataIndex: "purchase_price", key: "price", sorter: true, responsive: ["xl"], render: (price) => `₹${price}` },
-    { title: "Selling Price", dataIndex: "selling_price", key: "selling_price", sorter: true, responsive: ["xl"], render: (price) => `₹${price}` },
+    { title: "Category", dataIndex: "category_name", key: "category", width: 180, ellipsis: true },
+    {
+      title: "Price",
+      dataIndex: "purchase_price",
+      key: "price",
+      sorter: true,
+      render: (price) => `₹${price}`,
+    },
     {
       title: "Actions",
       key: "actions",
       fixed: "right",
+      align: "center",
+      width: 160,
       render: (_, record) => {
-        const menuItems = [
-          { key: "brand", label: `Brand: ${record.brand}` },
-          { key: "category", label: `Category: ${record.category_name}` },
-          { key: "price", label: `Price: ₹${record.purchase_price}` },
-          { key: "selling_price", label: `Selling Price: ₹${record.selling_price}` },
-        ];
-
         return (
           <Space>
-            <Button type="primary" icon={<EditOutlined />} onClick={() => navigate(`/product/edit/${record.id}`)}>
-              Edit
-            </Button>
+            <Button icon={<EyeOutlined />} onClick={() => openViewModal(record)} />
+
+            <Button type="primary" icon={<EditOutlined />} onClick={() => navigate(`/product/edit/${record.id}`)} />
+
             <Popconfirm title="Are you sure to delete this product?" onConfirm={() => handleDelete(record.id)}>
-              <Button danger icon={<DeleteOutlined />}>Delete</Button>
+              <Button danger icon={<DeleteOutlined />}></Button>
             </Popconfirm>
           </Space>
         );
@@ -165,7 +238,12 @@ const ProductList = () => {
           style={{ width: 300 }}
         />
         <Space>
-          <Button style={{backgroundColor:"#0E1680", fontWeight:"5000", fontSize:"16px" }} type="primary" icon={<PlusOutlined />} onClick={() => navigate("/product/add")}>
+          <Button
+            style={{ backgroundColor: "#0E1680", fontWeight: "500", fontSize: "16px" }}
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate("/product/add")}
+          >
             Add Product
           </Button>
           <Button type="default" icon={<DownloadOutlined />} onClick={downloadAllQRPDF}>
@@ -174,16 +252,77 @@ const ProductList = () => {
         </Space>
       </Space>
 
-      <Table
-        columns={columns}
-        rowKey={(record) => record.id}
-        dataSource={products}
-        pagination={pagination}
-        loading={loading}
-        onChange={handleTableChange}
-        bordered
-        scroll={{ x: true }}
-      />
+      {/* Wrap table in horizontally-scrollable container so tablet shows horizontal scroll */}
+      <div style={{ width: "100%", overflowX: "auto" }}>
+        <Table
+          columns={columns}
+          rowKey={(record) => record.id}
+          dataSource={products}
+          pagination={pagination}
+          loading={loading}
+          onChange={handleTableChange}
+          bordered
+          // ensure horizontal scroll appears — total column widths ~ 1350 so use 1200-1400
+          scroll={{ x: 1200 }}
+        />
+      </div>
+
+      {/* View Modal */}
+      <Modal
+        open={viewModalOpen}
+        title={currentProduct ? currentProduct.product_name : "Product Details"}
+        onCancel={closeViewModal}
+        footer={[
+          <Button key="close" onClick={closeViewModal}>
+            Close
+          </Button>,
+          <Button
+            key="edit"
+            type="primary"
+            onClick={() => {
+              if (currentProduct?.id) navigate(`/product/edit/${currentProduct.id}`);
+              closeViewModal();
+            }}
+          >
+            Edit
+          </Button>,
+        ]}
+        width={800}
+      >
+        {viewLoading ? (
+          <div style={{ textAlign: "center", padding: 40 }}>
+            <Spin />
+          </div>
+        ) : currentProduct ? (
+          <Descriptions bordered column={1} size="small">
+            <Descriptions.Item label="Product Name">{currentProduct.product_name || "-"}</Descriptions.Item>
+            <Descriptions.Item label="Product Code">{currentProduct.product_code || "-"}</Descriptions.Item>
+            <Descriptions.Item label="Category">{currentProduct.category_name ?? "-"}</Descriptions.Item>
+            <Descriptions.Item label="Subcategory">{currentProduct.subcategory_name ?? "-"}</Descriptions.Item>
+            <Descriptions.Item label="Brand">{currentProduct.brand || "-"}</Descriptions.Item>
+            <Descriptions.Item label="Unit">{currentProduct.unit || "-"}</Descriptions.Item>
+            <Descriptions.Item label="Purchase Price">₹{currentProduct.purchase_price ?? "0.00"}</Descriptions.Item>
+            <Descriptions.Item label="Selling Price">₹{currentProduct.selling_price ?? "0.00"}</Descriptions.Item>
+            <Descriptions.Item label="Tax %">{currentProduct.tax_percentage ?? "0.00"}</Descriptions.Item>
+            <Descriptions.Item label="Min Quantity">{currentProduct.min_quantity ?? 0}</Descriptions.Item>
+            <Descriptions.Item label="Max Quantity">{currentProduct.max_quantity ?? 0}</Descriptions.Item>
+            <Descriptions.Item label="Status">
+              {currentProduct.status}
+              {currentProduct.is_active ? <Tag color="green" style={{ marginLeft: 8 }}>Active</Tag> : <Tag color="red" style={{ marginLeft: 8 }}>Inactive</Tag>}
+            </Descriptions.Item>
+            <Descriptions.Item label="Description">{currentProduct.description || "-"}</Descriptions.Item>
+            <Descriptions.Item label="Created By">{currentProduct.created_by_name || currentProduct.created_by_email || "-"}</Descriptions.Item>
+            <Descriptions.Item label="Created At">
+              {currentProduct.createdAt ? new Date(currentProduct.createdAt).toLocaleString() : "-"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Updated At">
+              {currentProduct.updatedAt ? new Date(currentProduct.updatedAt).toLocaleString() : "-"}
+            </Descriptions.Item>
+          </Descriptions>
+        ) : (
+          <div>No product data available</div>
+        )}
+      </Modal>
     </div>
   );
 };
