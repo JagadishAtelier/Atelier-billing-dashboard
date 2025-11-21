@@ -49,11 +49,11 @@ const stockMovementData = [
 ];
 
 const topSellingProducts = [
-  { rank: 1, product: "AirPods Pro 2", units: 92, revenue: "$22,908" },
-  { rank: 2, product: "iPhone 15 Pro Max", units: 45, revenue: "$67,500" },
-  { rank: 3, product: "Samsung Galaxy S24", units: 38, revenue: "$53,200" },
-  { rank: 4, product: 'MacBook Pro 14"', units: 23, revenue: "$45,770" },
-  { rank: 5, product: "Sony WH-1000XM5", units: 52, revenue: "$20,748" },
+  { rank: 1, product: "AirPods Pro 2", units: 92, revenue: "₹22,908" },
+  { rank: 2, product: "iPhone 15 Pro Max", units: 45, revenue: "₹67,500" },
+  { rank: 3, product: "Samsung Galaxy S24", units: 38, revenue: "₹53,200" },
+  { rank: 4, product: 'MacBook Pro 14"', units: 23, revenue: "₹45,770" },
+  { rank: 5, product: "Sony WH-1000XM5", units: 52, revenue: "₹20,748" },
 ];
 
 export default function Reports() {
@@ -147,7 +147,7 @@ export default function Reports() {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Total Sales</p>
-            <p className="text-gray-900 mt-1 font-semibold">$328,000</p>
+            <p className="text-gray-900 mt-1 font-semibold">₹328,000</p>
           </div>
         </div>
 
@@ -157,7 +157,7 @@ export default function Reports() {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Total Purchases</p>
-            <p className="text-gray-900 mt-1 font-semibold">$231,000</p>
+            <p className="text-gray-900 mt-1 font-semibold">₹231,000</p>
           </div>
         </div>
 
@@ -167,7 +167,7 @@ export default function Reports() {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Total Profit</p>
-            <p className="text-gray-900 mt-1 font-semibold">$94,500</p>
+            <p className="text-gray-900 mt-1 font-semibold">₹94,500</p>
           </div>
         </div>
 
@@ -177,7 +177,7 @@ export default function Reports() {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Stock Value</p>
-            <p className="text-gray-900 mt-1 font-semibold">$456,789</p>
+            <p className="text-gray-900 mt-1 font-semibold">₹456,789</p>
           </div>
         </div>
       </div>
