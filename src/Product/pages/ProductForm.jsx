@@ -85,6 +85,9 @@ const ProductForm = () => {
         tax_percentage: data.tax_percentage,
         description: data.description,
         status: data.status || "active",
+        // <-- set min and max quantity when editing
+        min_quantity: data.min_quantity ?? 0,
+        max_quantity: data.max_quantity ?? 0,
       });
       if (Array.isArray(data.images)) {
         const files = data.images.map((url, idx) => ({
@@ -157,6 +160,9 @@ const ProductForm = () => {
       description: trim(values.description ?? ""),
       status: trim(values.status ?? "active"),
       images,
+      // <-- include min and max quantities in payload
+      min_quantity: typeof values.min_quantity === "number" ? values.min_quantity : Number(values.min_quantity ?? 0),
+      max_quantity: typeof values.max_quantity === "number" ? values.max_quantity : Number(values.max_quantity ?? 0),
     };
 
     return payload;
@@ -391,6 +397,25 @@ const ProductForm = () => {
                 <InputNumber style={{ width: "100%" }} placeholder="Enter tax percentage" />
               </Form.Item>
             </div>
+
+            {/* NEW: min/max quantity row */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16, marginTop: 16 }}>
+              <Form.Item
+                label="Min Quantity"
+                name="min_quantity"
+                rules={[{ type: "number", min: 0, message: "Min quantity must be >= 0" }]}
+              >
+                <InputNumber style={{ width: "100%" }} min={0} step={1} placeholder="Minimum quantity" />
+              </Form.Item>
+
+              <Form.Item
+                label="Max Quantity"
+                name="max_quantity"
+                rules={[{ type: "number", min: 0, message: "Max quantity must be >= 0" }]}
+              >
+                <InputNumber style={{ width: "100%" }} min={0} step={1} placeholder="Maximum quantity" />
+              </Form.Item>
+            </div>
           </>
         );
 
@@ -436,7 +461,18 @@ const ProductForm = () => {
                 </div>
               </div>
 
-              <Form form={form} layout="vertical" initialValues={{ status: "active", purchase_price: 0, selling_price: 0 }}>
+              <Form
+                form={form}
+                layout="vertical"
+                initialValues={{
+                  status: "active",
+                  purchase_price: 0,
+                  selling_price: 0,
+                  // initial values for the new fields
+                  min_quantity: 0,
+                  max_quantity: 0,
+                }}
+              >
                 {renderStepContent(current)}
               </Form>
 

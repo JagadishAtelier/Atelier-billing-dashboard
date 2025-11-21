@@ -83,6 +83,18 @@ async getMonthlyCollections() {
   return res.data;
 },
 
+// 🔹 Get low stock products
+async getLowStock() {
+  const res = await axios.get(`${API_BASE}/low-stock`, {
+    headers: {
+      Authorization: `Bearer ${getAuthToken()}`,
+    },
+  });
+
+  return res.data;
+},
+
+
 };
 
 export default dashboardService;

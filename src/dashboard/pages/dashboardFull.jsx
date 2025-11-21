@@ -6,6 +6,7 @@ import LatestPayments from "./LatestPayments";
 import LatestCollections from "./LatestCollections";
 import OverviewCharts from "./OverviewCharts";
 import IncomingPOs from "./IncomingPOs";
+import LowStockAlerts from "./LowStockAlerts";
 import TopProducts from "./TopProducts";
 import { LATEST_COLLECTIONS } from "../../data/dummyData";
 import {
@@ -67,6 +68,14 @@ const DashboardFull = () => {
 
   // ⭐ ADDED: Last updated state
   const [lastUpdated, setLastUpdated] = useState("");
+
+  const [lowStockItems, setLowStockItems] = useState([]);
+
+  useEffect(() => {
+    dashboardService.getLowStock().then((res) => {
+      setLowStockItems(res?.data || []);
+    });
+  }, []);
 
   const updateTimestamp = () => {
     const now = new Date();
@@ -142,12 +151,12 @@ const DashboardFull = () => {
             b.status === "paid"
               ? "Fulfilled"
               : b.status === "pending"
-              ? "Draft"
-              : b.status === "partially_paid"
-              ? "Processing"
-              : b.status === "cancelled"
-              ? "Cancelled"
-              : "Draft",
+                ? "Draft"
+                : b.status === "partially_paid"
+                  ? "Processing"
+                  : b.status === "cancelled"
+                    ? "Cancelled"
+                    : "Draft",
           status: b.status,
           total: Number(b.total_amount || b.subtotal_amount || 0),
           date: b.billing_date
@@ -218,10 +227,10 @@ const DashboardFull = () => {
         formattedCategory =
           sumCategory > 0
             ? formattedCategory.map((c) => ({
-                name: c.name,
-                value: Math.round((c.value / sumCategory) * 10000) / 100,
-                color: c.color,
-              }))
+              name: c.name,
+              value: Math.round((c.value / sumCategory) * 10000) / 100,
+              color: c.color,
+            }))
             : [];
 
         if (mounted) {
@@ -364,7 +373,7 @@ const DashboardFull = () => {
 
   return (
     <div style={styles.page}>
-      
+
       {/* ⭐ ADDED LAST UPDATED LABEL ⭐ */}
       <Row justify="space-between" align="middle">
         <Col>
@@ -384,17 +393,17 @@ const DashboardFull = () => {
       <Row gutter={[12, 12]} style={{ marginTop: 12 }}>
         {loadingSummary
           ? [0, 1, 2, 3].map((i) => (
-              <Col xs={24} sm={12} md={6} key={i}>
-                <Card style={{ borderRadius: 14 }}>
-                  <Skeleton active paragraph={{ rows: 2 }} />
-                </Card>
-              </Col>
-            ))
+            <Col xs={24} sm={12} md={6} key={i}>
+              <Card style={{ borderRadius: 14 }}>
+                <Skeleton active paragraph={{ rows: 2 }} />
+              </Card>
+            </Col>
+          ))
           : summaryCards.map((s) => (
-              <Col xs={24} sm={12} md={6} key={s.id}>
-                <StatCard {...s} />
-              </Col>
-            ))}
+            <Col xs={24} sm={12} md={6} key={s.id}>
+              <StatCard {...s} />
+            </Col>
+          ))}
       </Row>
 
       {/* Charts */}
@@ -410,6 +419,7 @@ const DashboardFull = () => {
       {/* Payments / POs / Products */}
       <Row gutter={[12, 12]} style={{ marginTop: 16 }}>
         <Col xs={24} lg={12}>
+          <LowStockAlerts items={lowStockItems} />
           <LatestPayments
             payments={payments}
             filterKey={filterKey}
@@ -419,6 +429,7 @@ const DashboardFull = () => {
             expandedRowKeys={expandedRowKeys}
             setExpandedRowKeys={setExpandedRowKeys}
           />
+          
         </Col>
 
         {/* Incoming POs */}
