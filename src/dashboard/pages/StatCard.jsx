@@ -11,9 +11,9 @@ const StatCard = ({ title, value, meta, gradient, icon }) => {
         
         {/* LEFT SECTION */}
         <div className="flex flex-col gap-1">
-          <p className="text-[13px]">{title}</p>
+          <p className="">{title}</p>
           <p className="text-2xl  leading-none">{value}</p>
-          <p className="text-[10px]  opacity-90">{meta}</p>
+          <p className="text-[12px] opacity-90">{meta}</p>
         </div>
 
         {/* RIGHT SECTION */}
@@ -22,9 +22,9 @@ const StatCard = ({ title, value, meta, gradient, icon }) => {
             <span className="text-white">{icon}</span>
           </div>
 
-          <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center cursor-pointer">
-            <RightOutlined className="text-white/90 text-sm" />
-          </div>
+          {/* <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center cursor-pointer">
+            <RightOutlined className="text-white/90 text-[10px]" />
+          </div> */}
         </div>
 
       </div>
