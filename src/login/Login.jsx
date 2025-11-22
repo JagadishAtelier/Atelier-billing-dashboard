@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Package, Mail, Phone, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import BASE_API from "../api/api.js";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
+  const [mobile, setMobile] = useState('');
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -100,7 +101,7 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("user", JSON.stringify(user));
 
-        message.success(`${responseMessage} 🎉 Welcome, ${user.username}!`);
+        message.success(`${responseMessage} 🎉 Welcome, ${user.username || user.name || ''}!`);
 
         // Navigate to dashboard
         navigate("/dashboard");
@@ -125,19 +126,19 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        {/* Left Side - Branding (hidden on small screens) */}
+      {/* Changed breakpoint to md so tablets show 2-column layout like desktop */}
+      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        {/* Left Side - Branding (now visible on md and up) */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="hidden lg:flex flex-col justify-center space-y-8 px-12"
+          className="hidden md:flex flex-col justify-center space-y-8 px-10"
         >
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              
               <div>
-                <img src={logo} style={{height:"100px", left:0}} />
+                <img src={logo} alt="Company logo" className="h-24 object-contain" />
                 <p className="text-sm text-gray-600">Enterprise Inventory System</p>
               </div>
             </div>
@@ -174,8 +175,6 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
               desc="Role-based access control, 2FA, and encrypted data storage for peace of mind."
             />
           </div>
-
-          
         </motion.div>
 
         {/* Right Side - Login Form */}
@@ -185,33 +184,72 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
           transition={{ duration: 0.5 }}
           className="w-full"
         >
-          <div className="bg-white rounded-3xl shadow-2xl p-8 lg:p-12">
-            <div className="text-center mb-8">
-              <div className="lg:hidden flex items-center justify-center gap-3 mb-1">
-                
-                <img src={logo} style={{height:"120px", left:0}} />
+          <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-12">
+            <div className="text-center mb-6">
+              <div className="md:hidden flex items-center justify-center gap-3 mb-1">
+                <img src={logo} alt="Company logo" className="h-24 object-contain" />
               </div>
               <h2 className="text-2xl font-semibold text-gray-900">Welcome back!</h2>
               <p className="text-sm text-gray-600 mt-2">Sign in to your account to continue</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="you@company.com"
-                    className="pl-11 pr-4 h-12 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+              {/* Toggle: Email vs Mobile login (so mobile state and isMobileLogin have UI) */}
+              {/* <div className="flex items-center justify-center gap-2"> */}
+                {/* <button
+                  type="button"
+                  onClick={() => setIsMobileLogin(false)}
+                  className={`px-4 py-1 rounded-full text-sm font-medium ${!isMobileLogin ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                >
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileLogin(true)}
+                  className={`px-4 py-1 rounded-full text-sm font-medium ${isMobileLogin ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                >
+                  Mobile
+                </button> */}
+              {/* </div> */}
+
+              {/* Conditionally render Email or Mobile input */}
+              {!isMobileLogin ? (
+                <div className="space-y-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="you@company.com"
+                      className="pl-11 pr-4 h-12 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  {emailError && <p className="text-xs text-red-600 mt-1">{emailError}</p>}
                 </div>
-                {emailError && <p className="text-xs text-red-600 mt-1">{emailError}</p>}
-              </div>
+              ) : (
+                <div className="space-y-2">
+                  <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">Mobile Number</label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      id="mobile"
+                      type="tel"
+                      inputMode="numeric"
+                      placeholder="10-digit mobile number"
+                      className="pl-11 pr-4 h-12 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      value={mobile}
+                      onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
+                      required
+                      maxLength={10}
+                    />
+                  </div>
+                  {mobileError && <p className="text-xs text-red-600 mt-1">{mobileError}</p>}
+                </div>
+              )}
 
               <div className="space-y-2">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
@@ -244,6 +282,9 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
                   <input id="remember" type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
                   <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer">Remember me</label>
                 </div>
+                <div>
+                  <button type="button" onClick={() => navigate('/forgot-password')} className="text-sm text-blue-600 hover:underline">Forgot password?</button>
+                </div>
               </div>
 
               <button
@@ -268,13 +309,11 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-200" />
                 </div>
-                
               </div>
-
-              
             </form>
 
             {/* show server response (for debugging / visibility) */}
+            {/* Uncomment if you want to display raw response */}
             {/* {lastResponse && (
               <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-100">
                 <div className="text-sm font-medium text-gray-700 mb-2">Last response</div>
