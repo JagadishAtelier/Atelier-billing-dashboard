@@ -218,7 +218,7 @@ export default function CRMModule() {
           </div>
         </motion.div>
 
-        <motion.div whileHover={{ scale: 1.02 }} className="p-6 rounded-xl shadow-lg bg-gradient-to-br from-green-500 to-green-600 text-white">
+        <motion.div whileHover={{ scale: 1.02 }}   className="p-6 rounded-xl shadow-lg bg-gradient-to-br from-green-500 to-green-600 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100">Active Customers</p>
@@ -231,13 +231,14 @@ export default function CRMModule() {
           </div>
         </motion.div>
 
-        <motion.div whileHover={{ scale: 1.02 }} className="p-6 rounded-xl shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+        <motion.div whileHover={{ scale: 1.02 }}   className="p-6 rounded-xl shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-100">Customer LTV</p>
               <p className="mt-2 text-3xl">
-                ₹{((customers.reduce((sum, c) => sum + c.totalSpent, 0) / customers.length) / 1000).toFixed(1)}K
-              </p>
+              ${((customers.reduce((sum, c) => sum + c.totalSpent, 0) / customers.length) / 1000).toFixed(1)}K
+</p>
               <p className="text-purple-100 text-sm mt-1">Avg per customer</p>
             </div>
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -246,7 +247,8 @@ export default function CRMModule() {
           </div>
         </motion.div>
 
-        <motion.div whileHover={{ scale: 1.02 }} className="p-6 rounded-xl shadow-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+        <motion.div whileHover={{ scale: 1.02 }}   className="p-6 rounded-xl shadow-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+
           <div className="flex items-center justify-between">
             <div>
               <p className="text-orange-100">Conversion Rate</p>
@@ -262,53 +264,54 @@ export default function CRMModule() {
 
       {/* Tabs */}
       <div>
-        <div className="flex gap-3 bg-white border p-2 rounded-lg">
-          {[
-            { key: "leads", label: "Leads Pipeline" },
-            { key: "customers", label: "Customer Insights" },
-            { key: "analytics", label: "Analytics" },
-          ].map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setActiveTab(t.key)}
-              className={`px-4 py-2 rounded-md text-sm font-medium ${
-                activeTab === t.key ? "bg-purple-600 !text-white" : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
+      <div className="flex gap-6 items-center bg-white border border-gray-300 px-6 py-2 rounded-full w-fit shadow-sm">
+  {[
+    { key: "leads", label: "Leads Pipeline" },
+    { key: "customers", label: "Customer Insights" },
+    { key: "analytics", label: "Analytics" },
+  ].map((t) => (
+    <button
+      key={t.key}
+      onClick={() => setActiveTab(t.key)}
+      className={`
+        px-4 py-2 rounded-md text-sm font-medium transition
+        ${activeTab === t.key
+          ? "text-purple-600 font-semibold"
+          : "text-gray-700"
+        }
+      `}
+    >
+      {t.label}
+    </button>
+  ))}
+</div>
         {/* Leads Tab */}
-        {activeTab === "leads" && (
+         {activeTab === "leads" && (
           <div className="space-y-6 mt-6">
-            <div className="bg-white rounded-xl shadow p-4">
-              <div className="flex gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search leads..."
-                    className="w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
+            <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm">
 
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-gray-500" />
-                    <select className="border rounded-md px-3 py-2">
-                      <option value="all">All Status</option>
-                      <option value="new">New</option>
-                      <option value="contacted">Contacted</option>
-                      <option value="qualified">Qualified</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+<div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 w-full">
+  <Search className="w-4 h-4 text-gray-400 mr-2" />
+  <input
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    placeholder="Search leads..."
+    className="bg-gray-100 w-full focus:outline-none text-sm text-gray-700"
+  />
+</div>
+<div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 cursor-pointer">
+  <Filter className="w-4 h-4 text-gray-500 mr-2" />
+  <select
+    className="bg-gray-100 text-sm text-gray-700 focus:outline-none"
+  >
+    <option value="all">Filter by status</option>
+    <option value="new">New</option>
+    <option value="contacted">Contacted</option>
+    <option value="qualified">Qualified</option>
+  </select>
+</div>
+</div>
+       
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredLeads.map((lead, index) => (
                 <motion.div
@@ -460,7 +463,8 @@ export default function CRMModule() {
                             <button className="px-3 py-1 border rounded-md text-sm flex items-center gap-2">
                               <Mail className="w-4 h-4" /> Email
                             </button>
-                            <button className="px-3 py-1 bg-purple-600 text-white rounded-md text-sm">View Details</button>
+                            <button className="px-4 py-2 bg-black !text-white rounded-lg shadow hover:bg-gray-900 transition flex items-center gap-2">View Details</button>
+
                           </div>
                         </div>
                       </div>
