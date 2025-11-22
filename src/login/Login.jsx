@@ -126,25 +126,57 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center ">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
       {/* Changed breakpoint to md so tablets show 2-column layout like desktop */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 items-center">
+      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         {/* Left Side - Branding (now visible on md and up) */}
         <motion.div
-  initial={{ opacity: 0, x: -40 }}
-  animate={{ opacity: 1, x: 0 }}
-  transition={{ duration: 0.5 }}
-  className="hidden md:flex h-full w-full"
->
-  <div className="flex items-center l-[200px]">
-    <img
-    src={loginmain}
-    alt="Login illustration"
-    className="w-[600px] md:w-full flex  h-[648px] object-cover rounded-l-3xl"
-  />
-  </div>
-  
-</motion.div>
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="hidden md:flex flex-col justify-center space-y-8 px-10"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div>
+                <img src={logo} alt="Company logo" className="h-24 object-contain" />
+                <p className="text-sm text-gray-600">Enterprise Inventory System</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <Feature
+              icon={(
+                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+              title="Real-time Inventory Tracking"
+              desc="Track stock levels, movements, and valuations in real-time across multiple warehouses."
+            />
+
+            <Feature
+              icon={(
+                <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              )}
+              title="Advanced Analytics"
+              desc="Make data-driven decisions with comprehensive reports and predictive insights."
+            />
+
+            <Feature
+              icon={(
+                <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              )}
+              title="Enterprise Security"
+              desc="Role-based access control, 2FA, and encrypted data storage for peace of mind."
+            />
+          </div>
+        </motion.div>
 
         {/* Right Side - Login Form */}
         <motion.div
@@ -153,7 +185,7 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
           transition={{ duration: 0.5 }}
           className="w-full"
         >
-          <div className="bg-white mr-6 rounded-3xl shadow-2xl p-6 md:p-12">
+          <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-12">
             <div className="text-center mb-6">
               <div className="md:hidden flex items-center justify-center gap-3 mb-1">
                 <img src={logo} alt="Company logo" className="h-24 object-contain" />
