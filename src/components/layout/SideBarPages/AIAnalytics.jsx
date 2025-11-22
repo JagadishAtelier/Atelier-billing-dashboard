@@ -78,18 +78,19 @@ export default function AIAnalytics() {
       <div className="flex items-center justify-between">
         <div>
         <div className="flex items-center gap-4">
-  <Brain className="w-3 h-5 text-purple-600" />
+  <Brain className="w-8 h-8 text-purple-600" />
   <span className="text-[22px] font-normal text-gray-800">
     AI-Powered Analytics
   </span>
   <span
-    className="flex items-center gap-1 text-white text-xs font-semibold px-3 py-1 rounded-full"
-    style={{
-      background: "linear-gradient(90deg, #a855f7, #ec4899)"
-    }}
+  className="flex items-center gap-2 text-white text-xs font-semibold px-3 py-1 rounded-full"
+  style={{
+    background: "linear-gradient(90deg, #a855f7, #ec4899)"
+  }}
   >
-    ⚡ Smart Insights
-  </span>
+  <Zap className="w-4 h-4 text-white" />
+  Smart Insights
+</span>
 </div>
 
           <p className="text-gray-500 mt-1 text-sm">
@@ -98,72 +99,101 @@ export default function AIAnalytics() {
         </div>
 
         <button
-          onClick={handleGenerateReorder}
-          disabled={isGenerating}
-          className="px-5 py-2 rounded-lg text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 flex items-center shadow"
-        >
-          {isGenerating ? (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              Generating...
-            </div>
-          ) : (
-            <>
-              <Brain className="w-4 h-4 mr-2 text-white" /> Generate AI Insights
-            </>
-          )}
-        </button>
+  onClick={handleGenerateReorder}
+  disabled={isGenerating}
+  className="px-5 py-2 rounded-lg text-white font-medium bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 flex items-center shadow"
+>
+  {isGenerating ? (
+    <div className="flex items-center gap-2">
+      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      <span className="text-white">Generating...</span>
+    </div>
+  ) : (
+    <>
+      <Brain className="w-4 h-4 mr-2 text-white" />
+      <span className="text-white">Generate AI Insights</span>
+    </>
+  )}
+</button>
+
       </div>
 
       {/* SUMMARY CARDS */}
-<div className="grid grid-cols-1 md:grid-cols-4 gap-5 mt-4">
-<div className="p-5 rounded-xl shadow-md bg-gradient-to-br from-purple-500 to-purple-500 text-white relative h-[150px]">
-  <p className="text-sm opacity-90">Stock Runout Alerts</p>
+      <div className="flex gap-4">
+  <div className="w-[360px] h-[140px] p-5 rounded-2xl bg-gradient-to-r from-[#a855f7] to-[#9333ea] text-white shadow flex flex-col justify-between">
+    <h3 className="text-[15px] font-medium">Stock Runout Alerts</h3>
 
-  <p className="text-4xl font-semibold mt-3">4</p>
+    <div className="flex justify-between items-center">
+      <p className="text-3xl font-semibold">4</p>
 
-  <p className="text-sm mt-2 opacity-90">Next 30 days</p>
+      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+       
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <circle cx="12" cy="16" r="1" />
+        </svg>
+      </div>
+    </div>
 
-  <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-xl">
-    <AlertCircle className="w-6 h-6 text-white" />
+    <p className="text-xs opacity-90">Next 30 days</p>
   </div>
-</div>
-<div className="p-5 rounded-xl shadow-md bg-gradient-to-br from-blue-500 to-blue-600 text-white relative h-[150px]">
-  <p className="text-sm opacity-90">Predicted Sales</p>
+  <div className="w-[360px] h-[140px] p-5 rounded-2xl bg-[#1E55FF] text-white shadow flex flex-col justify-between">
+    <h3 className="text-[15px] font-medium">Predicted Sales</h3>
 
-  <p className="text-4xl font-semibold mt-3">$58K</p>
+    <div className="flex justify-between items-center">
+      <p className="text-3xl font-bold">$58K</p>
 
-  <p className="text-sm mt-2 opacity-90">Next month</p>
+      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="4 14 10 8 14 12 20 6" />
+        </svg>
+      </div>
+    </div>
 
-  <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-xl">
-    <TrendingUp className="w-6 h-6 text-white" />
+    <p className="text-xs opacity-90">Next month</p>
   </div>
-</div>
-<div className="p-5 rounded-xl shadow-md bg-gradient-to-br from-green-500 to-green-600 text-white relative h-[150px]">
-  <p className="text-sm opacity-90">Fast-Moving Items</p>
 
-  <p className="text-4xl font-semibold mt-3">4</p>
 
-  <p className="text-sm mt-2 opacity-90">High velocity</p>
+  <div className="w-[360px] h-[140px] p-5 rounded-2xl bg-gradient-to-br from-[#02C23E] to-[#00A637] text-white shadow flex flex-col justify-between">
+  <h3 className="text-[15px] font-medium">Fast-Moving Items</h3>
 
-  <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-xl">
-    <Zap className="w-6 h-6 text-white" />
+  <div className="flex justify-between items-center">
+    <p className="text-3xl font-semibold">4</p>
+
+    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 13 10" />
+      </svg>
+    </div>
   </div>
+
+  <p className="text-xs opacity-90">High velocity</p>
 </div>
-<div className="p-5 rounded-xl shadow-md bg-gradient-to-br from-orange-500 to-orange-600 text-white relative h-[150px]">
-  <p className="text-sm opacity-90">Slow Movers</p>
 
-  <p className="text-4xl font-semibold mt-3">3</p>
 
-  <p className="text-sm mt-2 opacity-90">Needs action</p>
 
-  <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-xl">
-    <Clock className="w-6 h-6 text-white" />
+<div className="w-[360px] h-[140px] p-5 rounded-2xl bg-gradient-to-br from-[#FF6A00] to-[#FF4E00] text-white shadow flex flex-col justify-between">
+  <h3 className="text-[15px] font-medium">Slow Movers</h3>
+
+  <div className="flex justify-between items-center">
+    <p className="text-3xl font-semibold">3</p>
+
+    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    </div>
   </div>
+
+  <p className="text-xs opacity-90">Needs action</p>
 </div>
 
 </div>
-<div className="bg-white rounded-xl p-2 flex items-center gap-8">
+
+
+<div className="bg-white rounded p-1 flex items-center gap-2">
   {[
     { key: "predictions", label: "Stock Predictions" },
     { key: "forecast", label: "Sales Forecast" },
@@ -174,9 +204,10 @@ export default function AIAnalytics() {
       key={t.key}
       onClick={() => setTab(t.key)}
       className={`px-4 py-2 rounded-md text-[15px] font-medium transition
+        outline-none focus:outline-none focus:ring-0
         ${
           tab === t.key
-            ? "border border-black text-black bg-white shadow-sm"
+            ? "bg-white text-black shadow-sm"  
             : "text-gray-800 hover:bg-gray-100"
         }`}
     >
@@ -189,12 +220,12 @@ export default function AIAnalytics() {
       ------------------------------------------------------------ */}
   {tab === "predictions" && (
   <>
-    <h2 className="text-xl !font-normal font-[300] flex items-center gap-2 mb-4 text-gray-900">
-  <Brain className="w-6 h-6 text-purple-600" />
-  AI Stock Runout Prediction
-</h2>
+    <h2 className="text-[15px]  !font-normal font-[300] flex items-center gap-2 mb-4 text-gray-900">
+      <Brain className="w-6 h-6 text-purple-600" />
+      AI Stock Runout Prediction
+    </h2>
+
     <div className="space-y-4">
-      
       {predictedStockData.map((item, i) => (
         <motion.div
           key={item.product}
@@ -205,31 +236,35 @@ export default function AIAnalytics() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-[17px] font-normal text-gray-900">
-                {item.product}
+            <h3 className="text-[17px] text-gray-900" style={{ fontWeight: 400 }}>
+              {item.product}
               </h3>
 
-              <div className="flex items-center gap-6 mt-1 text-[15px]">
-                <span className="text-gray-900">Current: {item.current}</span>
 
+            <div className="flex items-center gap-6 mt-1 text-[15px]">
+              <span className="text-gray-900">
+                Current: <span className="font-bold">{item.current}</span>
+                </span>
                 <div className="flex items-center gap-3">
-                  <span className="text-red-600">Predicted: {item.predicted}</span>
+                  <span className="text-red-600">
+                    Predicted: <span className="font-bold">{item.predicted}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-[#FEEAD1] text-[#C86822] text-[13px] font-medium">
+                      <Clock className="w-[14px] h-[14px] text-[#C86822]" />
+                      {item.daysUntil} days
+                      </span>
+                      </div>
+                      </div>
 
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded-md text-[14px]">
-                    <Clock className="w-3 h-3" /> {item.daysUntil} days
-                  </span>
-                </div>
-              </div>
             </div>
-
-            <button className="px-4 py-2 rounded-md text-white font-normal text-[15px] bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 shadow">
-              Reorder {item.reorderQty} Units
-            </button>
-          </div>
-          <div className="mt-4">
-            <div className="flex justify-between text-[15px] text-gray-700 mb-1">
-              <span>Stock Depletion Progress</span>
-              <span>
+            <button className="px-4 py-2 rounded-md text-white font-medium text-[15px] bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 shadow">
+              <span className="text-white">Reorder {item.reorderQty} Units</span>
+              </button>
+              </div>
+              <div className="mt-4">
+                <div className="flex justify-between text-[15px] text-white mb-1 font-medium">
+                  <span className="text-white">Stock Depletion Progress</span>
+              <span className="text-white">
                 {(((item.current - item.predicted) / item.current) * 100).toFixed(0)}%
               </span>
             </div>
@@ -248,79 +283,77 @@ export default function AIAnalytics() {
     </div>
   </>
 )}
-
-        {/* ====================== FORECAST TAB ====================== */}
+{/* ------------------------------------------------------------
+   SALES FORECAST TAB
+------------------------------------------------------------ */}
 {tab === "forecast" && (
-  <div className="mt-6 p-6 bg-white shadow rounded-xl">
-    <h2 className="text-[16px] font-normal text-gray-800 mb-4">
-  30-Day Sales Forecast
-</h2>
+  <div className="mt-6 bg-white p-6 rounded-2xl shadow-sm">
+    <h2 className="text-[16px]  !font-normal font-[300] flex items-center gap-2 mb-4 text-gray-900">
+     30-Day Sales Forecast 
+    </h2>
     <ResponsiveContainer width="100%" height={350}>
-      <AreaChart data={salesForecast}>
+      <AreaChart
+        data={salesForecast}
+        margin={{ top: 10, right: 40, left: 0, bottom: 0 }}
+      >
         <defs>
-          <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#000" stopOpacity={0.15} />
-            <stop offset="95%" stopColor="#000" stopOpacity={0} />
+          <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
           </linearGradient>
-
-          <linearGradient id="colorPredicted" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#a855f7" stopOpacity={0.2} />
-            <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+          <linearGradient id="predictedGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#A855F7" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="#A855F7" stopOpacity={0} />
           </linearGradient>
         </defs>
-
-        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-        <XAxis dataKey="month" stroke="#6b7280" />
-        <YAxis stroke="#6b7280" />
-        <Tooltip />
+        <CartesianGrid stroke="#d9d9d9" strokeDasharray="4" opacity={0.4} />
+        <XAxis dataKey="month" stroke="#555" tickMargin={10} />
+        <YAxis stroke="#555" />
+        <Tooltip 
+          contentStyle={{ 
+            background: "white", 
+            borderRadius: "10px", 
+            border: "1px solid #eee" 
+          }} 
+        />
         <Area
           type="monotone"
           dataKey="actual"
-          stroke="#000"
-          fill="url(#colorActual)"
-          strokeWidth={2}
+          name="Actual Sales"
+          stroke="#4F46E5"         
+          strokeWidth={3}
+          fillOpacity={1}
+          fill="url(#actualGradient)"
         />
         <Area
           type="monotone"
           dataKey="predicted"
-          stroke="#a855f7"
-          fill="url(#colorPredicted)"
-          strokeWidth={2}
-          strokeDasharray="5 5"
+          name="Predicted Sales"
+          stroke="#A855F7"         
+          strokeWidth={3}
+          strokeDasharray="6 6"  
+          fillOpacity={1}
+          fill="url(#predictedGradient)"
         />
       </AreaChart>
     </ResponsiveContainer>
-<div className="grid grid-cols-1 md:grid-cols-3 gap-16 mt-10">
-
-<div className="flex flex-col">
-  <p className="text-[15px] text-blue-700 font-normal">
-    Predicted Growth
-  </p>
-  <p className="text-[22px] mt-1 font-semibold text-blue-900 tracking-wide">
-    +12.5%
-  </p>
-</div>
-<div className="flex flex-col">
-  <p className="text-[15px] text-purple-700 font-normal">
-    Confidence Score
-  </p>
-  <p className="text-[22px] mt-1 font-semibold text-purple-900 tracking-wide">
-    87%
-  </p>
-</div>
-<div className="flex flex-col">
-  <p className="text-[15px] text-green-700 font-normal">
-    Expected Revenue
-  </p>
-  <p className="text-[22px] mt-1 font-semibold text-green-900 tracking-wide">
-    $179K
-  </p>
-</div>
-
-</div>
-
+    <div className="grid grid-cols-3 gap-4 mt-6">
+  <div className="p-5 bg-[#F0F6FF] text-[#1E40AF] rounded-2xl border border-[#E0ECFF]">
+    <p className="text-[15px] font-normal">Predicted Growth</p>
+    <p className="text-[28px] font-normal mt-1">+12.5%</p>
   </div>
+  <div className="p-5 bg-[#F9F2FF] text-[#7E22CE] rounded-2xl border border-[#ECD8FF]">
+    <p className="text-[15px] font-normal">Confidence Score</p>
+    <p className="text-[28px] font-normal mt-1">87%</p>
+  </div>
+  <div className="p-5 bg-[#F0FFF6] text-[#0F8A4C] rounded-2xl border border-[#D7FFE9]">
+    <p className="text-[15px] font-normal">Expected Revenue</p>
+    <p className="text-[28px] font-normal mt-1">$179K</p>
+  </div>
+</div>
+ </div>
 )}
+
       {/* ------------------------------------------------------------
          VELOCITY TAB
       ------------------------------------------------------------ */}
@@ -328,7 +361,7 @@ export default function AIAnalytics() {
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 text-[15px] font-normal">
 
     <div>
-    <h2 className="text-[18px] font-normal mb-4 flex items-center gap-2">
+    <h2 className="text-[15px]  !font-normal font-[300] flex items-center gap-2 mb-4 text-gray-900">
   <Zap className="w-5 h-5 text-green-600" />
   Fast-Moving Products
 </h2>
@@ -361,7 +394,7 @@ export default function AIAnalytics() {
       ))}
     </div>
     <div>
-    <h2 className="text-[18px] font-normal mb-4 flex items-center gap-2">
+    <h2 className="text-[15px]  !font-normal font-[300] flex items-center gap-2 mb-4 text-gray-900">
   <Clock className="w-5 h-5 text-orange-600" />
   Slow-Moving Products
 </h2>
@@ -413,18 +446,16 @@ export default function AIAnalytics() {
         <circle cx="12" cy="12" r="10" />
       </svg>
 
-      <h2 className="text-[18px] font-normal text-gray-900">
+      <h2 className="text-[15px]  !font-normal font-[300] flex items-center gap-2 mb-4 text-gray-900">
         Seasonal Demand Insights
       </h2>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div className="p-6 rounded-[20px] bg-gradient-to-b from-blue-50 to-purple-50 shadow-sm">
-
-{/* Season Badge */}
-<span className="px-3 py-1 bg-blue-200 text-blue-600 text-sm rounded-lg inline-block mb-3">
+<span className="px-3 py-1 bg-blue-200 text-blue-600 text-14px rounded-lg inline-block mb-3">
   Holiday Season
 </span>
-<p className="text-[18px] font-medium text-gray-900 mb-4">
+<p className="text-[17px] font-normal text-gray-900 mb-4">
   iPhone 15 Pro
 </p>
         <div className="mt-4 bg-white rounded-xl p-4 flex justify-between items-center">
@@ -441,11 +472,11 @@ export default function AIAnalytics() {
       </div>
       <div className="p-6 rounded-[20px] bg-gradient-to-b from-blue-50 to-purple-50 shadow-sm">
 
-  <span className="px-3 py-1 bg-blue-200 text-blue-600 text-sm rounded-lg inline-block mb-3">
+  <span className="px-3 py-1 bg-blue-200 text-blue-600 text-14px rounded-lg inline-block mb-3">
     Back to School
   </span>
 
-  <p className="text-[18px] font-medium text-gray-900 mb-4">
+  <p className="text-[17px] font-normal text-gray-900 mb-4">
     Back to School Bundle
   </p>
         <div className="mt-4 bg-white rounded-xl p-4 flex justify-between items-center">
@@ -463,16 +494,13 @@ export default function AIAnalytics() {
       </div>
       <div className="p-6 rounded-[20px] bg-gradient-to-b from-blue-50 to-purple-50 shadow-sm">
 
-  <span className="px-3 py-1 bg-blue-200 text-blue-600 text-sm rounded-lg inline-block mb-3">
+  <span className="px-3 py-1 bg-blue-200 text-blue-600 text-14px rounded-lg inline-block mb-3">
     Summer
   </span>
 
-  <p className="text-[18px] font-medium text-gray-900 mb-4">
+  <p className="text-[17px] font-normal text-gray-900 mb-4">
     Air Conditioner
   </p>
-
-
-        {/* Expected Increase */}
         <div className="mt-4 bg-white rounded-xl p-4 flex justify-between items-center">
           <span className="text-gray-700 text-[14px]">Expected Increase</span>
           <span className="text-green-600 text-[16px] font-normal text-right">120%</span>
@@ -492,4 +520,4 @@ export default function AIAnalytics() {
 )}
     </div>
   );
-}
+} 
