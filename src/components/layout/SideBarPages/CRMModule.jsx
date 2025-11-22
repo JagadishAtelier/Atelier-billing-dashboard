@@ -205,7 +205,7 @@ export default function CRMModule() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <motion.div whileHover={{ scale: 1.02 }} className="p-6 rounded-xl shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+        <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded-xl shadow-md bg-gradient-to-br from-blue-500 to-blue-600 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100">Total Leads</p>
@@ -213,12 +213,13 @@ export default function CRMModule() {
               <p className="text-blue-100 text-sm mt-1">{leads.filter((l) => l.status === "new").length} New</p>
             </div>
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-              <Users className="w-8 h-8" />
+              <Users className="w-8 h-7" />
             </div>
           </div>
         </motion.div>
 
-        <motion.div whileHover={{ scale: 1.02 }}   className="p-6 rounded-xl shadow-lg bg-gradient-to-br from-green-500 to-green-600 text-white">
+        <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded-xl shadow-md bg-gradient-to-br from-green-500 to-green-600 text-white">
+
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100">Active Customers</p>
@@ -226,29 +227,27 @@ export default function CRMModule() {
               <p className="text-green-100 text-sm mt-1">{customers.filter((c) => c.segment === "high_value").length} High Value</p>
             </div>
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-              <Star className="w-8 h-8" />
+              <Star className="w-8 h-7" />
             </div>
           </div>
         </motion.div>
 
-        <motion.div whileHover={{ scale: 1.02 }}   className="p-6 rounded-xl shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-
+        <motion.div whileHover={{ scale: 1.02 }}     className="p-3 rounded-xl shadow-md bg-gradient-to-br from-purple-500 to-purple-600 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-100">Customer LTV</p>
               <p className="mt-2 text-3xl">
               ${((customers.reduce((sum, c) => sum + c.totalSpent, 0) / customers.length) / 1000).toFixed(1)}K
-</p>
+              </p>
               <p className="text-purple-100 text-sm mt-1">Avg per customer</p>
             </div>
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-              <IndianRupee className="w-8 h-8" />
+              <IndianRupee className="w-8 h-7" />
             </div>
           </div>
         </motion.div>
 
-        <motion.div whileHover={{ scale: 1.02 }}   className="p-6 rounded-xl shadow-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-
+        <motion.div whileHover={{ scale: 1.02 }}     className="p-3 rounded-xl shadow-md bg-gradient-to-br from-orange-500 to-orange-600 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-orange-100">Conversion Rate</p>
@@ -256,61 +255,55 @@ export default function CRMModule() {
               <p className="text-orange-100 text-sm mt-1">+5% this month</p>
             </div>
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-              <TrendingUp className="w-8 h-8" />
+              <TrendingUp className="w-8 h-7" />
             </div>
           </div>
         </motion.div>
       </div>
 
       {/* Tabs */}
-      <div>
-      <div className="flex gap-6 items-center bg-white border border-gray-300 px-6 py-2 rounded-full w-fit shadow-sm">
-  {[
-    { key: "leads", label: "Leads Pipeline" },
-    { key: "customers", label: "Customer Insights" },
-    { key: "analytics", label: "Analytics" },
-  ].map((t) => (
-    <button
-      key={t.key}
-      onClick={() => setActiveTab(t.key)}
-      className={`
-        px-4 py-2 rounded-md text-sm font-medium transition
-        ${activeTab === t.key
-          ? "text-purple-600 font-semibold"
-          : "text-gray-700"
-        }
-      `}
-    >
-      {t.label}
-    </button>
-  ))}
-</div>
+      <div className="mt-4">
+  <div className="flex items-center gap-8 bg-white border border-gray-300 px-6 py-2 rounded-full shadow-sm w-fit">
+    {[
+      { key: "leads", label: "Leads Pipeline" },
+      { key: "customers", label: "Customer Insights" },
+      { key: "analytics", label: "Analytics" },
+    ].map((t) => (
+      <button
+        key={t.key}
+        onClick={() => setActiveTab(t.key)}
+        className={`text-sm font-medium transition ${
+          activeTab === t.key
+            ? "text-purple-600 font-semibold"
+            : "text-gray-800"
+        }`}
+      >
+        {t.label}
+      </button>
+    ))}
+  </div>
+
         {/* Leads Tab */}
          {activeTab === "leads" && (
           <div className="space-y-6 mt-6">
             <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm">
-
-<div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 w-full">
-  <Search className="w-4 h-4 text-gray-400 mr-2" />
-  <input
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-    placeholder="Search leads..."
-    className="bg-gray-100 w-full focus:outline-none text-sm text-gray-700"
-  />
-</div>
-<div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 cursor-pointer">
-  <Filter className="w-4 h-4 text-gray-500 mr-2" />
-  <select
-    className="bg-gray-100 text-sm text-gray-700 focus:outline-none"
-  >
-    <option value="all">Filter by status</option>
-    <option value="new">New</option>
-    <option value="contacted">Contacted</option>
-    <option value="qualified">Qualified</option>
-  </select>
-</div>
-</div>
+              <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 w-full">
+                <Search className="w-4 h-4 text-gray-400 mr-2" />
+                 <input
+                 value={searchTerm}
+                 onChange={(e) => setSearchTerm(e.target.value)}
+                 placeholder="Search leads..."
+                 className="bg-gray-100 w-full focus:outline-none text-sm text-gray-700"/>
+                 </div>
+                 <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 cursor-pointer">
+                  <Filter className="w-4 h-4 text-gray-500 mr-2" />
+                   <select className="bg-gray-100 text-sm text-gray-700 focus:outline-none">
+                    <option value="all">Filter by status</option>
+                    <option value="new">New</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="qualified">Qualified</option>
+                    </select></div>
+                    </div>
        
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredLeads.map((lead, index) => (
@@ -361,6 +354,7 @@ export default function CRMModule() {
                       </div>
 
                       <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+
                         <div>
                           <p className="text-gray-500 text-sm">Expected Value</p>
                           <p className="text-gray-900">₹{lead.value.toLocaleString("en-IN")}</p>
@@ -371,14 +365,14 @@ export default function CRMModule() {
                         </div>
                       </div>
 
-                      <div className="flex gap-2 mt-4">
-                        <button className="flex-1 px-3 py-2 border rounded-md flex items-center justify-center gap-2">
+                      <div className="flex gap-4 mt-4">
+                        <button className="flex-1 px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-center gap-2 bg-white hover:bg-gray-50 transition">
                           <Phone className="w-4 h-4" /> Call
-                        </button>
-                        <button className="flex-1 px-3 py-2 border rounded-md flex items-center justify-center gap-2">
-                          <MessageSquare className="w-4 h-4" /> Note
-                        </button>
-                      </div>
+                          </button>
+                          <button className="flex-1 px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-center gap-2 bg-white hover:bg-gray-50 transition">
+                            <MessageSquare className="w-4 h-4" /> Note
+                            </button></div>
+
                     </div>
                   </div>
                 </motion.div>
@@ -479,36 +473,49 @@ export default function CRMModule() {
         {/* Analytics Tab */}
         {activeTab === "analytics" && (
           <div className="space-y-6 mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl shadow p-6">
-                <h3 className="text-lg font-medium mb-4">Customer Segmentation</h3>
-                <div className="space-y-4">
-                  {["VIP", "High Value", "Regular", "Inactive"].map((segment, index) => {
-                    const count = customers.filter((c) => c.segment.replace("_", " ").toLowerCase() === segment.toLowerCase()).length;
-                    const percentage = (count / customers.length) * 100 || 0;
-                    return (
-                      <div key={segment}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-gray-700">{segment}</span>
-                          <span className="text-gray-900">{count} ({percentage.toFixed(0)}%)</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-3">
-                          <div
-                            className={`h-3 rounded-full ${
-                              index === 0 ? "bg-purple-500" : index === 1 ? "bg-green-500" : index === 2 ? "bg-blue-500" : "bg-gray-400"
-                            }`}
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl shadow p-6">
+              <h3 className="text-lg font-medium mb-6">Customer Segmentation</h3>
+        
+              <div className="space-y-6">
+                {["VIP", "High Value", "Regular", "Inactive"].map((segment, index) => {
+                  const count = customers.filter((c) =>
+                    c.segment.replace("_", " ").toLowerCase() === segment.toLowerCase()
+                  ).length;
+        
+                  const percentage = (count / customers.length) * 100 || 0;
+        
+                  return (
+                    <div key={segment} className="pb-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-gray-800 text-[15px]">{segment}</span>
+                        <span className="text-gray-900 text-[15px]">
+                          {count} ({percentage.toFixed(0)}%)
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
+        
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div
+                          className={`h-3 rounded-full ${
+                            index === 0
+                              ? "bg-purple-500"
+                              : index === 1
+                              ? "bg-green-500"
+                              : index === 2
+                              ? "bg-blue-500"
+                              : "bg-gray-400"
+                          }`}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-
+            </div>
               <div className="bg-white rounded-xl shadow p-6">
                 <h3 className="text-lg font-medium mb-4">Lead Source Performance</h3>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {["Website", "Referral", "Walk-in", "Social Media"].map((source) => {
                     const count = leads.filter((l) => l.source === source).length;
                     const percentage = leads.length > 0 ? (count / leads.length) * 100 : 0;
@@ -530,8 +537,6 @@ export default function CRMModule() {
           </div>
         )}
       </div>
-
-      {/* Add Lead Modal (Tailwind-only) */}
       {isAddLeadOpen && (
         <div
           role="dialog"
