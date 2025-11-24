@@ -1,4 +1,3 @@
-// ProductForm.jsx
 import React, { useEffect, useState } from "react";
 import {
   Steps,
@@ -7,10 +6,10 @@ import {
   InputNumber,
   Select,
   Button,
-  message,
   Spin,
 } from "antd";
 import { LeftOutlined, RightOutlined, CheckCircleTwoTone } from "@ant-design/icons";
+import { toast } from "sonner";        // ✅ NEW
 import { useNavigate, useParams } from "react-router-dom";
 import productService from "../services/productService";
 import categoryService from "../services/categoryService";
@@ -36,20 +35,18 @@ const ProductForm = () => {
   const [fileList, setFileList] = useState([]);
   const [form] = Form.useForm();
 
-  // Fetch categories (with debug log)
+  // Fetch categories
   const fetchCategories = async () => {
     try {
       const res = await categoryService.getAll();
       const data = res?.data || res || [];
-      console.log("DEBUG: categories:", data);
       setCategories(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Category fetch error:", err);
-      message.error("Failed to fetch categories");
+      toast.error("Failed to fetch categories");   // ✅ CHANGED
     }
   };
 
-  // Fetch subcategories for category
+  // Fetch subcategories
   const handleCategoryChange = async (categoryId) => {
     form.setFieldsValue({ subcategory_id: undefined });
     if (!categoryId) {
@@ -61,18 +58,19 @@ const ProductForm = () => {
       const data = res?.data || res || [];
       setSubcategories(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Subcategory fetch error:", err);
-      message.error("Failed to fetch subcategories");
+      toast.error("Failed to fetch subcategories"); // ✅ CHANGED
     }
   };
 
-  // Fetch existing product when editing
+  // Fetch product (edit mode)
   const fetchProduct = async (productId) => {
     if (!productId) return;
     setLoading(true);
     try {
       const data = await productService.getById(productId);
+
       if (data?.category_id) await handleCategoryChange(data.category_id);
+
       form.setFieldsValue({
         product_name: data.product_name,
         brand: data.brand,
@@ -85,22 +83,22 @@ const ProductForm = () => {
         tax_percentage: data.tax_percentage,
         description: data.description,
         status: data.status || "active",
-        // <-- set min and max quantity when editing
         min_quantity: data.min_quantity ?? 0,
         max_quantity: data.max_quantity ?? 0,
       });
+
       if (Array.isArray(data.images)) {
-        const files = data.images.map((url, idx) => ({
-          uid: `orig-${idx}`,
-          name: `image-${idx}`,
-          status: "done",
-          url,
-        }));
-        setFileList(files);
+        setFileList(
+          data.images.map((url, idx) => ({
+            uid: `orig-${idx}`,
+            name: `image-${idx}`,
+            status: "done",
+            url,
+          }))
+        );
       }
     } catch (err) {
-      console.error("Product fetch error:", err);
-      message.error("Failed to load product");
+      toast.error("Failed to load product");        // ✅ CHANGED
     } finally {
       setLoading(false);
     }
@@ -114,7 +112,7 @@ const ProductForm = () => {
     if (routeId) fetchProduct(routeId);
   }, [routeId]);
 
-  // Validation groups
+  // Step validation mapping
   const stepFieldMap = [
     ["category_id", "subcategory_id"],
     ["product_name", "brand", "unit", "size", "purchase_price", "selling_price", "tax_percentage"],
@@ -126,131 +124,69 @@ const ProductForm = () => {
       const fields = stepFieldMap[current] || [];
       if (fields.length) await form.validateFields(fields);
       setCurrent((c) => Math.min(c + 1, STEP_COLORS.length - 1));
-    } catch (err) {
-      console.log("Validation failed for step", current, err);
-    }
+    } catch (err) {}
   };
 
   const prev = () => setCurrent((c) => Math.max(c - 1, 0));
 
-  const handleUploadChange = ({ fileList: newList }) => setFileList(newList);
-
-  // Build payload from current Form state (always pull current values from the Form)
+  // Build payload
   const buildPayloadFromForm = () => {
-    // get all fields (latest form state)
-    const values = form.getFieldsValue(true); // true => include all controlled fields
-    // Trim strings and coerce IDs to strings
+    const values = form.getFieldsValue(true);
     const trim = (v) => (typeof v === "string" ? v.trim() : v);
 
     const images = fileList
       .filter((f) => f.status === "done" || f.url || f.thumbUrl)
       .map((f) => f.url || f.thumbUrl || f.response?.url || f.name);
 
-    const payload = {
+    return {
       product_name: trim(values.product_name ?? ""),
       brand: trim(values.brand ?? ""),
       unit: trim(values.unit ?? ""),
       size: trim(values.size ?? ""),
-      // ensure category/subcategory values are strings (Select value may be number or uuid)
-      category_id: values.category_id != null ? String(values.category_id) : "",
-      subcategory_id: values.subcategory_id != null ? String(values.subcategory_id) : "",
+      category_id: values.category_id ? String(values.category_id) : "",
+      subcategory_id: values.subcategory_id ? String(values.subcategory_id) : "",
       purchase_price: values.purchase_price ?? 0,
       selling_price: values.selling_price ?? 0,
       tax_percentage: values.tax_percentage ?? 0,
       description: trim(values.description ?? ""),
       status: trim(values.status ?? "active"),
       images,
-      // <-- include min and max quantities in payload
-      min_quantity: typeof values.min_quantity === "number" ? values.min_quantity : Number(values.min_quantity ?? 0),
-      max_quantity: typeof values.max_quantity === "number" ? values.max_quantity : Number(values.max_quantity ?? 0),
+      min_quantity: Number(values.min_quantity ?? 0),
+      max_quantity: Number(values.max_quantity ?? 0),
     };
-
-    return payload;
   };
 
-  // Map backend validation to form fields
-  const applyServerValidationToForm = (errorArray) => {
-    if (!Array.isArray(errorArray)) return;
-    const fieldErrors = errorArray
-      .map((e) => {
-        const name = Array.isArray(e.path) ? e.path : (e.path ? [e.path] : [""]);
-        return { name, errors: [e.message || "Invalid value"] };
-      })
-      .filter(Boolean);
-    if (fieldErrors.length) form.setFields(fieldErrors);
-  };
-
-  // Final submit: validate client-side, then build payload from form state, guard common problems,
-  // then send. This prevents "empty payload" being sent.
+  // Submit form
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // run validation for entire form (ensures required fields flagged)
       await form.validateFields();
 
-      // build payload from form (fresh)
       const payload = buildPayloadFromForm();
-      console.log("FINAL PAYLOAD:", payload);
 
-      // client-side guard: check critical server validations
-      const clientFieldErrors = [];
-      if (!payload.product_name || payload.product_name.length === 0) {
-        clientFieldErrors.push({ name: ["product_name"], errors: ["Product name is required"] });
-      }
-      // If your backend expects a UUID for category_id, check format
-      if (!payload.category_id || payload.category_id.length === 0) {
-        clientFieldErrors.push({ name: ["category_id"], errors: ["Please select category"] });
-      } else if (!isUUID(payload.category_id)) {
-        // Only enforce UUID format if your categories are expected to be UUIDs.
-        // If your category IDs are numeric or other format, remove this check.
-        clientFieldErrors.push({ name: ["category_id"], errors: ["Category ID must be a valid UUID"] });
-      }
-
-      if (clientFieldErrors.length) {
-        form.setFields(clientFieldErrors);
-        setLoading(false);
-        // bring the user to the step containing the first error
-        const firstField = clientFieldErrors[0].name[0];
-        if (["category_id", "subcategory_id"].includes(firstField)) setCurrent(0);
-        else if (["product_name", "brand", "unit", "size", "purchase_price", "selling_price", "tax_percentage"].includes(firstField)) setCurrent(1);
-        else setCurrent(2);
-        return;
-      }
-
-      // send payload
       if (routeId) {
         await productService.update(routeId, payload);
-        message.success("Product updated successfully");
+        toast.success("Product updated successfully");   // ✅ CHANGED
       } else {
         await productService.create(payload);
-        message.success("Product created successfully");
+        toast.success("Product created successfully");   // ✅ CHANGED
       }
 
       navigate("/product/list");
     } catch (err) {
-      console.error("Save error:", err);
-
-      // handle axios backend validation
       const resp = err?.response?.data;
+
       if (resp?.error && Array.isArray(resp.error)) {
-        applyServerValidationToForm(resp.error);
-        resp.error.forEach((e) => message.error(e.message || JSON.stringify(e)));
-      } else if (err?.message) {
-        message.error(err.message);
+        resp.error.forEach((e) => toast.error(e.message || "Validation error"));  // ✅ CHANGED
       } else {
-        message.error("Failed to save product");
+        toast.error(err?.message || "Failed to save product");                     // ✅ CHANGED
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Helper to pick a string value from category object (use uuid if available)
-  const optionValue = (cat) => {
-    // prefer uuid or _id if present, otherwise id
-    if (!cat) return "";
-    return String(cat.uuid ?? cat._id ?? cat.id ?? "");
-  };
+  const optionValue = (cat) => String(cat?.uuid ?? cat?._id ?? cat?.id ?? "");
 
   const StepIcon = ({ index, title }) => (
     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -281,36 +217,17 @@ const ProductForm = () => {
             <Form.Item
               label="Category"
               name="category_id"
-              rules={[
-                { required: true, message: "Please select category" },
-                {
-                  validator: (_, v) => {
-                    if (!v || String(v).trim() === "") return Promise.reject(new Error("Please select category"));
-                    // only validate UUID if categories are UUIDs; skip if your categories are numeric
-                    if (v && !isUUID(String(v))) {
-                      // if your API expects uuid, uncomment next line
-                      // return Promise.reject(new Error("Category ID must be a valid UUID"));
-                      return Promise.resolve(); // comment out if you want UUID enforcement client-side
-                    }
-                    return Promise.resolve();
-                  },
-                },
-              ]}
+              rules={[{ required: true, message: "Please select category" }]}
             >
               <Select
                 placeholder="Select category"
                 onChange={handleCategoryChange}
                 allowClear
                 showSearch
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  option?.children?.toLowerCase().includes(input.toLowerCase())
-                }
               >
                 {categories.map((cat) => (
-                  // value always a string (helps avoid numeric vs uuid mismatches)
                   <Option key={optionValue(cat)} value={optionValue(cat)}>
-                    {cat.category_name || cat.name || "Unnamed"}
+                    {cat.category_name}
                   </Option>
                 ))}
               </Select>
@@ -321,18 +238,10 @@ const ProductForm = () => {
               name="subcategory_id"
               rules={[{ required: true, message: "Please select subcategory" }]}
             >
-              <Select
-                placeholder="Select subcategory"
-                allowClear
-                showSearch
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  option?.children?.toLowerCase().includes(input.toLowerCase())
-                }
-              >
+              <Select allowClear placeholder="Select subcategory">
                 {subcategories.map((sub) => (
                   <Option key={optionValue(sub)} value={optionValue(sub)}>
-                    {sub.subcategory_name || sub.name || "Unnamed"}
+                    {sub.subcategory_name}
                   </Option>
                 ))}
               </Select>
@@ -357,63 +266,39 @@ const ProductForm = () => {
               </Form.Item>
 
               <Form.Item label="Unit" name="unit">
-                <Input placeholder="Enter unit (e.g., pcs, kg)" />
+                <Input placeholder="Enter unit" />
               </Form.Item>
 
               <Form.Item label="Size" name="size">
-                <Select placeholder="Select size" allowClear>
-                  <Option value="XS">XS</Option>
+                <Select allowClear placeholder="Select size">
                   <Option value="S">S</Option>
                   <Option value="M">M</Option>
                   <Option value="L">L</Option>
-                  <Option value="XL">XL</Option>
-                  <Option value="XXL">XXL</Option>
                 </Select>
               </Form.Item>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 16 }}>
-              <Form.Item
-                label="Purchase Price"
-                name="purchase_price"
-                rules={[{ type: "number", min: 0, message: "Price must be >= 0" }]}
-              >
-                <InputNumber style={{ width: "100%" }} placeholder="Enter purchase price" />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+              <Form.Item label="Purchase Price" name="purchase_price">
+                <InputNumber style={{ width: "100%" }} />
               </Form.Item>
 
-              <Form.Item
-                label="Selling Price"
-                name="selling_price"
-                rules={[{ type: "number", min: 0, message: "Price must be >= 0" }]}
-              >
-                <InputNumber style={{ width: "100%" }} placeholder="Enter selling price" />
+              <Form.Item label="Selling Price" name="selling_price">
+                <InputNumber style={{ width: "100%" }} />
               </Form.Item>
 
-              <Form.Item
-                label="Tax %"
-                name="tax_percentage"
-                rules={[{ type: "number", min: 0, message: "Tax must be >= 0" }]}
-              >
-                <InputNumber style={{ width: "100%" }} placeholder="Enter tax percentage" />
+              <Form.Item label="Tax %" name="tax_percentage">
+                <InputNumber style={{ width: "100%" }} />
               </Form.Item>
             </div>
 
-            {/* NEW: min/max quantity row */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16, marginTop: 16 }}>
-              <Form.Item
-                label="Min Quantity"
-                name="min_quantity"
-                rules={[{ type: "number", min: 0, message: "Min quantity must be >= 0" }]}
-              >
-                <InputNumber style={{ width: "100%" }} min={0} step={1} placeholder="Minimum quantity" />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
+              <Form.Item label="Min Quantity" name="min_quantity">
+                <InputNumber style={{ width: "100%" }} />
               </Form.Item>
 
-              <Form.Item
-                label="Max Quantity"
-                name="max_quantity"
-                rules={[{ type: "number", min: 0, message: "Max quantity must be >= 0" }]}
-              >
-                <InputNumber style={{ width: "100%" }} min={0} step={1} placeholder="Maximum quantity" />
+              <Form.Item label="Max Quantity" name="max_quantity">
+                <InputNumber style={{ width: "100%" }} />
               </Form.Item>
             </div>
           </>
@@ -447,57 +332,35 @@ const ProductForm = () => {
           <div style={{ display: "flex", gap: 16 }}>
             <div style={{ width: 260 }}>
               <Steps direction="vertical" current={current} onChange={(idx) => setCurrent(idx)}>
-                <Step title={<StepIcon index={0} title="Category" />} description="Choose category & subcategory" />
-                <Step title={<StepIcon index={1} title="Info" />} description="Product details + pricing" />
-                <Step title={<StepIcon index={2} title="Extras" />} description="Description & status" />
+                <Step title={<StepIcon index={0} title="Category" />} />
+                <Step title={<StepIcon index={1} title="Info" />} />
+                <Step title={<StepIcon index={2} title="Extras" />} />
               </Steps>
             </div>
 
             <div style={{ flex: 1 }}>
-              <div style={{ marginBottom: 12, display: "flex", justifyContent: "space-between" }}>
-                <div>
-                  <h2 style={{ margin: 0 }}>{routeId ? "Edit Product" : "Add Product"}</h2>
-                  <div style={{ color: "#666", fontSize: 13 }}>Step {current + 1} of {STEP_COLORS.length}</div>
-                </div>
-              </div>
+              <h2>{routeId ? "Edit Product" : "Add Product"}</h2>
 
-              <Form
-                form={form}
-                layout="vertical"
-                initialValues={{
-                  status: "active",
-                  purchase_price: 0,
-                  selling_price: 0,
-                  // initial values for the new fields
-                  min_quantity: 0,
-                  max_quantity: 0,
-                }}
-              >
+              <Form form={form} layout="vertical">
                 {renderStepContent(current)}
               </Form>
 
               <div style={{ marginTop: 20, display: "flex", justifyContent: "space-between" }}>
-                <div>
-                  {current > 0 && (
-                    <Button icon={<LeftOutlined />} onClick={prev} style={{ marginRight: 8 }}>
-                      Back
-                    </Button>
-                  )}
-                </div>
+                {current > 0 && (
+                  <Button icon={<LeftOutlined />} onClick={prev}>
+                    Back
+                  </Button>
+                )}
 
-                <div>
-                  {current < STEP_COLORS.length - 1 && (
-                    <Button style={{backgroundColor:"#0E1680"}} type="primary" onClick={next} icon={<RightOutlined />}>
-                      Next
-                    </Button>
-                  )}
-
-                  {current === STEP_COLORS.length - 1 && (
-                    <Button type="primary" onClick={handleSubmit} icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}>
-                      {routeId ? "Update Product" : "Create Product"}
-                    </Button>
-                  )}
-                </div>
+                {current < STEP_COLORS.length - 1 ? (
+                  <Button type="primary" onClick={next} icon={<RightOutlined />} style={{ backgroundColor: "#0E1680" }}>
+                    Next
+                  </Button>
+                ) : (
+                  <Button type="primary" onClick={handleSubmit} icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}>
+                    {routeId ? "Update Product" : "Create Product"}
+                  </Button>
+                )}
               </div>
             </div>
           </div>

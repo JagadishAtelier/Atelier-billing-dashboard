@@ -1,4 +1,4 @@
-// CategoryForm.jsx
+
 import React, { useEffect, useState } from "react";
 import {
   Card,
@@ -21,13 +21,6 @@ import categoryService from "../services/categoryService";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-/**
- * Polished CategoryForm
- * - Responsive two-column layout on wide screens
- * - Gradient header with avatar/icon
- * - Sticky action footer
- * - Validation & success handling (shows Result briefly)
- */
 const CategoryForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();

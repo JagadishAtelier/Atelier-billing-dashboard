@@ -25,5 +25,5 @@ const ProductRoutes = () => {
     </Routes>
   );
 };
-
 export default ProductRoutes;
+

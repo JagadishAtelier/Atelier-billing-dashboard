@@ -1,3 +1,4 @@
+
 import { Suspense, useMemo } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./components/layout/Mainlayout";
@@ -5,7 +6,7 @@ import MainLayout from "./components/layout/Mainlayout";
 import dashboard from "./components/assets/dashboard.png";
 import CustomerBillCopy from "./billing/pages/CustomerBillCopy";
 import CustomerBillForm from "./billing/pages/CustomerBillingForm";
-import Hotel from "../public/factory.png";
+//import Hotel from "../public/factory.png";
 import Login from "./login/Login";
 import ProtectedRoute from "./context/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -29,9 +30,12 @@ import CRMModule from "./components/layout/SideBarPages/CRMModule";
 const routeModules = import.meta.glob("./*/AppRoutes.jsx", { eager: true });
 
 const moduleIcons = {
-Hotel: <img src={Hotel} alt="company" className="w-7 h-9" />,
+  Hotel: <img src="/factory.png" alt="company" className="w-7 h-9" />,
+
   // HMS: <img src={HMS} alt="HMS" className="w-7 h-9" />,
   dashboard: <img src={dashboard} alt="iot" className="w-6 h-6" />,
+  
+
   // hrms: <img src={hrms} alt="iot" className="w-6 h-6 " />,
 
   // master: <img src={master} alt="master" className="w-7 h-9" />,
@@ -279,3 +283,4 @@ element={
 };
 
 export default App;
+

@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import BillingList from "./pages/billingList";
 import BillingForm from "./pages/billingForm";
 import CustomerBillingForm from "./pages/CustomerBillingForm";
-import CustomerBillCopy from "./pages/CustomerBillCopy"; // 🔹 import
+import CustomerBillCopy from "./pages/CustomerBillCopy"; // 🔹 impor
 
 export const billingMenuItems = [
   {
