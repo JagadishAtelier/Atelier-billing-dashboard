@@ -1,5 +1,5 @@
 // src/inward/pages/InwardForm.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Form,
@@ -35,6 +35,7 @@ const InwardForm = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+
   // summary now stores items array plus totals and lastAdded index
   const [summary, setSummary] = useState({
     items: [],
@@ -51,6 +52,11 @@ const InwardForm = () => {
   // vendors for vendor select
   const [vendors, setVendors] = useState([]);
   const [vendorsLoading, setVendorsLoading] = useState(false);
+
+  // products for dropdown search
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const searchTimeout = useRef(null);
 
   /** 🔹 Fetch purchase orders on mount (for selector) */
   useEffect(() => {
@@ -89,7 +95,102 @@ const InwardForm = () => {
     fetchVendors();
   }, []);
 
-  /** 🔹 Add product by code (unchanged logic) */
+  /**
+   * Fetch products from backend using query-string style:
+   *    GET /product?search=value&limit=50
+   * Attempts a few call shapes so it works with common wrappers.
+   */
+  const fetchProducts = async (query = "", limit = 50) => {
+    setProductsLoading(true);
+    try {
+      const q = encodeURIComponent(query || "");
+      const queryString = `?search=${q}&limit=${limit}`;
+
+      const tryCalls = [
+        // 1) productService.getAll(queryString)
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll(queryString);
+          }
+          throw new Error("getAll(string) not available");
+        },
+        // 2) productService.get(`/product${queryString}`)
+        async () => {
+          if (typeof productService.get === "function") {
+            return await productService.get(`/product${queryString}`);
+          }
+          throw new Error("get not available");
+        },
+        // 3) productService.getAll({ params: { search, limit } })
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll({ search: query || undefined, limit });
+          }
+          throw new Error("getAll(params) not available");
+        },
+        // 4) productService.getAll({ search, limit })
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll({ search: query || undefined, limit });
+          }
+          throw new Error("getAll({search}) not available");
+        },
+        // 5) productService.search(query, opts)
+        async () => {
+          if (query && typeof productService.search === "function") {
+            return await productService.search(query, { limit });
+          }
+          throw new Error("search not available");
+        },
+        // 6) fallback: getAll() and client-side filter
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll();
+          }
+          throw new Error("final fallback failed");
+        },
+      ];
+
+      let response = null;
+      let success = false;
+      // run calls sequentially until one returns
+      for (const call of tryCalls) {
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const res = await call();
+          if (res) {
+            response = res;
+            success = true;
+            break;
+          }
+        } catch (err) {
+          // ignore and try next
+        }
+      }
+
+      if (!success || !response) {
+        setProducts([]);
+        return;
+      }
+
+      let list = response?.data ?? response;
+      if (!Array.isArray(list)) {
+        if (list && Array.isArray(list.items)) list = list.items;
+        else list = [];
+      }
+
+      if (!query) setProducts(list.slice(0, 10));
+      else setProducts(list.slice(0, limit));
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+      message.error("Failed to load products");
+      setProducts([]);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
+  /** 🔹 Add product by code (keeps original behavior for scanner) */
   const handleProductCode = async (e) => {
     const code = (e?.target?.value || "").trim();
     if (!code) return;
@@ -126,6 +227,7 @@ const InwardForm = () => {
           unit_price: Number(product.purchase_price) || 0,
           unit: product.unit || "",
           expiry_date: null,
+          isManual: false,
         });
         form.setFieldsValue({ items });
         // update summary: last added is last index
@@ -162,25 +264,20 @@ const InwardForm = () => {
         return;
       }
 
-      // map order items to form item structure
       const mappedItems = (orderData.items || []).map((it) => ({
         product_id: it.product_id,
         product_code: it.product?.product_code || "",
         product_name: it.product?.product_name || "",
-        // prefer pending_quantity if available (inward typically receive pending)
         quantity: Number(it.pending_quantity ?? it.quantity ?? 0),
         unit_price: Number(it.unit_price ?? it.product?.purchase_price ?? 0),
         unit: it.product?.unit || "",
         expiry_date: null,
+        isManual: false,
       }));
 
-      // set supplier_name from vendor if available
       const supplierName = orderData.vendor?.name || orderData.vendor_id || "";
-
-      // set received_date to order date (or you can set to today)
       const receivedDate = orderData.order_date ? dayjs(orderData.order_date) : null;
 
-      // set the fields: include order_id and vendor_id so payload will contain them
       form.setFieldsValue({
         supplier_name: supplierName,
         received_date: receivedDate,
@@ -198,11 +295,97 @@ const InwardForm = () => {
     }
   };
 
-  /** 🔹 Submit Handler (send payload matching DTO: vendor_id + inward_items) */
+  /** Add a new product-selection row (select from dropdown) */
+  const handleAddProduct = () => {
+    const items = form.getFieldValue("items") || [];
+    items.push({
+      product_id: null,
+      product_code: "",
+      product_name: "",
+      quantity: 1,
+      unit_price: 0,
+      unit: "",
+      expiry_date: null,
+      isManual: false,
+    });
+    form.setFieldsValue({ items });
+    updateSummary(items, items.length - 1);
+  };
+
+  /** Add manual product row */
+  const handleAddManualProduct = () => {
+    const items = form.getFieldValue("items") || [];
+    items.push({
+      product_id: null,
+      product_code: "",
+      product_name: "",
+      quantity: 1,
+      unit_price: 0,
+      unit: "",
+      expiry_date: null,
+      isManual: true,
+    });
+    form.setFieldsValue({ items });
+    updateSummary(items, items.length - 1);
+  };
+
+  /** When the user types in the Select, debounce and call backend */
+  const handleSearch = (val) => {
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      fetchProducts(val.trim());
+    }, 300);
+  };
+
+  /** When a product is selected from dropdown for a specific row */
+  const handleProductSelect = (productId, rowIndex) => {
+    const items = form.getFieldValue("items") || [];
+    const p = products.find((x) => String(x.id) === String(productId));
+    if (!p) {
+      (async () => {
+        try {
+          if (typeof productService.getById === "function") {
+            const res = await productService.getById(productId);
+            const prod = res?.data || res;
+            if (prod) {
+              items[rowIndex] = {
+                ...items[rowIndex],
+                product_id: prod.id,
+                product_code: prod.product_code || "",
+                product_name: prod.product_name || "",
+                unit_price: Number(prod.purchase_price) || 0,
+                unit: prod.unit || "",
+                isManual: false,
+              };
+              form.setFieldsValue({ items });
+              updateSummary(items, rowIndex);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load product by id:", err);
+          message.error("Failed to load selected product");
+        }
+      })();
+      return;
+    }
+
+    items[rowIndex] = {
+      ...items[rowIndex],
+      product_id: p.id,
+      product_code: p.product_code || "",
+      product_name: p.product_name || "",
+      unit_price: Number(p.purchase_price) || 0,
+      unit: p.unit || "",
+      isManual: false,
+    };
+    form.setFieldsValue({ items });
+    updateSummary(items, rowIndex);
+  };
+
+  /** Submit Handler (send payload matching DTO: vendor_id + inward_items) */
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      // Ensure vendor_id exists (server requires it)
       const vendorId = values.vendor_id;
       if (!vendorId) {
         message.error(
@@ -212,7 +395,6 @@ const InwardForm = () => {
         return;
       }
 
-      // Map form .items -> server expected inward_items shape
       const items = (values.items || []).map((it) => {
         const mapped = {
           product_id: it.product_id,
@@ -220,14 +402,12 @@ const InwardForm = () => {
           unit_price: Number(it.unit_price || 0),
         };
 
-        // optional fields only when present
         if (it.unit) mapped.unit = String(it.unit);
         if (it.total_price !== undefined) mapped.total_price = Number(it.total_price);
         if (it.batch_number) mapped.batch_number = String(it.batch_number);
         if (it.unused_quantity !== undefined) mapped.unused_quantity = Number(it.unused_quantity);
         if (it.excess_quantity !== undefined) mapped.excess_quantity = Number(it.excess_quantity);
 
-        // expiry_date: convert Dayjs/Date to ISO string when present
         if (it.expiry_date) {
           try {
             mapped.expiry_date = typeof it.expiry_date === "string"
@@ -241,7 +421,6 @@ const InwardForm = () => {
         return mapped;
       });
 
-      // Build payload following DTO names
       const payload = {
         order_id: values.order_id || undefined,
         vendor_id: vendorId,
@@ -305,6 +484,10 @@ const InwardForm = () => {
   useEffect(() => {
     const items = form.getFieldValue("items") || [];
     updateSummary(items, -1);
+    // cleanup search timeout on unmount
+    return () => {
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -314,11 +497,48 @@ const InwardForm = () => {
       dataIndex: "product_code",
       key: "product_code",
       width: 140,
+      render: (_, __, index) => (
+        <Form.Item name={[index, "product_code"]} style={{ margin: 0 }}>
+          <Input disabled className="w-full" />
+        </Form.Item>
+      ),
     },
     {
       title: "Product Name",
       dataIndex: "product_name",
       key: "product_name",
+      width: 400,
+      render: (_, record, index) => (
+        <Form.Item
+          name={[index, "product_name"]}
+          rules={[{ required: true, message: "Enter/select product name" }]}
+          style={{ margin: 0 }}
+        >
+          {record?.isManual ? (
+            <Input placeholder="Enter product name" />
+          ) : (
+            <Select
+              showSearch
+              showArrow
+              placeholder="Search product by name or code"
+              filterOption={false}
+              notFoundContent={productsLoading ? <Spin size="small" /> : null}
+              onSearch={handleSearch}
+              onFocus={() => {
+                if (!products || products.length === 0) fetchProducts("");
+              }}
+              onChange={(productId) => handleProductSelect(productId, index)}
+              style={{ width: "100%" }}
+            >
+              {products.map((p) => (
+                <Option key={String(p.id)} value={String(p.id)} data-code={p.product_code}>
+                  {p.product_name} {p.product_code ? ` — (${p.product_code})` : ""}
+                </Option>
+              ))}
+            </Select>
+          )}
+        </Form.Item>
+      ),
     },
     {
       title: "Quantity",
@@ -421,7 +641,7 @@ const InwardForm = () => {
                 onValuesChange={onValuesChange}
               >
                 <Row gutter={12}>
-                  {/* NEW: Purchase Order selector (optional) */}
+                  {/* Purchase Order selector */}
                   <Col xs={24} sm={12}>
                     <Form.Item label="Purchase Order" name="order_id">
                       <Select
@@ -444,7 +664,7 @@ const InwardForm = () => {
                     </Form.Item>
                   </Col>
 
-                  {/* NEW: Vendor select (required when PO not selected) */}
+                  {/* Vendor select */}
                   <Col xs={24} sm={12}>
                     <Form.Item
                       label="Vendor"
@@ -480,11 +700,7 @@ const InwardForm = () => {
                   </Col>
 
                   <Col xs={24} sm={12}>
-                    <Form.Item
-                      label="Supplier Name"
-                      name="supplier_name"
-                      // supplier_name is optional now; vendor_id is authoritative
-                    >
+                    <Form.Item label="Supplier Name" name="supplier_name">
                       <Input placeholder="Enter supplier name (optional if vendor selected)" />
                     </Form.Item>
                   </Col>
@@ -509,17 +725,16 @@ const InwardForm = () => {
                     </Form.Item>
                   </Col>
 
+                  {/* Add product buttons */}
                   <Col xs={24}>
-                    <Form.Item label="Scan/Enter Product Code" shouldUpdate={false}>
-                      <Input
-                        placeholder="Scan or type code, press Enter"
-                        onPressEnter={(e) => {
-                          e.preventDefault("");
-                          handleProductCode(e); // only add/update product
-                        }}
-                        allowClear
-                      />
-                    </Form.Item>
+                    <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                      <Button type="dashed" onClick={handleAddProduct}>
+                        + Add Product
+                      </Button>
+                      <Button type="dashed" onClick={handleAddManualProduct}>
+                        + Add Product Manually
+                      </Button>
+                    </div>
                   </Col>
 
                   <Col xs={24}>
@@ -527,12 +742,17 @@ const InwardForm = () => {
                     <Form.List name="items">
                       {(fields, { remove }) => {
                         const items = form.getFieldValue("items") || [];
+                        // Table expects dataSource rows; ensure each row has expected fields
+                        const dataSource = (items || []).map((it, idx) => ({
+                          ...it,
+                          key: idx,
+                        }));
                         return (
                           <Table
-                            dataSource={items}
+                            dataSource={dataSource}
                             columns={columns}
                             pagination={false}
-                            rowKey={(record, idx) => idx}
+                            rowKey={(record) => record.key}
                             size="small"
                           />
                         );
@@ -542,7 +762,7 @@ const InwardForm = () => {
 
                   <Col xs={24} style={{ marginTop: 16 }}>
                     <Space>
-                      <Button style={{backgroundColor:"#0E1680"}} type="primary" htmlType="submit" loading={loading}>
+                      <Button style={{ backgroundColor: "#0E1680" }} type="primary" htmlType="submit" loading={loading}>
                         {id ? "Update Inward" : "Add Inward"}
                       </Button>
                       <Button onClick={() => navigate("/inward/list")}>Cancel</Button>
@@ -587,7 +807,6 @@ const InwardForm = () => {
                   size="small"
                   dataSource={summary.items.slice().reverse().slice(0, 6)} // show up to 6 recent
                   renderItem={(item, idx) => {
-                    // compute original index to detect last added if needed
                     const originalIndex = summary.items.length - 1 - idx;
                     const isLast = originalIndex === summary.lastAddedIndex;
                     return (
@@ -617,7 +836,7 @@ const InwardForm = () => {
               <Text type="secondary">Guidance</Text>
               <div style={{ marginTop: 8 }}>
                 <Text>
-                  Use the scan field to add products quickly. The summary and recent list update live.
+                  Use the scan field to add products quickly or click “+ Add Product” to search and select items from catalog.
                 </Text>
               </div>
             </Card>

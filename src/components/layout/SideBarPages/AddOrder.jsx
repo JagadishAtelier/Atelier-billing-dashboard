@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+// AddOrder.jsx
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Form,
@@ -11,6 +12,8 @@ import {
   Row,
   Col,
   Typography,
+  Select,
+  Spin,
 } from "antd";
 import vendorService from "./services/vendorService";
 import productService from "../../../Product/services/productService";
@@ -18,6 +21,7 @@ import orderService from "./services/orderService";
 import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 function AddOrder() {
   const { id } = useParams(); // edit mode
@@ -25,6 +29,8 @@ function AddOrder() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [vendors, setVendors] = useState([]);
+  const [products, setProducts] = useState([]); // products shown in dropdown
+  const [productsLoading, setProductsLoading] = useState(false);
   const [summary, setSummary] = useState({
     items: [],
     count: 0,
@@ -33,8 +39,118 @@ function AddOrder() {
     lastAddedIndex: -1,
   });
 
-  /** Fetch vendors list */
+  const searchTimeout = useRef(null);
+
+  /**
+   * Fetch products from backend using query-string style:
+   *    GET /product?search=value&limit=50
+   *
+   * This function attempts several call shapes:
+   *  - productService.getAll('?search=...&limit=...')
+   *  - productService.get('/product?search=...&limit=...')
+   *  - productService.getAll({ params: { search, limit } })  (fallback)
+   *  - productService.search(query, { limit })                (fallback)
+   *  - getAll() + client-side filter (final fallback)
+   */
+  const fetchProducts = async (query = "", limit = 50) => {
+    setProductsLoading(true);
+    try {
+      const q = encodeURIComponent(query || "");
+      const queryString = `?search=${q}&limit=${limit}`;
+
+      // Try direct string argument (some services accept the path/query as string)
+      const tryCalls = [
+        // 1) common shape: productService.getAll(queryString)
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll(queryString);
+          }
+          throw new Error("getAll(string) not available");
+        },
+        // 2) try productService.get(`/product${queryString}`)
+        async () => {
+          if (typeof productService.get === "function") {
+            return await productService.get(`/product${queryString}`);
+          }
+          throw new Error("get not available");
+        },
+        // 3) try getAll with params object (some services serialize differently, but keep as fallback)
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll({ search: query || undefined, limit });
+          }
+          throw new Error("getAll(params) not available");
+        },
+        // 4) try alternate param signature
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll({ search: query || undefined, limit });
+          }
+          throw new Error("getAll({search}) not available");
+        },
+        // 5) try productService.search
+        async () => {
+          if (query && typeof productService.search === "function") {
+            return await productService.search(query, { limit });
+          }
+          throw new Error("search not available");
+        },
+        // 6) fallback to getAll() and client-side filter
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll();
+          }
+          throw new Error("final fallback failed");
+        },
+      ];
+
+      let response = null;
+      let success = false;
+      for (const call of tryCalls) {
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const res = await call();
+          if (res) {
+            response = res;
+            success = true;
+            break;
+          }
+        } catch (err) {
+          // ignore and try next
+        }
+      }
+
+      if (!success || !response) {
+        // nothing worked -> empty products
+        setProducts([]);
+        return;
+      }
+
+      // normalize list from response
+      let list = response?.data ?? response;
+      if (!Array.isArray(list)) {
+        // if the API returned an object like { items: [...] }
+        if (list && Array.isArray(list.items)) list = list.items;
+        else list = [];
+      }
+
+      // If no query, return only first 10 to match earlier behaviour
+      if (!query) {
+        setProducts(list.slice(0, 10));
+      } else {
+        setProducts(list.slice(0, limit));
+      }
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+      message.error("Failed to load products");
+      setProducts([]);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
   useEffect(() => {
+    // initial data load: vendors and first 10 products
     const fetchVendors = async () => {
       try {
         const res = await vendorService.getAll();
@@ -44,7 +160,15 @@ function AddOrder() {
         message.error("Failed to load vendor list");
       }
     };
+
     fetchVendors();
+    // fetch first 10 products (no search)
+    fetchProducts("");
+    // cleanup debounced timer on unmount
+    return () => {
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /** Fetch order data if editing */
@@ -89,46 +213,23 @@ function AddOrder() {
     };
 
     fetchOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  /** Add product by code */
-  const handleProductCode = async (e) => {
-    const code = (e?.target?.value || "").trim();
-    if (!code) return;
-    e.target.value = "";
-
-    try {
-      const product = await productService.getByCode(code);
-      if (!product) {
-        message.error("No product found with that code");
-        return;
-      }
-
-      let items = form.getFieldValue("items") || [];
-      const existingIndex = items.findIndex(
-        (item) => item.product_code === product.product_code
-      );
-
-      if (existingIndex >= 0) {
-        items[existingIndex].quantity += 1;
-      } else {
-        items.push({
-          product_id: product.id,
-          product_code: product.product_code,
-          product_name: product.product_name,
-          quantity: 1,
-          unit_price: Number(product.purchase_price) || 0,
-          unit: product.unit || "",
-          isManual: false,
-        });
-      }
-
-      form.setFieldsValue({ items });
-      updateSummary(items, existingIndex >= 0 ? existingIndex : items.length - 1);
-    } catch (err) {
-      console.error("Fetch product error:", err);
-      message.error("Failed to fetch product");
-    }
+  /** Add a new product-selection row (select from dropdown) */
+  const handleAddProduct = () => {
+    const items = form.getFieldValue("items") || [];
+    items.push({
+      product_id: null,
+      product_code: "",
+      product_name: "",
+      quantity: 1,
+      unit_price: 0,
+      unit: "",
+      isManual: false,
+    });
+    form.setFieldsValue({ items });
+    updateSummary(items, items.length - 1);
   };
 
   /** Add manual product row */
@@ -145,6 +246,61 @@ function AddOrder() {
     });
     form.setFieldsValue({ items });
     updateSummary(items, items.length - 1);
+  };
+
+  /** When the user types in the Select, debounce and call backend */
+  const handleSearch = (val) => {
+    // debounce
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      fetchProducts(val.trim());
+    }, 300);
+  };
+
+  /** When a product is selected from dropdown for a specific row */
+  const handleProductSelect = (productId, index) => {
+    const items = form.getFieldValue("items") || [];
+    const p = products.find((x) => String(x.id) === String(productId));
+    if (!p) {
+      // if not in current list, try getById
+      (async () => {
+        try {
+          if (typeof productService.getById === "function") {
+            const res = await productService.getById(productId);
+            const prod = res?.data || res;
+            if (prod) {
+              items[index] = {
+                ...items[index],
+                product_id: prod.id,
+                product_code: prod.product_code || "",
+                product_name: prod.product_name || "",
+                unit_price: Number(prod.purchase_price) || 0,
+                unit: prod.unit || "",
+                isManual: false,
+              };
+              form.setFieldsValue({ items });
+              updateSummary(items, index);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load product by id:", err);
+          message.error("Failed to load selected product");
+        }
+      })();
+      return;
+    }
+
+    items[index] = {
+      ...items[index],
+      product_id: p.id,
+      product_code: p.product_code || "",
+      product_name: p.product_name || "",
+      unit_price: Number(p.purchase_price) || 0,
+      unit: p.unit || "",
+      isManual: false,
+    };
+    form.setFieldsValue({ items });
+    updateSummary(items, index);
   };
 
   /** Submit order */
@@ -182,9 +338,7 @@ function AddOrder() {
 
       const payload = {
         vendor_id: values.vendor_id,
-        order_date: values.order_date
-          ? dayjs(values.order_date).toDate()
-          : new Date(),
+        order_date: values.order_date ? dayjs(values.order_date).toDate() : new Date(),
         status: id ? values.status : "pending",
         items: formattedItems,
       };
@@ -231,20 +385,11 @@ function AddOrder() {
 
   return (
     <div style={{ padding: 5 }}>
-      <Row
-        gutter={16}
-        align="middle"
-        justify="space-between"
-        style={{ marginBottom: 16 }}
-      >
+      <Row gutter={16} align="middle" justify="space-between" style={{ marginBottom: 16 }}>
         <Col>
-          <Title level={4} style={{ margin: 0 }}>
-            {id ? "Edit Order" : "Add Order"}
-          </Title>
+          <Title level={4} style={{ margin: 0 }}>{id ? "Edit Order" : "Add Order"}</Title>
           <Text type="secondary">
-            {id
-              ? "Update order details"
-              : "Create Order entries quickly using product codes or manually"}
+            {id ? "Update order details" : "Create Order entries quickly by adding products from the dropdown or manually"}
           </Text>
         </Col>
         <Col>
@@ -259,21 +404,11 @@ function AddOrder() {
         </Col>
       </Row>
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        initialValues={{ items: [] }}
-        onValuesChange={onValuesChange}
-      >
+      <Form form={form} layout="vertical" onFinish={handleSubmit} initialValues={{ items: [] }} onValuesChange={onValuesChange}>
         <Row gutter={12}>
           {/* Vendor */}
           <Col xs={24} sm={12}>
-            <Form.Item
-              label="Vendor Name"
-              name="vendor_id"
-              rules={[{ required: true, message: "Please select a vendor" }]}
-            >
+            <Form.Item label="Vendor Name" name="vendor_id" rules={[{ required: true, message: "Please select a vendor" }]}>
               <select className="w-full outline-none text-sm border border-gray-300 py-4 px-4 rounded-md bg-white">
                 <option value="">Select Vendor</option>
                 {vendors.map((v) => (
@@ -287,25 +422,14 @@ function AddOrder() {
 
           {/* Order Date */}
           <Col xs={24} sm={12}>
-            <Form.Item
-              label="Order Date"
-              name="order_date"
-              rules={[{ required: true, message: "Please select order date" }]}
-            >
-              <input
-                type="date"
-                className="w-full outline-none text-sm border border-gray-300 py-4 px-4 rounded-md bg-white"
-              />
+            <Form.Item label="Order Date" name="order_date" rules={[{ required: true, message: "Please select order date" }]}>
+              <input type="date" className="w-full outline-none text-sm border border-gray-300 py-4 px-4 rounded-md bg-white" />
             </Form.Item>
           </Col>
 
           {id && (
             <Col xs={24} sm={12}>
-              <Form.Item
-                label="Status"
-                name="status"
-                rules={[{ required: true, message: "Please select status" }]}
-              >
+              <Form.Item label="Status" name="status" rules={[{ required: true, message: "Please select status" }]}>
                 <select className="w-full outline-none text-sm border border-gray-300 py-4 px-4 rounded-md bg-white">
                   <option value="">Select Status</option>
                   <option value="pending">Pending</option>
@@ -317,28 +441,12 @@ function AddOrder() {
             </Col>
           )}
 
-          {/* Product Code Input */}
+          {/* Add Product Buttons (replaces scan input) */}
           <Col xs={24}>
-            <Form.Item label="Scan/Enter Product Code">
-              <input
-                className="w-full outline-none text-sm border border-gray-300 py-4 px-4 rounded-md bg-white"
-                placeholder="Scan or type code, press Enter"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleProductCode(e);
-                  }
-                }}
-              />
-            </Form.Item>
-
-            <Button
-              type="dashed"
-              style={{ width: "100%", marginBottom: 10 }}
-              onClick={handleAddManualProduct}
-            >
-              + Add Product Manually
-            </Button>
+            <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+              <Button type="dashed" onClick={handleAddProduct}>+ Add Product</Button>
+              <Button type="dashed" onClick={handleAddManualProduct}>+ Add Product Manually</Button>
+            </div>
           </Col>
 
           {/* Items Table */}
@@ -354,11 +462,7 @@ function AddOrder() {
                     key: "product_code",
                     render: (_, record, index) => (
                       <Form.Item name={[index, "product_code"]} style={{ margin: 0 }}>
-                        <input
-                          className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-gray-100"
-                          disabled={items[index]?.isManual} // 🔹 disable if manual
-                          placeholder="Auto / Scanned"
-                        />
+                        <input className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-gray-100" disabled placeholder="Auto" />
                       </Form.Item>
                     ),
                   },
@@ -366,16 +470,31 @@ function AddOrder() {
                     title: "Product Name",
                     dataIndex: "product_name",
                     key: "product_name",
+                    width: "30%",
                     render: (_, record, index) => (
-                      <Form.Item
-                        name={[index, "product_name"]}
-                        rules={[{ required: true, message: "Enter product name" }]}
-                        style={{ margin: 0 }}
-                      >
-                        <input
-                          className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-white"
-                          placeholder="Enter name"
-                        />
+                      <Form.Item name={[index, "product_name"]} rules={[{ required: true, message: "Enter/select product name" }]} style={{ margin: 0 }}>
+                        {/* If item is manual allow text input, otherwise show Select dropdown */}
+                        {items[index]?.isManual ? (
+                          <input className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-white" placeholder="Enter name" />
+                        ) : (
+                          <Select
+                            showSearch
+                            showArrow
+                            placeholder="Search product by name or code"
+                            filterOption={false} // server-side filtering
+                            notFoundContent={productsLoading ? <Spin size="small" /> : null}
+                            onSearch={handleSearch}
+                            onFocus={() => { if (!products || products.length === 0) fetchProducts(""); }}
+                            onChange={(productId) => handleProductSelect(productId, index)}
+                            style={{ width: "100%" }}
+                          >
+                            {products.map((p) => (
+                              <Option key={String(p.id)} value={String(p.id)} data-code={p.product_code}>
+                                {p.product_name} {p.product_code ? ` — (${p.product_code})` : ""}
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
                       </Form.Item>
                     ),
                   },
@@ -384,11 +503,7 @@ function AddOrder() {
                     dataIndex: "quantity",
                     key: "quantity",
                     render: (_, record, index) => (
-                      <Form.Item
-                        name={[index, "quantity"]}
-                        rules={[{ required: true, message: "Enter qty" }]}
-                        style={{ margin: 0 }}
-                      >
+                      <Form.Item name={[index, "quantity"]} rules={[{ required: true, message: "Enter qty" }]} style={{ margin: 0 }}>
                         <InputNumber min={1} style={{ width: "100%" }} />
                       </Form.Item>
                     ),
@@ -398,11 +513,7 @@ function AddOrder() {
                     dataIndex: "unit_price",
                     key: "unit_price",
                     render: (_, record, index) => (
-                      <Form.Item
-                        name={[index, "unit_price"]}
-                        rules={[{ required: true, message: "Enter price" }]}
-                        style={{ margin: 0 }}
-                      >
+                      <Form.Item name={[index, "unit_price"]} rules={[{ required: true, message: "Enter price" }]} style={{ margin: 0 }}>
                         <InputNumber min={0} style={{ width: "100%" }} />
                       </Form.Item>
                     ),
@@ -412,15 +523,8 @@ function AddOrder() {
                     dataIndex: "unit",
                     key: "unit",
                     render: (_, record, index) => (
-                      <Form.Item
-                        name={[index, "unit"]}
-                        rules={[{ required: true, message: "Enter unit" }]}
-                        style={{ margin: 0 }}
-                      >
-                        <input
-                          className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-white"
-                          placeholder="pcs / kg / box"
-                        />
+                      <Form.Item name={[index, "unit"]} rules={[{ required: true, message: "Enter unit" }]} style={{ margin: 0 }}>
+                        <input className="w-full outline-none text-sm border border-gray-300 py-2 px-3 rounded-md bg-white" placeholder="pcs / kg / box" />
                       </Form.Item>
                     ),
                   },
@@ -428,29 +532,19 @@ function AddOrder() {
                     title: "Action",
                     key: "action",
                     render: (_, record, index) => (
-                      <Button
-                        danger
-                        onClick={() => {
-                          const items = form.getFieldValue("items") || [];
-                          items.splice(index, 1);
-                          form.setFieldsValue({ items });
-                          updateSummary(items, -1);
-                        }}
-                      >
+                      <Button danger onClick={() => {
+                        const items = form.getFieldValue("items") || [];
+                        items.splice(index, 1);
+                        form.setFieldsValue({ items });
+                        updateSummary(items, -1);
+                      }}>
                         Remove
                       </Button>
                     ),
                   },
                 ];
 
-                return (
-                  <Table
-                    dataSource={items.map((item, idx) => ({ ...item, key: idx }))}
-                    columns={columns}
-                    pagination={false}
-                    size="small"
-                  />
-                );
+                return <Table dataSource={items.map((item, idx) => ({ ...item, key: idx }))} columns={columns} pagination={false} size="small" />;
               }}
             </Form.List>
           </Col>
@@ -459,17 +553,10 @@ function AddOrder() {
         {/* Submit Buttons */}
         <div className="flex justify-end mt-10">
           <Space>
-            <button
-              className="bg-[#0E1680] !text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
-              type="submit"
-              disabled={loading}
-            >
+            <button className="bg-[#0E1680] !text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer" type="submit" disabled={loading}>
               {id ? "Update Order" : "Add Order"}
             </button>
-            <button
-              className="bg-white border border-gray-400 text-black py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
-              onClick={() => navigate("/order")}
-            >
+            <button className="bg-white border border-gray-400 text-black py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer" onClick={() => navigate("/order")}>
               Cancel
             </button>
           </Space>

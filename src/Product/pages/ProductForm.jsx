@@ -6,10 +6,10 @@ import {
   InputNumber,
   Select,
   Button,
-  message,
   Spin,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";  // <-- Using Sonner
 
 import productService from "../services/productService";
 import categoryService from "../services/categoryService";
@@ -27,28 +27,25 @@ const ProductFormSimple = () => {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
 
-  /** Fetch categories */
   const fetchCategories = async () => {
     try {
       const res = await categoryService.getAll();
       setCategories(res?.data || []);
     } catch {
-      message.error("Failed to load categories");
+      toast.error("Failed to load categories");
     }
   };
 
-  /** Fetch subcategories when category changes */
   const handleCategoryChange = async (categoryId) => {
     form.setFieldsValue({ subcategory_id: undefined });
     try {
       const res = await subcategoryService.getByCategory(categoryId);
       setSubcategories(res?.data || []);
     } catch {
-      message.error("Failed to load subcategories");
+      toast.error("Failed to load subcategories");
     }
   };
 
-  /** Fetch product when editing */
   const fetchProduct = async () => {
     if (!routeId) return;
     setLoading(true);
@@ -64,7 +61,7 @@ const ProductFormSimple = () => {
         max_quantity: product.max_quantity ?? 0,
       });
     } catch {
-      message.error("Failed to load product");
+      toast.error("Failed to load product");
     } finally {
       setLoading(false);
     }
@@ -75,7 +72,6 @@ const ProductFormSimple = () => {
     if (routeId) fetchProduct();
   }, [routeId]);
 
-  /** Submit */
   const onFinish = async (values) => {
     setLoading(true);
 
@@ -88,16 +84,16 @@ const ProductFormSimple = () => {
     try {
       if (routeId) {
         await productService.update(routeId, payload);
-        message.success("Product updated successfully");
+        toast.success("Product updated successfully");
       } else {
         await productService.create(payload);
-        message.success("Product created successfully");
+        toast.success("Product created successfully");
       }
 
       navigate("/product/list");
     } catch (err) {
       console.log(err);
-      message.error("Failed to save");
+      toast.error("Failed to save");
     } finally {
       setLoading(false);
     }
@@ -105,7 +101,9 @@ const ProductFormSimple = () => {
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 24 }}>
-      <h2 className="text-lg font-semibold text-gray-900">{routeId ? "Edit Product" : "Add Product"}</h2>
+      <h2 className="text-lg font-semibold text-gray-900">
+        {routeId ? "Edit Product" : "Add Product"}
+      </h2>
 
       <Spin spinning={loading}>
         <Form
@@ -123,42 +121,38 @@ const ProductFormSimple = () => {
             <Input placeholder="Enter product name" />
           </Form.Item>
 
-          {/* Category */}
           <div style={{ display: "flex", gap: 12 }}>
             <Form.Item
-            name="category_id"
-            label="Category"
-            rules={[{ required: true, message: "Please select category" }]}
-            style={{ flex: 1 }}
-          >
-            <Select
-              placeholder="Select category"
-              onChange={handleCategoryChange}
+              name="category_id"
+              label="Category"
+              rules={[{ required: true, message: "Please select category" }]}
+              style={{ flex: 1 }}
             >
-              {categories.map((c) => (
-                <Option key={c.id} value={c.id}>
-                  {c.category_name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
+              <Select placeholder="Select category" onChange={handleCategoryChange}>
+                {categories.map((c) => (
+                  <Option key={c.id} value={c.id}>
+                    {c.category_name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
 
-          {/* Subcategory */}
-          <Form.Item
-            name="subcategory_id"
-            label="Subcategory"
-            rules={[{ required: true, message: "Please select subcategory" }]}
-            style={{ flex: 1 }}
-          >
-            <Select placeholder="Select subcategory">
-              {subcategories.map((s) => (
-                <Option key={s.id} value={s.id}>
-                  {s.subcategory_name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
+            <Form.Item
+              name="subcategory_id"
+              label="Subcategory"
+              rules={[{ required: true, message: "Please select subcategory" }]}
+              style={{ flex: 1 }}
+            >
+              <Select placeholder="Select subcategory">
+                {subcategories.map((s) => (
+                  <Option key={s.id} value={s.id}>
+                    {s.subcategory_name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
           </div>
+
           <div style={{ display: "flex", gap: 12 }}>
             <Form.Item name="brand" label="Brand" style={{ flex: 1 }}>
               <Input placeholder="Brand" />
@@ -169,7 +163,6 @@ const ProductFormSimple = () => {
             </Form.Item>
           </div>
 
-          {/* Prices */}
           <div style={{ display: "flex", gap: 12 }}>
             <Form.Item name="purchase_price" label="Purchase Price" style={{ flex: 1 }}>
               <InputNumber min={0} style={{ width: "100%" }} />
@@ -184,7 +177,6 @@ const ProductFormSimple = () => {
             </Form.Item>
           </div>
 
-          {/* Min/Max Quantity */}
           <div style={{ display: "flex", gap: 12 }}>
             <Form.Item name="min_quantity" label="Min Quantity" style={{ flex: 1 }}>
               <InputNumber min={0} style={{ width: "100%" }} />
@@ -195,12 +187,10 @@ const ProductFormSimple = () => {
             </Form.Item>
           </div>
 
-          {/* Description */}
           <Form.Item name="description" label="Description">
             <TextArea rows={3} />
           </Form.Item>
 
-          {/* Status */}
           <Form.Item name="status" label="Status">
             <Select>
               <Option value="active">Active</Option>
