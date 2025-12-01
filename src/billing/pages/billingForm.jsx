@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+// billingForm.jsx
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Form,
@@ -14,12 +15,16 @@ import {
   Col,
   Divider,
   Typography,
+  Card,
+  List,
+  Badge,
+  Space,
 } from "antd";
 import dayjs from "dayjs";
 import productService from "../../Product/services/productService";
 import billingService from "../service/billingService";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 function BillingForm() {
@@ -30,9 +35,30 @@ function BillingForm() {
   const [productCode, setProductCode] = useState("");
   const [preview, setPreview] = useState({ items: [], customer_name: "", billing_date: dayjs() });
 
+  // product search
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const searchTimeout = useRef(null);
+
+  // summary similar to InwardForm
+  const [summary, setSummary] = useState({
+    items: [],
+    count: 0,
+    qty: 0,
+    value: 0,
+    lastAddedIndex: -1,
+  });
+
   useEffect(() => {
     form.setFieldsValue({ billing_date: dayjs(), status: "pending", items: [] });
     setPreview({ items: [], billing_date: dayjs(), customer_name: "" });
+    // initialize summary
+    const items = form.getFieldValue("items") || [];
+    updateSummary(items, -1);
+    // cleanup on unmount
+    return () => {
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -47,12 +73,12 @@ function BillingForm() {
     const tax = ((qty * price * taxPerc) / 100);
     const total = qty * price + tax - discount;
 
-    item.tax_amount = parseFloat(tax.toFixed(2));
-    item.total_price = parseFloat(total.toFixed(2));
+    item.tax_amount = parseFloat((isFinite(tax) ? tax : 0).toFixed(2));
+    item.total_price = parseFloat((isFinite(total) ? total : 0).toFixed(2));
     return item;
   };
 
-  // ADD PRODUCT BY CODE
+  // ADD PRODUCT BY CODE (scanner / Enter)
   const handleProductCode = async (code) => {
     const trimmed = String(code || "").trim();
     if (!trimmed) return;
@@ -66,7 +92,6 @@ function BillingForm() {
         return;
       }
 
-      // resolve product id from common property names
       const resolvedProductId =
         product.id ||
         product._id ||
@@ -87,24 +112,28 @@ function BillingForm() {
       if (index >= 0) {
         items[index].quantity = (items[index].quantity || 0) + 1;
         items[index] = updateItemCalculations(items[index]);
+        form.setFieldsValue({ items });
+        updateSummary(items, index);
       } else {
         const newItem = updateItemCalculations({
           product_id: String(resolvedProductId),
           product_code: product.product_code,
           product_name: product.product_name || product.name || "",
           quantity: 1,
-          unit_price: product.selling_price,
+          unit_price: Number(product.selling_price) || 0,
           discount_amount: 0,
-          tax_percentage: product.tax_percentage || product.tax || 0,
+          tax_percentage: Number(product.tax_percentage || product.tax || 0),
           tax_amount: 0,
           total_price: 0,
+          unit: product.unit || "",
+          isManual: false,
         });
         items = [...items, newItem];
+        form.setFieldsValue({ items });
+        updateSummary(items, items.length - 1);
       }
 
-      form.setFieldsValue({ items });
-      setPreview((p) => ({ ...p, items }));
-
+      setPreview((p) => ({ ...p, items: form.getFieldValue("items") || [] }));
       message.success(`${product.product_name || product.product_code} added`);
       setProductCode("");
     } catch (err) {
@@ -126,6 +155,7 @@ function BillingForm() {
     items[index] = updateItemCalculations(item);
     form.setFieldsValue({ items });
     setPreview((p) => ({ ...p, items }));
+    updateSummary(items, -1);
   };
 
   const removeItem = (index) => {
@@ -133,6 +163,7 @@ function BillingForm() {
     items.splice(index, 1);
     form.setFieldsValue({ items });
     setPreview((p) => ({ ...p, items }));
+    updateSummary(items, -1);
   };
 
   // calculate invoice summary
@@ -149,6 +180,7 @@ function BillingForm() {
     const items = (all.items || []).map((it) => updateItemCalculations({ ...it }));
     form.setFieldsValue({ items });
     setPreview({ ...all, items });
+    updateSummary(items, -1);
   };
 
   // SUBMIT -> send payload shape backend expects
@@ -241,30 +273,342 @@ function BillingForm() {
     }
   };
 
-  // table columns (editable)
+  /**
+   * Product fetching (robust): tries common shapes so productService implementations don't break
+   * query: search string
+   */
+  const fetchProducts = async (query = "", limit = 50) => {
+    setProductsLoading(true);
+    try {
+      const q = encodeURIComponent(query || "");
+      const queryString = `?search=${q}&limit=${limit}`;
+
+      const tryCalls = [
+        // 1) productService.getAll(queryString)
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll(queryString);
+          }
+          throw new Error("getAll(string) not available");
+        },
+        // 2) productService.get(`/product${queryString}`)
+        async () => {
+          if (typeof productService.get === "function") {
+            return await productService.get(`/product${queryString}`);
+          }
+          throw new Error("get not available");
+        },
+        // 3) productService.getAll({ params: { search, limit } })
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll({ search: query || undefined, limit });
+          }
+          throw new Error("getAll(params) not available");
+        },
+        // 4) productService.search(query, opts)
+        async () => {
+          if (query && typeof productService.search === "function") {
+            return await productService.search(query, { limit });
+          }
+          throw new Error("search not available");
+        },
+        // 5) fallback: getAll() and client-side filter
+        async () => {
+          if (typeof productService.getAll === "function") {
+            return await productService.getAll();
+          }
+          throw new Error("final fallback failed");
+        },
+      ];
+
+      let response = null;
+      let success = false;
+      // run calls sequentially until one returns
+      for (const call of tryCalls) {
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const res = await call();
+          if (res) {
+            response = res;
+            success = true;
+            break;
+          }
+        } catch (err) {
+          // ignore and try next
+        }
+      }
+
+      if (!success || !response) {
+        setProducts([]);
+        return;
+      }
+
+      let list = response?.data ?? response;
+      if (!Array.isArray(list)) {
+        if (list && Array.isArray(list.items)) list = list.items;
+        else list = [];
+      }
+
+      if (!query) setProducts(list.slice(0, 10));
+      else setProducts(list.slice(0, limit));
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+      message.error("Failed to load products");
+      setProducts([]);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
+  /** Add a new product-selection row (select from dropdown) */
+  const handleAddProduct = () => {
+    const items = form.getFieldValue("items") || [];
+    items.push({
+      product_id: null,
+      product_code: "",
+      product_name: "",
+      quantity: 1,
+      unit_price: 0,
+      unit: "",
+      discount_amount: 0,
+      tax_percentage: 0,
+      tax_amount: 0,
+      total_price: 0,
+      expiry_date: null,
+      isManual: false,
+    });
+    form.setFieldsValue({ items });
+    updateSummary(items, items.length - 1);
+  };
+
+  /** Add manual product row */
+  const handleAddManualProduct = () => {
+    const items = form.getFieldValue("items") || [];
+    items.push({
+      product_id: null,
+      product_code: "",
+      product_name: "",
+      quantity: 1,
+      unit_price: 0,
+      unit: "",
+      discount_amount: 0,
+      tax_percentage: 0,
+      tax_amount: 0,
+      total_price: 0,
+      expiry_date: null,
+      isManual: true,
+    });
+    form.setFieldsValue({ items });
+    updateSummary(items, items.length - 1);
+  };
+
+  /** When the user types in the Select, debounce and call backend */
+  const handleSearch = (val) => {
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      fetchProducts(val.trim());
+    }, 300);
+  };
+
+  /** When a product is selected from dropdown for a specific row */
+  const handleProductSelect = (productId, rowIndex) => {
+    const items = form.getFieldValue("items") || [];
+    const p = products.find((x) => String(x.id) === String(productId));
+    if (!p) {
+      (async () => {
+        try {
+          if (typeof productService.getById === "function") {
+            const res = await productService.getById(productId);
+            const prod = res?.data || res;
+            if (prod) {
+              items[rowIndex] = {
+                ...items[rowIndex],
+                product_id: prod.id,
+                product_code: prod.product_code || "",
+                product_name: prod.product_name || "",
+                unit_price: Number(prod.selling_price || prod.purchase_price) || 0,
+                unit: prod.unit || "",
+                tax_percentage: Number(prod.tax_percentage || prod.tax || 0),
+                isManual: false,
+              };
+              items[rowIndex] = updateItemCalculations(items[rowIndex]);
+              form.setFieldsValue({ items });
+              updateSummary(items, rowIndex);
+              setPreview((p) => ({ ...p, items }));
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load product by id:", err);
+          message.error("Failed to load selected product");
+        }
+      })();
+      return;
+    }
+
+    items[rowIndex] = {
+      ...items[rowIndex],
+      product_id: p.id,
+      product_code: p.product_code || "",
+      product_name: p.product_name || "",
+      unit_price: Number(p.selling_price || p.purchase_price) || 0,
+      unit: p.unit || "",
+      tax_percentage: Number(p.tax_percentage || p.tax || 0),
+      isManual: false,
+    };
+    items[rowIndex] = updateItemCalculations(items[rowIndex]);
+    form.setFieldsValue({ items });
+    updateSummary(items, rowIndex);
+    setPreview((p) => ({ ...p, items }));
+  };
+
+  // utility to compute summary from items array and optionally set lastAddedIndex
+  const updateSummary = (items = [], lastAddedIndex = -1) => {
+    let qty = 0;
+    let value = 0;
+    (items || []).forEach((it) => {
+      const q = Number(it.quantity || 0);
+      const p = Number(it.unit_price || 0);
+      qty += q;
+      value += q * p;
+    });
+    setSummary({
+      items: items || [],
+      count: (items || []).length,
+      qty,
+      value,
+      lastAddedIndex,
+    });
+  };
+
+  // table columns (editable with Form.Item like InwardForm)
   const columns = [
-    { title: "Product Code", dataIndex: "product_code", key: "code" },
-    { title: "Product Name", dataIndex: "product_name", key: "name" },
+    {
+      title: "Product Code",
+      dataIndex: "product_code",
+      key: "product_code",
+      width: 140,
+      render: (_, __, index) => (
+        <Form.Item name={[index, "product_code"]} style={{ margin: 0 }}>
+          <Input disabled />
+        </Form.Item>
+      ),
+    },
+    {
+      title: "Product Name",
+      dataIndex: "product_name",
+      key: "product_name",
+      width: 360,
+      render: (_, record, index) => (
+        <Form.Item
+          name={[index, "product_name"]}
+          rules={[{ required: true, message: "Enter/select product name" }]}
+          style={{ margin: 0 }}
+        >
+          {record?.isManual ? (
+            <Input placeholder="Enter product name" onChange={(e) => handleItemChange(index, "product_name", e.target.value)} />
+          ) : (
+            <Select
+              showSearch
+              showArrow
+              placeholder="Search product by name or code"
+              filterOption={false}
+              notFoundContent={productsLoading ? <Spin size="small" /> : null}
+              onSearch={handleSearch}
+              onFocus={() => {
+                if (!products || products.length === 0) fetchProducts("");
+              }}
+              onChange={(productId) => handleProductSelect(productId, index)}
+              style={{ width: "100%" }}
+            >
+              {products.map((p) => (
+                <Option key={String(p.id)} value={String(p.id)} data-code={p.product_code}>
+                  {p.product_name} {p.product_code ? ` — (${p.product_code})` : ""}
+                </Option>
+              ))}
+            </Select>
+          )}
+        </Form.Item>
+      ),
+    },
     {
       title: "Qty",
       key: "qty",
-      render: (_, record, idx) => (
-        <InputNumber min={1} value={record.quantity} onChange={(v) => handleItemChange(idx, "quantity", v || 0)} />
+      width: 120,
+      render: (_, record, index) => (
+        <Form.Item
+          name={[index, "quantity"]}
+          rules={[{ required: true, message: "Enter qty" }]}
+          style={{ margin: 0 }}
+        >
+          <InputNumber
+            min={1}
+            style={{ width: "100%" }}
+            onChange={(v) => handleItemChange(index, "quantity", v || 0)}
+          />
+        </Form.Item>
       ),
     },
-    { title: "Unit Price", dataIndex: "unit_price", key: "price", render: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
+    {
+      title: "Unit Price",
+      dataIndex: "unit_price",
+      key: "unit_price",
+      width: 140,
+      render: (_, record, index) => (
+        <Form.Item
+          name={[index, "unit_price"]}
+          rules={[{ required: true, message: "Enter price" }]}
+          style={{ margin: 0 }}
+        >
+          <InputNumber
+            min={0}
+            style={{ width: "100%" }}
+            onChange={(v) => handleItemChange(index, "unit_price", v || 0)}
+            formatter={(val) => (val === undefined || val === null ? "" : `₹${Number(val).toFixed(2)}`)}
+            parser={(val) => String(val).replace(/[₹,]/g, "")}
+          />
+        </Form.Item>
+      ),
+    },
     {
       title: "Discount",
       key: "disc",
-      render: (_, record, idx) => (
-        <InputNumber min={0} value={record.discount_amount} onChange={(v) => handleItemChange(idx, "discount_amount", v || 0)} />
+      width: 140,
+      render: (_, record, index) => (
+        <Form.Item name={[index, "discount_amount"]} style={{ margin: 0 }}>
+          <InputNumber
+            min={0}
+            style={{ width: "100%" }}
+            onChange={(v) => handleItemChange(index, "discount_amount", v || 0)}
+          />
+        </Form.Item>
       ),
     },
-    { title: "Tax", dataIndex: "tax_amount", key: "tax", render: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
-    { title: "Total", dataIndex: "total_price", key: "total", render: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
+    {
+      title: "Tax",
+      dataIndex: "tax_amount",
+      key: "tax",
+      width: 120,
+      render: (_, record, index) => (
+        <Form.Item name={[index, "tax_amount"]} style={{ margin: 0 }}>
+          <InputNumber value={record.tax_amount} disabled style={{ width: "100%" }} formatter={(v)=>`₹${Number(v||0).toFixed(2)}`} />
+        </Form.Item>
+      ),
+    },
+    {
+      title: "Total",
+      dataIndex: "total_price",
+      key: "total",
+      width: 140,
+      render: (_, record, index) => (
+        <Form.Item name={[index, "total_price"]} style={{ margin: 0 }}>
+          <InputNumber value={record.total_price} disabled style={{ width: "100%" }} formatter={(v)=>`₹${Number(v||0).toFixed(2)}`} />
+        </Form.Item>
+      ),
+    },
     {
       title: "",
       key: "actions",
+      width: 100,
       render: (_, __, idx) => (
         <Button danger size="small" onClick={() => removeItem(idx)}>
           Remove
@@ -273,7 +617,7 @@ function BillingForm() {
     },
   ];
 
-  // preview (read-only)
+  // preview columns (read-only)
   const previewColumns = [
     { title: "#", dataIndex: "_idx", key: "idx", render: (_, __, idx) => idx + 1 },
     { title: "Product", dataIndex: "product_name", key: "pname" },
@@ -283,8 +627,6 @@ function BillingForm() {
     { title: "Total", dataIndex: "total_price", key: "ptotal", render: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
   ];
 
-  const summary = calculateSummaryFromItems(preview.items || []);
-
   const styles = {
     page: { background: "#f1f6fb", minHeight: "100vh", padding: 12 },
     container: { maxWidth: 1100, margin: "0 auto" },
@@ -293,6 +635,8 @@ function BillingForm() {
     rightCard: { background: "#fff", borderRadius: 8, padding: 12, height: "fit-content", position: "sticky", top: 24 },
     sectionTitle: { color: "#0b75ff", fontWeight: 600 },
   };
+
+  const summaryCalc = calculateSummaryFromItems(preview.items || []);
 
   return (
     <div style={styles.page}>
@@ -363,34 +707,28 @@ function BillingForm() {
                   </Col>
                 </Row>
 
-                <Form.Item label="Scan / Enter Product Code">
-                  <Input
-                    placeholder="Scan or type code and press Enter"
-                    value={productCode}
-                    onChange={(e) => setProductCode(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleProductCode(productCode);
-                      }
-                    }}
-                  />
-                </Form.Item>
+                {/* Add product buttons */}
+                <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                  <Button type="dashed" onClick={handleAddProduct}>
+                    + Add Product
+                  </Button>
+                </div>
 
                 {/* Items table (editable) */}
                 <Form.List name="items">
                   {(fields, { remove }) => {
                     const items = form.getFieldValue("items") || [];
+                    // Table data source should include keys
+                    const dataSource = (items || []).map((it, idx) => ({ ...it, key: idx }));
                     return (
                       <>
-                        <Table dataSource={items} columns={columns} pagination={false} rowKey={(r, idx) => idx} size="small" style={{ marginBottom: 8 }} />
+                        <Table dataSource={dataSource} columns={columns} pagination={false} rowKey={(r, idx) => idx} size="small" style={{ marginBottom: 8 }} />
 
                         <div style={{ display: "flex", justifyContent: "right", alignItems: "right", marginTop: 10 }}>
                           <div style={{ textAlign: "right" }}>
                             <div style={{ display: "flex", justifyContent: "space-between" }}>
                               <div style={{ color: "#374151" }}>Subtotal</div>
-                              <div>₹{summary.subtotal.toFixed(2)}</div>
+                              <div>₹{summaryCalc.subtotal.toFixed(2)}</div>
                             </div>
                           </div>
                         </div>
@@ -449,20 +787,20 @@ function BillingForm() {
                   <div className="previewTotals" style={{ marginTop: 8 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                       <div style={{ color: "#374151" }}>Subtotal</div>
-                      <div>₹{summary.subtotal.toFixed(2)}</div>
+                      <div>₹{summaryCalc.subtotal.toFixed(2)}</div>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                       <div>Tax</div>
-                      <div>₹{summary.totalTax.toFixed(2)}</div>
+                      <div>₹{summaryCalc.totalTax.toFixed(2)}</div>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                       <div>Discount</div>
-                      <div>₹{summary.totalDiscount.toFixed(2)}</div>
+                      <div>₹{summaryCalc.totalDiscount.toFixed(2)}</div>
                     </div>
 
                     <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #e5e7eb", paddingTop: 10, marginTop: 8 }}>
                       <div style={{ fontWeight: 800, fontSize: 16 }}>Total Amount</div>
-                      <div style={{ fontWeight: 800, fontSize: 16 }}>₹{summary.grandTotal.toFixed(2)}</div>
+                      <div style={{ fontWeight: 800, fontSize: 16 }}>₹{summaryCalc.grandTotal.toFixed(2)}</div>
                     </div>
 
                     <div style={{ display: "flex", justifyContent: "right", marginTop: 10, alignItems: "center" }}>
@@ -475,6 +813,66 @@ function BillingForm() {
                     </div>
                   </div>
                 </div>
+
+                <Divider />
+
+                {/* Right column summary card (recent items) */}
+                <Card size="small" bordered={false} style={{ marginTop: 12 }}>
+                  <Row justify="space-between" align="middle">
+                    <Col>
+                      <Text type="secondary">Items</Text>
+                      <div style={{ marginTop: 4 }}>
+                        <Title level={3} style={{ margin: 0 }}>
+                          {summary.count}
+                        </Title>
+                      </div>
+                    </Col>
+                    <Col style={{ textAlign: "right" }}>
+                      <Text type="secondary" style={{ display: "block" }}>
+                        Total Qty
+                      </Text>
+                      <Text strong>{summary.qty}</Text>
+                      <div style={{ marginTop: 8 }}>
+                        <Text type="secondary" style={{ display: "block" }}>
+                          Total Value
+                        </Text>
+                        <Text strong>₹{summary.value.toFixed(2)}</Text>
+                      </div>
+                    </Col>
+                  </Row>
+
+                  <Divider />
+
+                  <Text type="secondary">Recent items</Text>
+                  <div style={{ marginTop: 8 }}>
+                    <List
+                      size="small"
+                      dataSource={summary.items.slice().reverse().slice(0, 6)} // show up to 6 recent
+                      renderItem={(item, idx) => {
+                        const originalIndex = summary.items.length - 1 - idx;
+                        const isLast = originalIndex === summary.lastAddedIndex;
+                        return (
+                          <List.Item>
+                            <List.Item.Meta
+                              title={
+                                <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+                                  <div>
+                                    {isLast ? <Badge status="success" text={item.product_name || item.product_code} /> : (item.product_name || item.product_code)}
+                                  </div>
+                                  <div style={{ minWidth: 110, textAlign: "right" }}>
+                                    <Text>{(item.quantity || 0)} × {typeof item.unit_price === "number" ? `₹${item.unit_price.toFixed(2)}` : item.unit_price}</Text>
+                                  </div>
+                                </div>
+                              }
+                              description={item.product_code ? <Text type="secondary">{item.product_code}</Text> : null}
+                            />
+                          </List.Item>
+                        );
+                      }}
+                    />
+                    {summary.items.length === 0 && <Text type="secondary">No items added yet</Text>}
+                  </div>
+                </Card>
               </div>
             </div>
 
