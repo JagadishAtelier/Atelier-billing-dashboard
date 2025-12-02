@@ -20,6 +20,7 @@ import {
   DownloadOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
+import { BriefcaseMedical, Boxes } from "lucide-react";
 import productService from "../services/productService.js";
 import debounce from "lodash.debounce";
 import { QRCodeCanvas } from "qrcode.react";
@@ -200,7 +201,7 @@ const ProductList = () => {
           <Space>
             <Button icon={<EyeOutlined />} onClick={() => openViewModal(record)} />
 
-            <Button type="primary" icon={<EditOutlined />} onClick={() => navigate(`/product/edit/${record.id}`)} />
+            <Button style={{backgroundColor:"#f6f7ff"}} icon={<EditOutlined />} onClick={() => navigate(`/product/edit/${record.id}`)} />
 
             <Popconfirm title="Are you sure to delete this product?" onConfirm={() => handleDelete(record.id)}>
               <Button danger icon={<DeleteOutlined />}></Button>
@@ -214,12 +215,24 @@ const ProductList = () => {
   return (
     <div className="p-4">
       <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Products</h2>
+        <div className="flex items-center gap-3">
+          <div
+            initial={{ rotate: -45, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="bg-white  shadow-sm rounded-sm p-1.5 border border-gray-200"
+          >
+            <Boxes size={20} className="inline-block text-gray-600" />
+          </div>
+          <div >
+            <h2 className="!text-[24px] pt-1.5  text-foreground" style={{fontWeight:700}}>Product</h2>
+          </div>
+          
+        
         </div>
         <Space>
           <Button
-            style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px" }}
+            style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none" }}
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => navigate("/product/add")}
@@ -255,7 +268,7 @@ const ProductList = () => {
           </Button>,
           <Button
             key="edit"
-            type="primary"
+            style={{backgroundColor:"#506ee4", color:"#fff", border:"none"}}
             onClick={() => {
               if (currentProduct?.id) navigate(`/product/edit/${currentProduct.id}`);
               closeViewModal();
