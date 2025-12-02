@@ -168,8 +168,9 @@ const MainLayout = ({ menuItems }) => {
         token: { colorPrimary: primaryColor },
       }}
     >
-      {/* Sonner toaster (top-right) */}
-      <Toaster position="top-right" />
+      {/* Sonner toaster (top-right)
+      <Toaster position="top-right" closeButton />  */}
+
 
       <Layout style={{ minHeight: "100vh", maxWidth: layoutType === "boxed" ? 1200 : "100%", margin: layoutType === "boxed" ? "0 auto" : 0 }}>
         {/* Desktop Sidebar */}

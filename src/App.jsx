@@ -26,6 +26,8 @@ import ReportPage from "./ReportPage/ReportPage";
 import ViewReturn from "./ReturnPage/ViewReturn";
 import AIAnalytics from "./components/layout/SideBarPages/AIAnalytics";
 import CRMModule from "./components/layout/SideBarPages/CRMModule";
+import { Toaster } from "sonner";
+
 // import master from "./components/assets/cloud.png";
 const routeModules = import.meta.glob("./*/AppRoutes.jsx", { eager: true });
 
@@ -72,11 +74,15 @@ const App = () => {
   return (
     <BrowserRouter>
   <AuthProvider>
+  <Toaster position="top-right" richColors closeButton />
+  
+
     <Loading duration={3000} />
     <Suspense fallback={<div className="p-4"><Loading /></div>}>
       <Routes>
         {/* Public/Login routes */}
         <Route path="/" element={<Login />} />
+
 
         {/* Routes WITHOUT sidebar/header */}
         <Route

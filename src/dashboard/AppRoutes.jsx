@@ -12,6 +12,7 @@ export const dashboardMenuItems = [
 
 const DashboardRoutes = () => {
   return (
+    
     <Routes>
       {/* index → matches /dashboard */}
       <Route index element={<DashboardFull />} />

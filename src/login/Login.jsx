@@ -3,10 +3,16 @@ import { Package, Mail, Phone, Lock, Eye, EyeOff, ArrowRight } from 'lucide-reac
 import { motion } from 'framer-motion';
 import BASE_API from "../api/api.js";
 import { useNavigate } from "react-router-dom";
-import { message, Spin } from "antd";
+import { Spin } from "antd";
+
 import axios from "axios";
-import loginmain from "../components/assets/loginmain.png"
+import loginmain from "../components/assets/loginmain.png";
 import logo from "../components/assets/Company_logo.png";
+
+// ⭐ Fix: Add this
+import { toast, Toaster } from "sonner";
+
+
 
 export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
   const navigate = useNavigate();
@@ -102,7 +108,9 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("user", JSON.stringify(user));
 
-        message.success(`${responseMessage} 🎉 Welcome, ${user.username || user.name || ''}!`);
+        toast.success(` ${responseMessage} - Welcome, ${user.username || user.name || ''}!`);
+        navigate("/dashboard");
+
 
         // Navigate to dashboard
         navigate("/dashboard");
@@ -115,8 +123,9 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
         error.message ||
         "Login failed!";
 
-      setLoginError(errorMessage);
-      message.error(errorMessage);
+        setLoginError(errorMessage);
+        toast.error(errorMessage);
+        
 
       // also store error response for visibility
       setLastResponse(error.response?.data ?? { error: errorMessage });
@@ -126,8 +135,10 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      {/* Changed breakpoint to md so tablets show 2-column layout like desktop */}
+    <>
+     {/* <Toaster position="top-right" richColors closeButton /> */}
+  
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         {/* Left Side - Branding (now visible on md and up) */}
         <motion.div
@@ -328,10 +339,10 @@ export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
           </div>
         </motion.div>
       </div>
-    </div>
-  );
-}
-
+      </div>
+  </>
+);
+          }
 function Feature({ icon, title, desc }) {
   return (
     <div className="flex items-start gap-4">
@@ -343,5 +354,6 @@ function Feature({ icon, title, desc }) {
         <p className="text-gray-600 mt-1 text-sm">{desc}</p>
       </div>
     </div>
-  );
+ 
+ );
 }
