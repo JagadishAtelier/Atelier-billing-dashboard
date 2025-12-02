@@ -102,39 +102,91 @@ const CategoryList = () => {
     {
       title: "Actions",
       key: "actions",
-      width: 220,
-      align: "center", // centers action buttons
+      width: 140,
+      align: "center",
       render: (_, record) => (
-        <Space>
-          <Button type="default" icon={<EditOutlined />} onClick={() => navigate(`/category/edit/${record.id}`)}>
-            Edit
-          </Button>
-          <Popconfirm title="Are you sure you want to delete?" onConfirm={() => handleDelete(record.id)}>
-            <Button danger icon={<DeleteOutlined />}>
-              Delete
-            </Button>
+        <Space size={8}>
+          <Button
+            onClick={() => navigate(`/category/edit/${record.id}`)}
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 6,
+              padding: 0,
+              backgroundColor: "#F3F4F6",
+              border: "1px solid #E5E7EB",
+            }}
+            icon={
+              <EditOutlined style={{ fontSize: "14px", color: "#374151" }} />
+            }
+          />
+          <Popconfirm
+            title="Are you sure you want to delete?"
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button
+              danger
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 6,
+                padding: 0,
+                backgroundColor: "white",
+                border: "1px solid #EF4444",
+              }}
+              icon={
+                <DeleteOutlined style={{ fontSize: "14px", color: "#EF4444" }} />
+              }
+            />
           </Popconfirm>
+    
         </Space>
       ),
-    },
+    }
   ];
-
   return (
     <div className="p-4">
       <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
-        <Search
-          placeholder="Search categories..."
-          onSearch={(v) => handleSearch(v)}
-          onChange={(e) => handleSearch(e.target.value)}
-          enterButton
-          allowClear
-          style={{ width: 360 }}
-        />
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/category/add")}>
-          Add Category
-        </Button>
-      </Space>
+  <div className="flex items-center gap-3">
+    <div
+      initial={{ rotate: -45, opacity: 0 }}
+      animate={{ rotate: 0, opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      className="bg-white shadow-sm rounded-sm p-1.5 border border-gray-200"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="inline-block text-gray-600"
+      >
+        <path d="M3 7h5l2 3h11v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
+      </svg>
+    </div>
+    <div>
+      <h2 className="!text-[24px] pt-1.5 text-foreground" style={{ fontWeight: 700 }}>
+        Categories
+      </h2>
+    </div>
 
+  </div>
+  <Space>
+          <Button
+            style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none" }}
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate("/product/add")}
+          >
+            Categories
+          </Button>
+        </Space>
+</Space>
       <Table
         columns={columns}
         rowKey={(record) => record.id}
@@ -147,6 +199,5 @@ const CategoryList = () => {
       />
     </div>
   );
-};
-
+  }  
 export default CategoryList;

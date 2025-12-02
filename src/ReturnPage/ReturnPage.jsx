@@ -124,22 +124,41 @@ function ReturnPage() {
   return (
     <div>
       {/* Header Section */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2 relative">
+      
           {/* Search */}
-          <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
-            <Search size={16} className="text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search by return no..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setPage(1);
-              }}
-              className="outline-none text-sm"
-            />
-          </div>
+          <div className="flex items-center justify-between gap-4 mb-6">
+          <div className="flex items-center justify-between gap-4 mb-6">
+
+{/* LEFT — ICON + TITLE */}
+<div className="flex items-center gap-3">
+
+  {/* ICON BOX */}
+  <div className="bg-white shadow-sm rounded-md p-2 border border-gray-200">
+  <svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+>
+  <path d="M3 7h18v13H3z" />
+  <polyline points="3 7 12 3 21 7"></polyline>
+  <polyline points="12 12 9 9 12 6" />
+  <path d="M9 9h6" />
+</svg>
+
+
+  </div>
+
+  {/* HEADING */}
+  <h1 className="text-[28px] font-bold text-[#1F2937]">
+    Returns
+  </h1>
+</div>
 
           {/* Filter Button */}
           <button
@@ -215,12 +234,13 @@ function ReturnPage() {
 
         {/* Add Button */}
         <div
-          className="bg-[#0E1680] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
-          onClick={handleAdd}
-        >
-          <Plus size={16} />
-          Add Return
-        </div>
+  className="bg-[#506EE4] text-white py-2.5 px-6 text-[15px] font-medium flex items-center justify-center gap-2 rounded-md cursor-pointer"
+  onClick={() => navigate("/order/add")}
+>
+  <Plus size={18} />
+  Add Return
+</div>
+
       </div>
 
       {/* Table Section */}
@@ -286,25 +306,33 @@ function ReturnPage() {
                     {ret.reason || "-"}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
-                    <button
-                      onClick={() => handleView(ret.id)}
-                      className="flex items-center gap-1 px-2 py-1 bg-blue-500 !text-white rounded text-sm"
-                    >
-                      <Eye size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleEdit(ret.id)}
-                      className="flex items-center gap-1 px-2 py-1 bg-[#0E1680] !text-white rounded text-sm"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(ret.id)}
-                      className="flex items-center gap-1 px-2 py-1 bg-red-500 !text-white rounded text-sm"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
+
+  {/* VIEW BUTTON */}
+  <button
+    onClick={() => handleViewDetails(order.id)}
+    className="p-2 rounded-md border border-gray-300 bg-gray-50 hover:bg-gray-100"
+  >
+    <Eye size={18} className="text-gray-700" />
+  </button>
+
+  {/* EDIT BUTTON */}
+  <button
+    onClick={() => handleEdit(order.id)}
+    className="p-2 rounded-md border border-gray-300 bg-gray-50 hover:bg-gray-100"
+  >
+    <Edit size={18} className="text-gray-700" />
+  </button>
+
+  {/* DELETE BUTTON */}
+  <button
+    onClick={() => handleDelete(order.id)}
+    className="p-2 rounded-md border border-red-400 bg-transparent hover:bg-red-50"
+  >
+    <Trash2 size={18} className="text-red-500" />
+  </button>
+
+</td>
+
                 </tr>
               ))
             ) : (

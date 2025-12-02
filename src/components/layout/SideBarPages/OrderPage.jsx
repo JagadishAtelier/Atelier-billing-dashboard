@@ -118,21 +118,12 @@ function OrderPage() {
     <div>
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6">
-        {/* Search + Filter */}
-        <div className="flex items-center gap-2 relative">
-          <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
-            <Search size={16} className="text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search by PO, vendor, or status..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setPage(1);
-              }}
-              className="outline-none text-sm"
-            />
-          </div>
+        <div className="flex items-center gap-3 relative">
+        <h1 className="text-[30px] font-bold text-[#1F2937]">
+  Purchases / Orders
+</h1>
+
+
 
           {/* Filter button */}
           <button
@@ -207,13 +198,14 @@ function OrderPage() {
         </div>
 
         {/* Add Order */}
-        <div
-          className="bg-[#0E1680] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
-          onClick={() => navigate("/order/add")}
-        >
-          <Plus size={16} />
-          Add Order
-        </div>
+<div
+  className="bg-[#506EE4] text-white py-2.5 px-6 text-[15px] font-medium flex items-center justify-center gap-2 rounded-md cursor-pointer"
+  onClick={() => navigate("/order/add")}
+>
+  <Plus size={18} />
+  Add Order
+</div>
+
       </div>
 
       {/* Table */}
@@ -289,19 +281,25 @@ function OrderPage() {
                     </button>
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
-                    <button
-                      onClick={() => handleEdit(order.id)}
-                      className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-sm"
-                    >
-                      <Edit size={16} className="text-white" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(order.id)}
-                      className="flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded text-sm"
-                    >
-                      <Trash2 size={16} className="text-white" />
-                    </button>
-                  </td>
+
+{/* EDIT BUTTON — light gray background */}
+<button
+  onClick={() => handleEdit(order.id)}
+  className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-[#F5F6FA] hover:bg-gray-200 transition"
+>
+  <Edit size={18} className="text-gray-700" />
+</button>
+
+{/* DELETE BUTTON — white background + RED border */}
+<button
+  onClick={() => handleDelete(order.id)}
+  className="flex items-center justify-center w-10 h-10 rounded-lg border border-red-400 bg-white hover:bg-red-50 transition"
+>
+  <Trash2 size={18} className="text-red-500" />
+</button>
+
+</td>
+
                 </tr>
               ))
             ) : (
