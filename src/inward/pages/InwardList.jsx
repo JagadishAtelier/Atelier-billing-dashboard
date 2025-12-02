@@ -1,6 +1,6 @@
 // src/inward/pages/InwardList.jsx
 import React, { useEffect, useState, useRef } from "react";
-import { Plus, Search, Sliders, Edit, Trash2, Eye } from "lucide-react";
+import { Plus, Search,FileInput, Sliders, Edit, Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import inwardService from "../service/inwardService";
 import vendorService from "../../components/layout/SideBarPages/services/vendorService";
@@ -220,23 +220,30 @@ function InwardList() {
       <div className="flex items-center justify-between gap-4 mb-6">
         {/* Search + Filter */}
         <div className="flex items-center gap-2 relative">
-          <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
-            <Search size={16} className="text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search by Inward No, PO-No, vendor..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setPage(1);
-              }}
-              className="outline-none text-sm"
-            />
+          <div className="flex items-center gap-3">
+          <div
+            initial={{ rotate: -45, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="bg-white  shadow-sm rounded-sm p-1.5 border border-gray-200"
+          >
+            <FileInput size={20} className="inline-block text-gray-600" />
           </div>
+          <div >
+            <h2 className="!text-[24px] pt-1.5  text-foreground" style={{fontWeight:700}}>Inward</h2>
+          </div>
+          
+        </div>
 
+          
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-3">
           <button
             onClick={() => setFilterOpen(!filterOpen)}
             className="flex items-center gap-1 border border-gray-300 rounded-md px-2 py-1 text-sm bg-white"
+            style={{height: "40px"}}
           >
             <Sliders size={16} />
             Filter
@@ -245,7 +252,7 @@ function InwardList() {
           {filterOpen && (
             <div
               ref={filterRef}
-              className="absolute top-10 left-0 bg-white border border-gray-300 rounded-md p-4 shadow-lg z-50 w-72"
+              className="absolute top-30 right-20 bg-white border border-gray-300 rounded-md p-4 shadow-lg z-50 w-72"
             >
               <div className="mb-2">
                 <label className="text-sm font-medium">Vendor:</label>
@@ -299,20 +306,11 @@ function InwardList() {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-3">
-          <button
-            className="bg-white border border-gray-300 py-2 px-3 rounded text-sm"
-            onClick={exportPDF}
-          >
-            Export PDF
-          </button>
 
           <div
-            className="bg-[#1C2244] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
+            className=" py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
             onClick={handleAdd}
+            style={{backgroundColor: "#506ee4", color:"#fff", height: "40px"}}
           >
             <Plus size={16} />
             Add Inward
@@ -393,7 +391,7 @@ function InwardList() {
                   <td className="py-4 px-4 border-b border-gray-300">
                     <button
                       onClick={() => handleView(inv.id)}
-                      className="bg-[#1C2244] !text-white py-1 px-3 text-xs font-semibold rounded-sm hover:opacity-90 inline-flex items-center gap-1"
+                      className="bg-[#506ee4] !text-white py-1 px-3 text-xs font-semibold rounded-sm hover:opacity-90 inline-flex items-center gap-1"
                     >
                       <Eye size={14} />
                       View
@@ -403,9 +401,9 @@ function InwardList() {
                   <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
                     <button
                       onClick={() => handleEdit(inv.id)}
-                      className="flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                      className="flex bg-[#f6f7ff] items-center gap-1 px-2 py-1 !text-[#000] rounded text-sm"
                     >
-                      <Edit size={16} className="text-white" />
+                      <Edit size={16} className="text-black" />
                     </button>
                     <button
                       onClick={() => handleDelete(inv.id)}

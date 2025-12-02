@@ -1,7 +1,8 @@
 // src/stock/pages/StockListTailwind.jsx
 import React, { useCallback, useEffect, useState } from "react";
-import { Plus, Search as SearchIcon, Edit, Trash2, Upload as UploadIcon, Download, Settings } from "lucide-react";
+import { Plus, Warehouse , Search as SearchIcon, Edit, Trash2, Upload as UploadIcon, Download, Settings } from "lucide-react";
 import * as XLSX from "xlsx";
+
 import stockService from "../service/stockService"; // adjust path if needed
 import { jsPDF } from "jspdf"; // optional, remove if you don't use jsPDF
 
@@ -182,35 +183,38 @@ export default function StockListTailwind() {
     <div className="p-4">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        {/* Search */}
-        <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-3 w-full md:w-1/3 bg-white">
-          <SearchIcon size={16} className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search by product, code..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(1);
-            }}
-            className="outline-none text-sm w-full"
-          />
+        
+          <div className="flex items-center gap-3">
+          <div
+            initial={{ rotate: -45, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="bg-white  shadow-sm rounded-sm p-1.5 border border-gray-200"
+          >
+            <Warehouse size={20} className="inline-block text-gray-600" />
+          </div>
+          <div >
+            <h2 className="!text-[24px] pt-1.5  text-foreground" style={{fontWeight:700}}>Stock</h2>
+          </div>
+          
         </div>
 
         {/* Buttons */}
         <div className="flex gap-2 flex-wrap">
           <div
-            className="bg-[#0E1680] text-white py-3 px-4 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
+            className=" py-3 px-4 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
             onClick={() => setShowColumnModal(true)}
             title="Customize Columns"
+            style={{backgroundColor: "#506ee4", color:"#fff", height: "40px"}}
           >
             <Settings size={16} /> Customize Columns
           </div>
 
           <div
-            className="bg-[#0E1680] text-white py-3 px-4 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
+            className=" py-3 px-4 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
             onClick={() => setShowUploadModal(true)}
             title="Bulk Upload Excel"
+            style={{backgroundColor: "#506ee4", color:"#fff", height: "40px"}}
           >
             <UploadIcon size={16} /> Bulk Upload Excel
           </div>
@@ -219,6 +223,7 @@ export default function StockListTailwind() {
             className="bg-white border border-gray-300 py-3 px-4 flex items-center gap-2 rounded-md cursor-pointer"
             onClick={() => fetchStocks(1, "")}
             title="Refresh"
+            style={{height: "40px"}}
           >
             <Download size={16} />
             Refresh
@@ -228,6 +233,7 @@ export default function StockListTailwind() {
             className="bg-white border border-gray-300 py-3 px-4 flex items-center gap-2 rounded-md cursor-pointer"
             onClick={exportPDF}
             title="Export PDF (visible columns)"
+            style={{height: "40px"}}
           >
             Export PDF
           </div>

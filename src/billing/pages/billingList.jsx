@@ -366,7 +366,7 @@ function BillingList() {
           <Tooltip title="Quick view">
             <Button type="default" icon={<EyeOutlined />} onClick={() => showDetails(record)} />
           </Tooltip>
-          <Button type="primary" icon={<EditOutlined />} onClick={() => navigate(`/billing/edit/${record.id}`)} />
+          <Button style={{backgroundColor:"#f6f7ff"}} icon={<EditOutlined />} onClick={() => navigate(`/billing/edit/${record.id}`)} />
           <Popconfirm title="Are you sure to delete this billing?" onConfirm={() => handleDelete(record.id)}>
             <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>
@@ -424,24 +424,23 @@ function BillingList() {
 
         <Col>
           <Space>
-            <Search
-              placeholder="Search billings..."
-              onSearch={(v) => doSearch(v)}
-              onChange={(e) => doSearch(e.target.value)}
-              enterButton
-              allowClear
-              style={{ width: 300 }}
-            />
 
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/billing/add")}>
+            <Button style={{backgroundColor: "#506ee4", color:"#fff", height: "40px"}} icon={<PlusOutlined />} onClick={() => navigate("/billing/add")}>
               Add Billing
             </Button>
-            <Button icon={<FilePdfOutlined />} onClick={exportPDF}>
+            <Button style={{height: "40px"}} icon={<FilePdfOutlined />} onClick={exportPDF}>
               Export PDF
             </Button>
 
-            <Radio.Group value={viewMode} onChange={(e) => setViewMode(e.target.value)} optionType="button" buttonStyle="solid">
-              <Radio.Button value="table">Table</Radio.Button>
+            {/* Added className "view-mode-radio" so we can scope CSS to only this instance */}
+            <Radio.Group
+              value={viewMode}
+              onChange={(e) => setViewMode(e.target.value)}
+              optionType="button"
+              buttonStyle="solid"
+              className="view-mode-radio"
+            >
+              <Radio.Button  value="table">Table</Radio.Button>
               <Radio.Button value="card">Card</Radio.Button>
             </Radio.Group>
           </Space>
@@ -553,7 +552,7 @@ function BillingList() {
                             />
                           </Tooltip>
 
-                          <Button type="primary" icon={<EditOutlined />} onClick={() => navigate(`/billing/edit/${item.id}`)} style={{ borderRadius: 8, padding: "6px 14px" }} />
+                          <Button styles={{backgroundColor:"#f6f7ff"}} icon={<EditOutlined />} onClick={() => navigate(`/billing/edit/${item.id}`)} style={{ borderRadius: 8, padding: "6px 14px" }} />
 
                           <Popconfirm title="Are you sure to delete this billing?" onConfirm={() => handleDelete(item.id)}>
                             <Button danger icon={<DeleteOutlined />} style={{ borderRadius: 8, padding: "6px 14px" }} />
@@ -590,6 +589,30 @@ function BillingList() {
     .invoice-modal .ant-card-body {
       padding-top: 0px !important;
       padding-bottom: 8px !important;
+    }
+
+    /* === View mode radio custom styles (scoped) === */
+    .view-mode-radio .ant-radio-button-wrapper-checked {
+      background-color: #506ee4 !important;
+      color: #fff !important;
+      border-color: #506ee4 !important;
+      box-shadow: none !important;
+    }
+
+    .view-mode-radio .ant-radio-button-wrapper {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .view-mode-radio .ant-radio-button-wrapper:hover {
+      color: #506ee4;
+      border-color: #506ee4;
+    }
+
+    .view-mode-radio .ant-radio-button-wrapper-checked:hover {
+      background-color: #506ee4 !important;
+      color: #fff !important;
+      border-color: #506ee4 !important;
     }
   `}
       </style>
