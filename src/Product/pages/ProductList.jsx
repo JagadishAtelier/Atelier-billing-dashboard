@@ -175,41 +175,26 @@ const ProductList = () => {
       title: "Name",
       dataIndex: "product_name",
       key: "product_name",
+      width: 10,
       sorter: true,
       ellipsis: true,
     },
-    { title: "Code", dataIndex: "product_code", key: "product_code", width: 140, ellipsis: true },
-    {
-      title: "QR Code",
-      key: "qr_code",
-      render: (_, record) => (
-        <div ref={(el) => (qrRefs.current[record.id] = el)} style={{ display: "flex", alignItems: "center" }}>
-          <QRCodeCanvas value={record.product_code || ""} size={64} level="H" />
-          <Button
-            size="small"
-            icon={<DownloadOutlined />}
-            onClick={() => downloadQR(record.id, record.product_code)}
-            style={{ marginLeft: 8 }}
-          >
-            Download
-          </Button>
-        </div>
-      ),
-    },
-    { title: "Category", dataIndex: "category_name", key: "category", width: 180, ellipsis: true },
+    { title: "Code", dataIndex: "product_code", key: "product_code", width: 10, ellipsis: true },
+    
+    { title: "Category", dataIndex: "category_name", key: "category", width: 10, ellipsis: true },
     {
       title: "Price",
       dataIndex: "purchase_price",
       key: "price",
       sorter: true,
+      width: 10,
       render: (price) => `₹${price}`,
     },
     {
       title: "Actions",
       key: "actions",
-      fixed: "right",
       align: "center",
-      width: 160,
+      width: 10,
       render: (_, record) => {
         return (
           <Space>
@@ -229,25 +214,17 @@ const ProductList = () => {
   return (
     <div className="p-4">
       <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
-        <Search
-          placeholder="Search products..."
-          onSearch={handleSearch}
-          onChange={(e) => handleSearch(e.target.value)}
-          enterButton
-          allowClear
-          style={{ width: 300 }}
-        />
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Products</h2>
+        </div>
         <Space>
           <Button
-            style={{ backgroundColor: "#0E1680", fontWeight: "500", fontSize: "16px" }}
+            style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px" }}
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => navigate("/product/add")}
           >
             Add Product
-          </Button>
-          <Button type="default" icon={<DownloadOutlined />} onClick={downloadAllQRPDF}>
-            Download All QR PDF
           </Button>
         </Space>
       </Space>
@@ -263,7 +240,7 @@ const ProductList = () => {
           onChange={handleTableChange}
           bordered
           // ensure horizontal scroll appears — total column widths ~ 1350 so use 1200-1400
-          scroll={{ x: 1200 }}
+          scroll={{ x: 100 }}
         />
       </div>
 
