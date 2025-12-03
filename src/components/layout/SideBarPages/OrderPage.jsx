@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import orderService from "./services/orderService";
 import vendorService from "./services/vendorService";
+import { EyeOutlined } from "@ant-design/icons";
 
 const columns = [
   "S.No",
@@ -273,16 +274,25 @@ function OrderPage() {
                     {order.status || "-"}
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300">
-                    <button
-                      onClick={() => handleViewDetails(order.id)}
-                      className="bg-[#1C2244] !text-white py-1 px-3 text-xs font-semibold rounded-sm hover:opacity-90"
-                    >
-                      View
-                    </button>
+                  <button
+  onClick={() => handleViewDetails(order.id)}
+  className="flex items-center justify-center px-4 py-2 rounded-md border border-gray-300 bg-[#F5F6FA] text-[#1C2244] text-sm font-medium hover:bg-gray-200 transition"
+>
+  View
+</button>
+
                   </td>
                   <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
+                    
 
-{/* EDIT BUTTON — light gray background */}
+{/* EDIT BUTTON — light gray background */ }
+<button
+  onClick={() => handleViewDetails(order.id)}
+  className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-[#F5F6FA] hover:bg-gray-200 transition"
+>
+  <EyeOutlined style={{ fontSize: 18, color: "#475467" }} />
+</button>
+
 <button
   onClick={() => handleEdit(order.id)}
   className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-[#F5F6FA] hover:bg-gray-200 transition"
@@ -340,4 +350,4 @@ function OrderPage() {
   );
 }
 
-export default OrderPage;
+export default OrderPage; 

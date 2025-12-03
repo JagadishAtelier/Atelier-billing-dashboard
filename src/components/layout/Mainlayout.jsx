@@ -168,12 +168,8 @@ const MainLayout = ({ menuItems }) => {
         token: { colorPrimary: primaryColor },
       }}
     >
-      {/* Sonner toaster (top-right)
-      <Toaster position="top-right" closeButton />  */}
-
-
       <Layout style={{ minHeight: "100vh", maxWidth: layoutType === "boxed" ? 1200 : "100%", margin: layoutType === "boxed" ? "0 auto" : 0 }}>
-        {/* Desktop Sidebar */}
+   {/* Desktop Sidebar */}
         {!isMobile && (
           <Sider
             trigger={null}
@@ -243,19 +239,23 @@ const MainLayout = ({ menuItems }) => {
           </div>
 
           <Content
-            onClick={handleContentClick}
-            style={{
-              padding: 2,
-              minHeight: `calc(100vh - 100px)`,
-              overflow: "auto",
-              // ensure content is below the fixed header
-              marginTop: 65,
-            }}
-          >
-            <div className="rounded-lg p-1 min-h-full ">
-              <Outlet />
-            </div>
-          </Content>
+  onClick={handleContentClick}
+  style={{
+    padding: 2,
+    minHeight: `calc(100vh - 100px)`,
+    overflow: "auto",
+    marginTop: 65,
+  }}
+>
+
+  {/*Toast visible for all pages */}
+  <Toaster position="top-right" richColors closeButton />
+
+  <div className="rounded-lg p-1 min-h-full ">
+    <Outlet />
+  </div>
+</Content>
+
 
           <AppFooter theme={theme} bgColor={theme === "dark" ? "#001529" : footerBgColor} />
         </Layout>
