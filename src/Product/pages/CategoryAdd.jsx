@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   Card,
@@ -17,6 +16,8 @@ import {
 import { CheckCircleTwoTone, EditOutlined, ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import categoryService from "../services/categoryService";
+import { toast } from "sonner";
+
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -62,37 +63,39 @@ const CategoryForm = () => {
         category_name: values.category_name.trim(),
         description: values.description?.trim() || "",
       };
-
+  
       if (id) {
         await categoryService.update(id, payload);
-        message.success("Category updated successfully");
-      } else {
-        await categoryService.create(payload);
-        message.success("Category added successfully");
-      }
-
-      // show success Result briefly before redirecting
-      setSaved(true);
-      setTimeout(() => {
+        toast.success("Category updated successfully!");
         navigate("/category/list");
-      }, 1100);
+    } else {
+        await categoryService.create(payload);
+        toast.success("Category added successfully!");
+        navigate("/category/list");
+    }
+    
+  
     } catch (err) {
       console.error("Error details:", err?.response?.data ?? err?.message ?? err);
-      // try to surface structured server errors
+  
       const serverData = err?.response?.data;
       if (serverData && serverData?.error && Array.isArray(serverData.error)) {
         serverData.error.forEach((e) => message.error(e.message || JSON.stringify(e)));
       } else {
         message.error("Operation failed");
       }
+  
     } finally {
       setLoading(false);
     }
   };
+  
 
   // Cancel/back
-  const onCancel = () => navigate("/category/list");
-
+  const onCancel = () => {
+    navigate("/category/list");
+  };
+  
   // Character counter for description
   const onDescriptionChange = (e) => {
     setDescCount(e.target.value.length);

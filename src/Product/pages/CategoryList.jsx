@@ -5,6 +5,7 @@ import { Table, Button, Space, Popconfirm, message, Input, Tag } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import categoryService from "../services/categoryService.js";
 import debounce from "lodash.debounce";
+import { toast } from "sonner";
 
 const { Search } = Input;
 
@@ -146,6 +147,8 @@ const CategoryList = () => {
   ];
   return (
     <div className="p-4">
+      
+
       <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
   <div className="flex items-center gap-3">
     <div
@@ -181,7 +184,8 @@ const CategoryList = () => {
             style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none" }}
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => navigate("/product/add")}
+            onClick={() => navigate("/category/add")
+          }
           >
             Categories
           </Button>
@@ -201,3 +205,5 @@ const CategoryList = () => {
   );
   }  
 export default CategoryList;
+
+

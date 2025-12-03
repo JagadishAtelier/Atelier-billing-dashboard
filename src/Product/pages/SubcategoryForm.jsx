@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+
 import {
   Card,
   Form,
@@ -39,11 +40,7 @@ const SubcategoryForm = () => {
   const [saved, setSaved] = useState(false);
   const [categories, setCategories] = useState([]);
   const [descCount, setDescCount] = useState(0);
-
-  // helper to pick string ID from category/subcategory object (prefer uuid/_id then id)
   const optionValue = (obj) => (obj ? String(obj.uuid ?? obj._id ?? obj.id ?? "") : "");
-
-  // fetch categories
   const fetchCategories = async () => {
     try {
       const res = await categoryService.getAll();
@@ -55,18 +52,13 @@ const SubcategoryForm = () => {
       message.error("Failed to fetch categories");
     }
   };
-
-  // fetch subcategory (edit mode)
   const fetchSubcategory = async (subId) => {
     setLoading(true);
     try {
-      // ensure categories loaded first so select shows correct label
       await fetchCategories();
 
       const res = await subcategoryService.getById(subId);
       const data = res?.data ?? res ?? {};
-
-      // try to set the category id: use data.category_id or nested object
       const categoryId = data.category_id ?? (data.category ? (data.category.uuid ?? data.category._id ?? data.category.id) : "");
 
       form.setFieldsValue({
@@ -87,16 +79,11 @@ const SubcategoryForm = () => {
 
   useEffect(() => {
     if (!id) {
-      // Add mode: just load categories
       fetchCategories();
     } else {
-      // Edit mode: load subcategory (which also ensures categories)
       fetchSubcategory(id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
-  // map backend validation errors to form fields
   const applyServerValidationToForm = (errorArray) => {
     if (!Array.isArray(errorArray)) return;
     const fieldErrors = errorArray
@@ -114,22 +101,18 @@ const SubcategoryForm = () => {
   const onCancel = () => navigate("/subcategory/list");
 
   const handleSubmit = async (values) => {
-    // Normalize payload
     const payload = {
       subcategory_name: (values.subcategory_name || "").trim(),
       category_id: String(values.category_id || ""),
       description: (values.description || "").trim(),
       status: values.status || "active",
     };
-
-    // Client guard: required fields
     const clientErrors = [];
     if (!payload.subcategory_name) clientErrors.push({ name: ["subcategory_name"], errors: ["Subcategory name is required"] });
     if (!payload.category_id) clientErrors.push({ name: ["category_id"], errors: ["Please select a category"] });
 
     if (clientErrors.length) {
       form.setFields(clientErrors);
-      // bring user to top to see the error
       return;
     }
 
@@ -143,7 +126,7 @@ const SubcategoryForm = () => {
         message.success("Subcategory created successfully");
       }
 
-      // show brief success page then redirect
+      // ssuccess page
       setSaved(true);
       setTimeout(() => navigate("/subcategory/list"), 1000);
     } catch (err) {
@@ -226,7 +209,6 @@ const SubcategoryForm = () => {
               initialValues={{ status: "active" }}
             >
               <div style={{ display: "grid", gap: 16 }}>
-                {/* Category Select */}
                 <Form.Item
                   label="Category"
                   name="category_id"
@@ -247,8 +229,6 @@ const SubcategoryForm = () => {
                     ))}
                   </Select>
                 </Form.Item>
-
-                {/* Subcategory Name */}
                 <Form.Item
                   label="Subcategory Name"
                   name="subcategory_name"
@@ -256,16 +236,12 @@ const SubcategoryForm = () => {
                 >
                   <Input placeholder="e.g., T-Shirts" size="large" />
                 </Form.Item>
-
-                {/* Description */}
                 <Form.Item label="Description" name="description">
                   <TextArea rows={4} placeholder="Optional description" onChange={(e) => onDescriptionChange(e)} />
                   <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 6 }}>
                     <Text type="secondary" style={{ fontSize: 12 }}>{descCount} characters</Text>
                   </div>
                 </Form.Item>
-
-                {/* Status */}
               </div>
 
               {/* Sticky action bar */}
