@@ -287,7 +287,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
             </div>
           ) : (
             <div className="flex items-center justify-center">
-              <button onClick={() => navigate("/logout")} title="Logout" className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600">
+              <button onClick={() => navigate("/")} title="Logout" className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600">
                 <LogOut className="w-5 h-5" />
               </button>
             </div>

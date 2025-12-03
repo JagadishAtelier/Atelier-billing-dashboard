@@ -1,9 +1,131 @@
 import { Mail, Lock, EyeClosed, Eye } from "lucide-react";
 import loginIllustration from "/inventoryBg.svg";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import BASE_API from "../api/api.js";
+import { toast } from "sonner";
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [passwordError, setPasswordError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [mobileError, setMobileError] = useState("");
+  const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [isMobileLogin, setIsMobileLogin] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // NEW: store last response for visibility/debugging
+  const [lastResponse, setLastResponse] = useState(null);
+
+  const isValidEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const isValidMobile = (mobile) =>
+    /^\d{10}$/.test(mobile);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setEmailError("");
+    setMobileError("");
+    setPasswordError("");
+    setLoginError("");
+
+    let hasError = false;
+
+    // email / mobile validation
+    if (isMobileLogin) {
+      if (!mobile.trim()) {
+        setMobileError("Mobile number is required");
+        hasError = true;
+      } else if (!isValidMobile(mobile)) {
+        setMobileError("Please enter a valid 10-digit mobile number");
+        hasError = true;
+      }
+    } else {
+      if (!email.trim()) {
+        setEmailError("Email is required");
+        hasError = true;
+      } else if (!isValidEmail(email)) {
+        setEmailError("Please enter a valid email address");
+        hasError = true;
+      }
+    }
+
+    if (!password.trim()) {
+      setPasswordError("Password is required");
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    setLoading(true);
+    setLastResponse(null); // clear previous response
+
+    try {
+      const payload = {
+        identifier: isMobileLogin ? mobile : email,
+        password,
+      };
+
+      const res = await axios.post(
+        `${BASE_API}/user/login`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+
+      // save the raw response for debugging/display
+      setLastResponse(res.data ?? res);
+
+      const {
+        message: responseMessage,
+        token,
+        refreshToken,
+        user,
+      } = res.data;
+
+      if (token && user) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        toast.success(` ${responseMessage} - Welcome, ${user.username || user.name || ''}!`);
+        navigate("/dashboard");
+
+
+        // Navigate to dashboard
+        navigate("/dashboard");
+      } else {
+        throw new Error("Invalid login response");
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Login failed!";
+
+        setLoginError(errorMessage);
+        toast.error(errorMessage);
+        
+
+      // also store error response for visibility
+      setLastResponse(error.response?.data ?? { error: errorMessage });
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen w-full flex">
       {/* LEFT SECTION */}
@@ -39,15 +161,19 @@ const Login = () => {
           </h2>
 
           {/* Form */}
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Email */}
             <div data-aos="fade-up" data-aos-delay="100">
               <label className="text-sm font-medium">Email Address</label>
               <div className="relative mt-1">
                 <input
-                  type="email"
-                  placeholder="alex@email.com"
+                  id="email"
+                      type="email"
+                      placeholder="you@company.com"
                   className="w-full bg-gray-100 rounded-lg border border-gray-300 px-4 py-2 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
                 />
                 <div className="bg-blue-600 h-full aspect-square rounded-md absolute right-0 top-0 flex items-center justify-center">
                   <Mail
@@ -63,9 +189,13 @@ const Login = () => {
               <label className="text-sm font-medium">Password</label>
               <div className="relative mt-1">
                 <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
                   className="w-full rounded-lg bg-gray-100 border border-gray-300 px-4 py-2 pr-20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
                 />
 
                 {/* Eye Icon (left inside the input) */}
@@ -95,7 +225,8 @@ const Login = () => {
               data-aos="fade-up"
               data-aos-delay="300"
               type="submit"
-              className="w-full py-2.5 rounded-lg bg-linear-to-r from-[#003893] to-[#005FF9] text-white font-medium  shadow-lg shadow-blue-200 transition-all duration-500 ease-in-out hover:bg-linear-to-l"
+              disabled={loading}
+              className="w-full py-2.5 rounded-lg bg-linear-to-r from-[#003893] to-[#005FF9] !text-white font-medium  shadow-lg shadow-blue-200 transition-all duration-500 ease-in-out hover:bg-linear-to-l"
             >
               Login Now
             </button>
