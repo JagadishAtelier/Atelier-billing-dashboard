@@ -1,359 +1,128 @@
-import React, { useState } from 'react';
-import { Package, Mail, Phone, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
-import BASE_API from "../api/api.js";
-import { useNavigate } from "react-router-dom";
-import { Spin } from "antd";
+import { Mail, Lock, EyeClosed, Eye } from "lucide-react";
+import loginIllustration from "/inventoryBg.svg";
+import { useState } from "react";
 
-import axios from "axios";
-import loginmain from "../components/assets/loginmain.png";
-import logo from "../components/assets/Company_logo.png";
-
-// ⭐ Fix: Add this
-import { toast, Toaster } from "sonner";
-
-
-
-export default function Login({ onLogin = () => {}, onNavigate = () => {} }) {
-  const navigate = useNavigate();
+const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [passwordError, setPasswordError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [mobileError, setMobileError] = useState("");
-  const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(false);
-  const [loginError, setLoginError] = useState("");
-  const [isMobileLogin, setIsMobileLogin] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // NEW: store last response for visibility/debugging
-  const [lastResponse, setLastResponse] = useState(null);
-
-  const isValidEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-  const isValidMobile = (mobile) =>
-    /^\d{10}$/.test(mobile);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    setEmailError("");
-    setMobileError("");
-    setPasswordError("");
-    setLoginError("");
-
-    let hasError = false;
-
-    // email / mobile validation
-    if (isMobileLogin) {
-      if (!mobile.trim()) {
-        setMobileError("Mobile number is required");
-        hasError = true;
-      } else if (!isValidMobile(mobile)) {
-        setMobileError("Please enter a valid 10-digit mobile number");
-        hasError = true;
-      }
-    } else {
-      if (!email.trim()) {
-        setEmailError("Email is required");
-        hasError = true;
-      } else if (!isValidEmail(email)) {
-        setEmailError("Please enter a valid email address");
-        hasError = true;
-      }
-    }
-
-    if (!password.trim()) {
-      setPasswordError("Password is required");
-      hasError = true;
-    }
-
-    if (hasError) return;
-
-    setLoading(true);
-    setLastResponse(null); // clear previous response
-
-    try {
-      const payload = {
-        identifier: isMobileLogin ? mobile : email,
-        password,
-      };
-
-      const res = await axios.post(
-        `${BASE_API}/user/login`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
-
-      // save the raw response for debugging/display
-      setLastResponse(res.data ?? res);
-
-      const {
-        message: responseMessage,
-        token,
-        refreshToken,
-        user,
-      } = res.data;
-
-      if (token && user) {
-        localStorage.setItem("token", token);
-        localStorage.setItem("refreshToken", refreshToken);
-        localStorage.setItem("user", JSON.stringify(user));
-
-        toast.success(` ${responseMessage} - Welcome, ${user.username || user.name || ''}!`);
-        navigate("/dashboard");
-
-
-        // Navigate to dashboard
-        navigate("/dashboard");
-      } else {
-        throw new Error("Invalid login response");
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Login failed!";
-
-        setLoginError(errorMessage);
-        toast.error(errorMessage);
-        
-
-      // also store error response for visibility
-      setLastResponse(error.response?.data ?? { error: errorMessage });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <>
-     {/* <Toaster position="top-right" richColors closeButton /> */}
-  
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        {/* Left Side - Branding (now visible on md and up) */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="hidden md:flex flex-col justify-center space-y-8 px-10"
+    <div className="min-h-screen w-full flex">
+      {/* LEFT SECTION */}
+      <div
+        data-aos="fade-right"
+        className="hidden max-h-screen overflow-hidden lg:flex w-3/4 items-center justify-center bg-white/80"
+      >
+        <img
+          src={loginIllustration}
+          alt="Medical Illustration"
+          className="max-h-screen h-[98vh] absolute bottom-0 left-0 object-contain"
+        />
+      </div>
+
+      {/* RIGHT SECTION — slide-right */}
+      <div
+        data-aos="fade-left"
+        className="flex w-full lg:w-1/4 max-h-screen h-screen items-center justify-center px-3 lg:px-8 lg:py-16 bg-white shadow-[-10px_0_20px_rgba(0,0,0,0.05)]"
+      >
+        <div
+          className="w-full max-w-md"
+          data-aos="zoom-in"
+          data-aos-delay="200"
         >
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div>
-                <img src={logo} alt="Company logo" className="h-24 object-contain" />
-                <p className="text-sm text-gray-600">Enterprise Inventory System</p>
-              </div>
-            </div>
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <img src="/inventory_logo.svg" alt="logo" className="h-24 aspect-square" />
           </div>
 
-          <div className="space-y-6">
-            <Feature
-              icon={(
-                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-              title="Real-time Inventory Tracking"
-              desc="Track stock levels, movements, and valuations in real-time across multiple warehouses."
-            />
+          {/* Title */}
+          <h2 data-aos="fade-up" className="text-center text-md font-bold mb-6">
+            Login into your account
+          </h2>
 
-            <Feature
-              icon={(
-                <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              )}
-              title="Advanced Analytics"
-              desc="Make data-driven decisions with comprehensive reports and predictive insights."
-            />
-
-            <Feature
-              icon={(
-                <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              )}
-              title="Enterprise Security"
-              desc="Role-based access control, 2FA, and encrypted data storage for peace of mind."
-            />
-          </div>
-        </motion.div>
-
-        {/* Right Side - Login Form */}
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full"
-        >
-          <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-12">
-            <div className="text-center mb-6">
-              <div className="md:hidden flex items-center justify-center gap-3 mb-1">
-                <img src={logo} alt="Company logo" className="h-24 object-contain" />
+          {/* Form */}
+          <form className="space-y-4">
+            {/* Email */}
+            <div data-aos="fade-up" data-aos-delay="100">
+              <label className="text-sm font-medium">Email Address</label>
+              <div className="relative mt-1">
+                <input
+                  type="email"
+                  placeholder="alex@email.com"
+                  className="w-full bg-gray-100 rounded-lg border border-gray-300 px-4 py-2 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <div className="bg-blue-600 h-full aspect-square rounded-md absolute right-0 top-0 flex items-center justify-center">
+                  <Mail
+                    className="text-gray-100"
+                    size={20}
+                  />
+                </div>
               </div>
-              <h2 className="text-2xl font-semibold text-gray-900">Welcome back!</h2>
-              <p className="text-sm text-gray-600 mt-2">Sign in to your account to continue</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Toggle: Email vs Mobile login (so mobile state and isMobileLogin have UI) */}
-              {/* <div className="flex items-center justify-center gap-2"> */}
-                {/* <button
-                  type="button"
-                  onClick={() => setIsMobileLogin(false)}
-                  className={`px-4 py-1 rounded-full text-sm font-medium ${!isMobileLogin ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
-                >
-                  Email
-                </button>
+            {/* Password */}
+            <div data-aos="fade-up" data-aos-delay="200">
+              <label className="text-sm font-medium">Password</label>
+              <div className="relative mt-1">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  className="w-full rounded-lg bg-gray-100 border border-gray-300 px-4 py-2 pr-20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                {/* Eye Icon (left inside the input) */}
                 <button
                   type="button"
-                  onClick={() => setIsMobileLogin(true)}
-                  className={`px-4 py-1 rounded-full text-sm font-medium ${isMobileLogin ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-10 top-1/2 -translate-y-1/2 text-[#1E2772] hover:text-[#1E2772]/80 transition-padding px-3"
                 >
-                  Mobile
-                </button> */}
-              {/* </div> */}
+                  {showPassword ? <EyeClosed size={20} /> : <Eye size={20} />}
+                </button>
 
-              {/* Conditionally render Email or Mobile input */}
-              {!isMobileLogin ? (
-                <div className="space-y-2">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      id="email"
-                      type="email"
-                      placeholder="you@company.com"
-                      className="pl-11 pr-4 h-12 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  {emailError && <p className="text-xs text-red-600 mt-1">{emailError}</p>}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">Mobile Number</label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      id="mobile"
-                      type="tel"
-                      inputMode="numeric"
-                      placeholder="10-digit mobile number"
-                      className="pl-11 pr-4 h-12 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
-                      required
-                      maxLength={10}
-                    />
-                  </div>
-                  {mobileError && <p className="text-xs text-red-600 mt-1">{mobileError}</p>}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    className="pl-11 pr-11 h-12 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {passwordError && <p className="text-xs text-red-600 mt-1">{passwordError}</p>}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <input id="remember" type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
-                  <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer">Remember me</label>
-                </div>
-                <div>
-                  <button type="button" onClick={() => navigate('/forgot-password')} className="text-sm text-blue-600 hover:underline">Forgot password?</button>
+                {/* Blue Lock Box (unchanged) */}
+                <div className="bg-blue-600 h-full aspect-square rounded-md absolute right-0 top-0 flex items-center justify-center">
+                  <Lock className="text-white" size={20} />
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full h-12 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-white font-semibold rounded-lg shadow-md disabled:opacity-60"
-              >
-                {loading ? (
-                  <>
-                    <Spin size="small" />
-                    <span>Signing in...</span>
-                  </>
-                ) : (
-                  <>
-                    Sign In
-                    <ArrowRight className="w-5 h-5 ml-1" />
-                  </>
-                )}
-              </button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
-                </div>
+              <div className="text-right mt-1">
+                <a href="#" className="text-xs text-[#1E2772] hover:underline">
+                  Forgot Password?
+                </a>
               </div>
-            </form>
+            </div>
 
-            {/* show server response (for debugging / visibility) */}
-            {/* Uncomment if you want to display raw response */}
-            {/* {lastResponse && (
-              <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-100">
-                <div className="text-sm font-medium text-gray-700 mb-2">Last response</div>
-                <pre className="text-xs text-gray-700 max-h-48 overflow-auto whitespace-pre-wrap">
-                  {JSON.stringify(lastResponse, null, 2)}
-                </pre>
-              </div>
-            )} */}
+            {/* Login Button */}
+            <button
+              data-aos="fade-up"
+              data-aos-delay="300"
+              type="submit"
+              className="w-full py-2.5 rounded-lg bg-linear-to-r from-[#003893] to-[#005FF9] text-white font-medium  shadow-lg shadow-blue-200 transition-all duration-500 ease-in-out hover:bg-linear-to-l"
+            >
+              Login Now
+            </button>
 
-            {loginError && <div className="mt-3 text-sm text-red-600">{loginError}</div>}
-          </div>
-        </motion.div>
-      </div>
-      </div>
-  </>
-);
-          }
-function Feature({ icon, title, desc }) {
-  return (
-    <div className="flex items-start gap-4">
-      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-        {icon}
-      </div>
-      <div>
-        <h3 className="text-gray-900 font-semibold">{title}</h3>
-        <p className="text-gray-600 mt-1 text-sm">{desc}</p>
+            {/* Divider */}
+            <div
+              className="flex items-center gap-3"
+              data-aos="fade-up"
+              data-aos-delay="350"
+            >
+              <div className="grow border-t border-gray-300" />
+              <span className="text-xs text-gray-600 font-bold">OR</span>
+              <div className="grow border-t border-gray-300" />
+            </div>
+
+            {/* Signup Button */}
+            <button
+              type="button"
+              className="w-full py-2.5 rounded-lg border border-blue-600 text-blue-600 font-medium hover:bg-blue-50 transition"
+            >
+              Signup Now
+            </button>
+          </form>
+        </div>
       </div>
     </div>
- 
- );
-}
+  );
+};
+
+export default Login;

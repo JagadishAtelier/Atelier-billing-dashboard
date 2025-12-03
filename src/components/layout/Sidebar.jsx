@@ -127,7 +127,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
           <button
             onClick={() => setCollapsed((p) => !p)}
             className="p-1.5 hover:bg-white/20 rounded-lg transition-colors !text-black"
-            style={{fontSize:"16px !important"}}
+            style={{fontSize:"15px !important"}}
             aria-label={collapsed ? "Open sidebar" : "Close sidebar"}
           >
             {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
@@ -136,7 +136,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
 
         {/* Center nav - scrollable area */}
         <nav
-          className={`flex-1 overflow-y-auto overflow-x-hidden px-2 py-3 ${collapsed ? "" : "p-3"}`}
+          className={`flex-1 gap-2 overflow-y-auto overflow-x-hidden px-2 py-3 ${collapsed ? "" : "p-3"}`}
           // Add some a11y attributes
           aria-label="Main navigation"
         >
@@ -177,7 +177,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                     }}
                     whileHover={{ scale: collapsed ? 1.05 : 1.03 }}
                     whileTap={{ scale: 0.98 }}
-                    className={`w-full text-left !text-[24px] !text-[#364153] flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+                    className={`w-full text-left !text-[20px] !text-[#364153] flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
                       active ? "!bg-[#f2f5ff] from-blue-500 to-purple-500 text-black shadow-md" : "text-gray-700 hover:bg-[#f1f6fb]"
                     }`}
                   >
@@ -186,7 +186,7 @@ const Sidebar = ({ collapsed = true, setCollapsed = () => {}, selectedParent, se
                     {/* label and chevron shown only when expanded */}
                     {!collapsed && (
                       <>
-                        <span className={`truncate text-[#364153] flex-1 !text-[17px] !font-normal hover:font-medium ${active ? "text-black !font-semibold" : ""} `}>{item.label}</span>
+                        <span className={`truncate text-[#364153] flex-1 !text-[16px] !font-normal hover:font-medium ${active ? "text-black !font-semibold" : ""} `}>{item.label}</span>
                         {item.children && (
                           <span className={`text-xs flex-shrink-0 ml-2 ${openMenu === item.key ? "rotate-180" : ""}`}>
                             <ChevronDown className="w-4 h-4 text-black" />

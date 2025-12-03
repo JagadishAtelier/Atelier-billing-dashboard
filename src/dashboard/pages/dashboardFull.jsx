@@ -9,6 +9,10 @@ import IncomingPOs from "./IncomingPOs";
 import LowStockAlerts from "./LowStockAlerts";
 import TopProducts from "./TopProducts";
 import { LATEST_COLLECTIONS } from "../../data/dummyData";
+import Billingicon from "../../../public/icon/billing-machine-svgrepo-com.svg"
+import Usericon from "../../../public/icon/user.svg"
+import Producticon from "../../../public/icon/product.svg"
+import Walleticon from "../../../public/icon/wallet.svg"
 import {
   ReceiptIndianRupee,
   Users,
@@ -335,41 +339,38 @@ const DashboardFull = () => {
   }, []);
 
   const summaryCards =
-    summary &&
-    [
-      {
-        id: "bills",
-        title: "Total Bills",
-        value: summary.totalBills ?? 0,
-        meta: "Number of bills",
-        gradient: "linear-gradient(135deg,#ff8a00,#ff5e3a)",
-        icon: <ReceiptIndianRupee />,
-      },
-      {
-        id: "users",
-        title: "Total Users",
-        value: summary.totalUsers ?? 0,
-        meta: "Registered users",
-        gradient: "linear-gradient(135deg,#1e3a8a,#3b82f6)",
-        icon: <Users />,
-      },
-      {
-        id: "products",
-        title: "Total Products",
-        value: summary.totalProducts ?? 0,
-        meta: "Available products",
-        gradient: "linear-gradient(135deg,#059669,#34d399)",
-        icon: <ShoppingBasket />,
-      },
-      {
-        id: "revenue",
-        title: "Total Revenue",
-        value: `₹${summary.totalRevenue ?? 0}`,
-        meta: "Revenue generated",
-        gradient: "linear-gradient(135deg,#7c3aed,#a78bfa)",
-        icon: <Wallet />,
-      },
-    ];
+  summary &&
+  [
+    {
+      id: "bills",
+      title: "Total Bills",
+      value: summary.totalBills ?? 0,
+      meta: "Number of bills",
+      icon: <img src={Billingicon} alt="Total Bills" className="w-12 h-12" />,
+    },
+    {
+      id: "users",
+      title: "Total Users",
+      value: summary.totalUsers ?? 0,
+      meta: "Registered users",
+      icon: <img src={Usericon} alt="Total Users" className="w-12 h-12" />,
+    },
+    {
+      id: "products",
+      title: "Total Products",
+      value: summary.totalProducts ?? 0,
+      meta: "Available products",
+      icon: <img src={Producticon} alt="Total Products" className="w-12 h-12" />,
+    },
+    {
+      id: "revenue",
+      title: "Total Revenue",
+      value: `₹${summary.totalRevenue ?? 0}`,
+      meta: "Revenue generated",
+      icon: <img src={Walleticon} alt="Total Revenue" className="w-12 h-12" />,
+    },
+  ];
+
 
   return (
     <div style={styles.page}>
