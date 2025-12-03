@@ -459,53 +459,73 @@ export default function CRMModule() {
           </button>
         </div>
       </div>
-
       {/* Summary cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded-xl shadow-md bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-100">Total Leads</p>
-              <p className="mt-2 text-3xl">{leads.length}</p>
-              <p className="text-blue-100 text-sm mt-1">{leads.filter((l) => (l.status || "new").toLowerCase() === "new").length} New</p>
-            </div>
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center"><Users className="w-8 h-7" /></div>
-          </div>
-        </motion.div>
+<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-        <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded-xl shadow-md bg-gradient-to-br from-green-500 to-green-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-green-100">Active Customers</p>
-              <p className="mt-2 text-3xl">{customers.filter((c) => c.is_active !== false).length}</p>
-              <p className="text-green-100 text-sm mt-1">{customers.filter((c) => c.segment === "high_value").length} High Value</p>
-            </div>
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center"><Star className="w-8 h-7" /></div>
-          </div>
-        </motion.div>
+{/* Total Leads */}
+<div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
 
-        <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded-xl shadow-md bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-100">Customer LTV</p>
-              <p className="mt-2 text-3xl">₹{((customers.reduce((s, c) => s + (c.totalSpent || 0), 0) / Math.max(customers.length, 1)) / 1000).toFixed(1)}K</p>
-              <p className="text-purple-100 text-sm mt-1">Avg per customer</p>
-            </div>
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center"><IndianRupee className="w-8 h-7" /></div>
-          </div>
-        </motion.div>
+<div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#F3F5FF]">
+    <img src="/icon/crm-leads.svg" alt="leads" className="w-14 h-14" />
+  </div>
+  <div>
+    <h2 className="text-3xl font-bold">{leads.length}</h2>
+    <p className="text-gray-700 font-semibold">TOTAL LEADS</p>
+    <p className="text-gray-500 text-sm mt-2">
+      {leads.filter(l => (l.status || "new").toLowerCase() === "new").length} New
+    </p>
+  </div>
+</div>
 
-        <motion.div whileHover={{ scale: 1.02 }} className="p-3 rounded-xl shadow-md bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-orange-100">Conversion Rate</p>
-              <p className="mt-2 text-3xl">24%</p>
-              <p className="text-orange-100 text-sm mt-1">+5% this month</p>
-            </div>
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center"><TrendingUp className="w-8 h-7" /></div>
-          </div>
-        </motion.div>
-      </div>
+{/* Active Customers */}
+<div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
+
+  <div className="w-14 h-14 rounded-xl flex items-center justify-center">
+    <img src="/icon/crm-customers.svg" alt="customers" className="w-14 h-14" />
+  </div>
+  <div>
+    <h2 className="text-3xl font-bold">
+      {customers.filter(c => c.is_active !== false).length}
+    </h2>
+    <p className="text-gray-700 font-semibold">ACTIVE CUSTOMERS</p>
+    <p className="text-gray-500 text-sm mt-2">
+      {customers.filter(c => c.segment === "high_value").length} High Value
+    </p>
+  </div>
+</div>
+
+{/* Customer LTV */}
+<div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
+  <div className="w-14 h-14 rounded-xl flex items-center justify-center">
+    <img src="/icon/crm-ltv.svg" alt="ltv" className="w-14 h-14" />
+  </div>
+  <div>
+    <h2 className="text-3xl font-bold">
+      ₹{(
+        (customers.reduce((s, c) => s + (c.totalSpent || 0), 0) /
+          Math.max(customers.length, 1)) /
+        1000
+      ).toFixed(1)}K
+    </h2>
+    <p className="text-gray-700 font-semibold">CUSTOMER LTV</p>
+    <p className="text-gray-500 text-sm mt-2">Avg per customer</p>
+  </div>
+</div>
+
+{/* Conversion Rate */}
+<div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
+  <div className="w-14 h-14 rounded-xl flex items-center justify-center">
+    <img src="/icon/crm-conversion.svg" alt="conversion" className="w-14 h-14" />
+  </div>
+  <div>
+    <h2 className="text-3xl font-bold">24%</h2>
+    <p className="text-gray-700 font-semibold">CONVERSION RATE</p>
+    <p className="text-gray-500 text-sm mt-2">+5% this month</p>
+  </div>
+</div>
+
+</div>
+
 
       {/* Tabs */}
       <div className="mt-4">

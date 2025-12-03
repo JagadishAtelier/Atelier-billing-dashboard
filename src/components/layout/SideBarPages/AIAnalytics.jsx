@@ -118,79 +118,97 @@ export default function AIAnalytics() {
 
       </div>
 
-      {/* SUMMARY CARDS */}
-      <div className="flex gap-4">
-  <div className="w-[360px] h-[140px] p-5 rounded-2xl bg-gradient-to-r from-[#a855f7] to-[#9333ea] text-white shadow flex flex-col justify-between">
-    <h3 className="text-[15px] font-medium">Stock Runout Alerts</h3>
+      <div className="grid grid-cols-4 gap-4">
 
-    <div className="flex justify-between items-center">
-      <p className="text-3xl font-semibold">4</p>
+  {/* ================= STOCK RUNOUT ALERTS ================= */}
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 w-full">
+    <div className="flex items-start gap-4">
 
-      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-       
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <div className="w-16 h-16 rounded-xl bg-[#FFE8D9] flex items-center justify-center">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" strokeWidth="2">
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="8" x2="12" y2="12" />
           <circle cx="12" cy="16" r="1" />
         </svg>
       </div>
-    </div>
 
-    <p className="text-xs opacity-90">Next 30 days</p>
-  </div>
-  <div className="w-[360px] h-[140px] p-5 rounded-2xl bg-[#1E55FF] text-white shadow flex flex-col justify-between">
-    <h3 className="text-[15px] font-medium">Predicted Sales</h3>
-
-    <div className="flex justify-between items-center">
-      <p className="text-3xl font-bold">$58K</p>
-
-      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="4 14 10 8 14 12 20 6" />
-        </svg>
+      <div>
+        <h2 className="text-3xl font-semibold text-[#1A1A1A]">4</h2>
+        <h4 className="text-[16px] uppercase text-gray-600 font-medium">STOCK RUNOUT ALERTS</h4>
       </div>
     </div>
 
-    <p className="text-xs opacity-90">Next month</p>
+    <div className="border-t border-dashed border-gray-200 my-4"></div>
+
+    <p className="text-gray-600 text-[15px]">Next 30 days</p>
   </div>
 
+  {/* ================= PREDICTED SALES ================= */}
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 w-full">
+    <div className="flex items-start gap-4">
 
-  <div className="w-[360px] h-[140px] p-5 rounded-2xl bg-gradient-to-br from-[#02C23E] to-[#00A637] text-white shadow flex flex-col justify-between">
-  <h3 className="text-[15px] font-medium">Fast-Moving Items</h3>
+      <div className="w-16 h-16 rounded-xl bg-[#DDE8FF] flex items-center justify-center">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1E55FF" strokeWidth="2">
+          <polyline points="4 14 10 8 14 12 20 6" />
+        </svg>
+      </div>
 
-  <div className="flex justify-between items-center">
-    <p className="text-3xl font-semibold">4</p>
-
-    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="13 2 3 14 12 14 11 22 21 10 13 10" />
-      </svg>
+      <div>
+        <h2 className="text-3xl font-semibold text-[#1A1A1A]">$58K</h2>
+        <h4 className="text-[16px] uppercase text-gray-600 font-medium">PREDICTED SALES</h4>
+      </div>
     </div>
+
+    <div className="border-t border-dashed border-gray-200 my-4"></div>
+
+    <p className="text-gray-600 text-[15px]">Next month</p>
   </div>
 
-  <p className="text-xs opacity-90">High velocity</p>
-</div>
+  {/* ================= FAST-MOVING ITEMS ================= */}
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 w-full">
+    <div className="flex items-start gap-4">
 
+      <div className="w-16 h-16 rounded-xl bg-[#D6FFE7] flex items-center justify-center">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#00A637" strokeWidth="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 13 10" />
+        </svg>
+      </div>
 
-
-<div className="w-[360px] h-[140px] p-5 rounded-2xl bg-gradient-to-br from-[#FF6A00] to-[#FF4E00] text-white shadow flex flex-col justify-between">
-  <h3 className="text-[15px] font-medium">Slow Movers</h3>
-
-  <div className="flex justify-between items-center">
-    <p className="text-3xl font-semibold">3</p>
-
-    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <polyline points="12 6 12 12 16 14" />
-      </svg>
+      <div>
+        <h2 className="text-3xl font-semibold text-[#1A1A1A]">4</h2>
+        <h4 className="text-[16px] uppercase text-gray-600 font-medium">FAST-MOVING ITEMS</h4>
+      </div>
     </div>
+
+    <div className="border-t border-dashed border-gray-200 my-4"></div>
+
+    <p className="text-gray-600 text-[15px]">High velocity</p>
   </div>
 
-  <p className="text-xs opacity-90">Needs action</p>
-</div>
+  {/* ================= SLOW MOVERS ================= */}
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 w-full">
+    <div className="flex items-start gap-4">
+
+      <div className="w-16 h-16 rounded-xl bg-[#FFE1CC] flex items-center justify-center">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" strokeWidth="2">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      </div>
+
+      <div>
+        <h2 className="text-3xl font-semibold text-[#1A1A1A]">3</h2>
+        <h4 className="text-[16px] uppercase text-gray-600 font-medium">SLOW MOVERS</h4>
+      </div>
+    </div>
+
+    <div className="border-t border-dashed border-gray-200 my-4"></div>
+
+    <p className="text-gray-600 text-[15px]">Needs action</p>
+  </div>
 
 </div>
+
 
 
 <div className="bg-white rounded p-1 flex items-center gap-2">

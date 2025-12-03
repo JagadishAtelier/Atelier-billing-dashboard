@@ -15,7 +15,7 @@ const columns = [
   "Total Amount",
   "Tax Amount",
   "Status",
-  "Details",
+  //"Details",
   "Actions",
 ];
 
@@ -110,10 +110,7 @@ function OrderPage() {
     navigate(`/order/edit/${id}`);
   };
 
-  // 🔹 Handle View Details
-  const handleViewDetails = (id) => {
-    navigate(`/order/view/${id}`);
-  };
+  
 
   return (
     <div>
@@ -273,15 +270,7 @@ function OrderPage() {
                   >
                     {order.status || "-"}
                   </td>
-                  <td className="py-4 px-4 border-b border-gray-300">
-                  <button
-  onClick={() => handleViewDetails(order.id)}
-  className="flex items-center justify-center px-4 py-2 rounded-md border border-gray-300 bg-[#F5F6FA] text-[#1C2244] text-sm font-medium hover:bg-gray-200 transition"
->
-  View
-</button>
-
-                  </td>
+                  
                   <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
                     
 
