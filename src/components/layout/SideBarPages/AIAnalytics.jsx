@@ -121,46 +121,57 @@ export default function AIAnalytics() {
       <div className="grid grid-cols-4 gap-4">
 
   {/* ================= STOCK RUNOUT ALERTS ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">
-  <div className="flex items-center gap-4">
+  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-    <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" strokeWidth="2">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="8" x2="12" y2="12" />
-          <circle cx="12" cy="16" r="1" />
-        </svg>
+    <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
+  <svg 
+    width="40" 
+    height="40" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="#FF6A00" 
+    strokeWidth="2"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+</div>
+
     </div>
 
     <h2 className="text-3xl font-bold text-[#1F2937]">4</h2>
   </div>
 
-  <p className="text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-    STOCK RUNOUT ALERTS
-  </p>
+  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
+  STOCK RUNOUT ALERTS
+</p>
+
   <p className="text-gray-600 text-sm">Next 30 days</p>
 </div>
   {/* ================= PREDICTED SALES ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">
-  <div className="flex items-center gap-4">
+  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#E7EBFF] rounded-xl flex items-center justify-center">
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1E55FF" strokeWidth="2">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1E55FF" strokeWidth="2">
           <polyline points="4 14 10 8 14 12 20 6" />
         </svg>
     </div>
 
     <h2 className="text-3xl font-bold text-[#1F2937]">$58K</h2>
   </div>
-  <p className="text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-    PREDICTED SALES
-  </p>
+  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
+  PREDICTED SALES
+</p>
+
   <p className="text-gray-600 text-sm">Next month</p>
 </div>
 
   {/* ================= FAST-MOVING ITEMS ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">
-  <div className="flex items-center gap-4">
+  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#E8FFEF] rounded-xl flex items-center justify-center">
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#00A637" strokeWidth="2">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00A637" strokeWidth="2">
           <polygon points="13 2 3 14 12 14 11 22 21 10 13 10" />
         </svg>
 
@@ -168,26 +179,28 @@ export default function AIAnalytics() {
 
     <h2 className="text-3xl font-bold text-[#1F2937]">4</h2>
   </div>
-  <p className="text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-    FAST-MOVING ITEMS
-  </p>
+  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
+  FAST-MOVING ITEMS
+</p>
   <p className="text-gray-600 text-sm">High velocity</p>
 </div>
 
   {/* ================= SLOW MOVERS ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">
-  <div className="flex items-center gap-4">
+  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" strokeWidth="2">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>    </div>
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" 
+     stroke="#FF6A00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <path d="M3 6 L9 12 L13 8 L21 16" />
+  <polyline points="21 12 21 16 17 16" />
+</svg>
+  </div>
 
     <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
   </div>
-  <p className="text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-    SLOW MOVERS
-  </p>
+  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
+  SLOW MOVERS
+</p>
   <p className="text-gray-600 text-sm">Needs action</p>
 </div>
 </div>

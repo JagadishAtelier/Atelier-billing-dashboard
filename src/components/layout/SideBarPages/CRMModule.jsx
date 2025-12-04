@@ -459,102 +459,92 @@ export default function CRMModule() {
           </button>
         </div>
       </div>
-      {/* Summary cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-3">
+
   {/* TOTAL LEADS */}
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">
+  <div className="bg-white rounded-2xl shadow-sm px-6 py-4 h-[150px] flex flex-col justify-between">
     <div className="flex items-center gap-4">
-      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#FFECE0]">
-        <img src="/icon/crm-leads.svg" alt="leads" className="w-10 h-10" />
+
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#FFECE0]">
+        <img src="/icon/crm-leads.svg" className="w-9 h-9" alt="leads" />
       </div>
 
-      {/* number + heading stacked like card 1 */}
       <div>
-        <p className="text-3xl font-semibold text-[#111827]">
-          {leads.length}
-        </p>
-        <p className="text-gray-600 font-semibold">
-          TOTAL LEADS
-        </p>
+        <p className="text-3xl font-semibold text-[#111827]">{leads.length}</p>
+        <p className="text-gray-600 font-semibold text-[13px] tracking-wide">TOTAL LEADS</p>
       </div>
+
     </div>
-    <p className="mt-3 text-gray-500 text-sm">
-      {leads.filter(l => (l.status || "new").toLowerCase() === "new").length} New
+
+    <p className="text-gray-500 text-[14px]"> 
+      {leads.filter(l => (l.status || "new") === "new").length} New
     </p>
   </div>
 
-
-{/* ACTIVE CUSTOMERS */}
-<div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">    
-
+  {/* ACTIVE CUSTOMERS */}
+  <div className="bg-white rounded-2xl shadow-sm px-6 py-4 h-[150px] flex flex-col justify-between">
     <div className="flex items-center gap-4">
-      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#EEE8FF]">
-        <img src="/icon/crm-customers.svg" alt="customers" className="w-10 h-10" />
+
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#EEE8FF]">
+        <img src="/icon/crm-customers.svg" className="w-9 h-9" alt="customers" />
       </div>
 
       <div>
         <p className="text-3xl font-semibold text-[#111827]">
           {customers.filter(c => c.is_active !== false).length}
         </p>
-        <p className="text-gray-600 font-semibold">
-          ACTIVE CUSTOMERS
-        </p>
+        <p className="text-gray-600 font-semibold text-[13px] tracking-wide">ACTIVE CUSTOMERS</p>
       </div>
+
     </div>
-    <p className="mt-3 text-gray-500 text-sm">
+
+    <p className="text-gray-500 text-[14px]">
       {customers.filter(c => c.segment === "high_value").length} High Value
     </p>
   </div>
 
-{/* Customer LTV */}
-<div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">
+  {/* CUSTOMER LTV */}
+  <div className="bg-white rounded-2xl shadow-sm px-6 py-4 h-[150px] flex flex-col justify-between">
     <div className="flex items-center gap-4">
-      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#FFF1C9]">
-        <img src="/icon/crm-ltv.svg" alt="ltv" className="w-10 h-10" />
+
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#FFF1C9]">
+        <img src="/icon/crm-ltv.svg" className="w-9 h-9" alt="ltv" />
       </div>
 
       <div>
         <p className="text-3xl font-semibold text-[#111827]">
           ₹{(
             (customers.reduce((s, c) => s + (c.totalSpent || 0), 0) /
-              Math.max(customers.length || 1, 1)) /
-            1000
-          ).toFixed(1)}K
+            Math.max(customers.length || 1, 1)
+          ) / 1000).toFixed(1)}K
         </p>
-        <p className="text-gray-600 font-semibold">
-          CUSTOMER LTV
-        </p>
+        <p className="text-gray-600 font-semibold text-[13px] tracking-wide">CUSTOMER LTV</p>
       </div>
+
     </div>
-    <p className="mt-3 text-gray-500 text-sm">
-      Avg per customer
-    </p>
+
+    <p className="text-gray-500 text-[14px]">Avg per customer</p>
   </div>
 
-
-{/* Conversion Rate */}
-<div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">
+  {/* CONVERSION RATE */}
+  <div className="bg-white rounded-2xl shadow-sm px-6 py-4 h-[150px] flex flex-col justify-between">
     <div className="flex items-center gap-4">
-      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#E2FFE9]">
-        <img src="/icon/crm-conversion.svg" alt="conversion" className="w-10 h-10" />
+
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#FFECE0]">
+        <img src="/icon/crm-conversion.svg" className="w-9 h-9" alt="conversion" />
       </div>
 
       <div>
-        <p className="text-3xl font-semibold text-[#111827]">
-          24%
-        </p>
-        <p className="text-gray-600 font-semibold">
-          CONVERSION RATE
-        </p>
+        <p className="text-3xl font-semibold text-[#111827]">24%</p>
+        <p className="text-gray-600 font-semibold text-[13px] tracking-wide">CONVERSION RATE</p>
       </div>
+
     </div>
-    <p className="mt-3 text-gray-500 text-sm">
-      +5% this month
-    </p>
+
+    <p className="text-gray-500 text-[14px]">+5% this month</p>
   </div>
 
 </div>
-
 
       {/* Tabs */}
       <div className="mt-4">
