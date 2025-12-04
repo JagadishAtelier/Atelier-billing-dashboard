@@ -16,6 +16,7 @@ import {
 import { CheckCircleTwoTone, EditOutlined, ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import categoryService from "../services/categoryService";
+import { Folder } from "lucide-react";
 import { toast } from "sonner";
 
 
@@ -130,19 +131,13 @@ const CategoryForm = () => {
           {/* Header */}
           <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 8 }}>
             <div
-              style={{
-                background: "linear-gradient(135deg,#6EE7B7 0%, #3B82F6 100%)",
-                width: 64,
-                height: 64,
-                borderRadius: 12,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 6px 20px rgba(59,130,246,0.18)",
-              }}
-            >
-              <Avatar shape="square" size={40} icon={<EditOutlined style={{ color: "white", fontSize: 20 }} />} />
-            </div>
+      initial={{ rotate: -45, opacity: 0 }}
+      animate={{ rotate: 0, opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      className="bg-white shadow-sm rounded-sm p-1.5 border border-gray-200"
+    >
+      <Folder size={20} className="inline-block text-gray-600" />
+    </div>
 
             <div style={{ flex: 1 }}>
               <Title level={4} style={{ margin: 0 }}>
@@ -239,14 +234,13 @@ const CategoryForm = () => {
                 </div>
 
                 <div style={{ display: "flex", gap: 8 }}>
-                  <Button onClick={onCancel}>Cancel</Button>
+                  <Button style={{height: "40px", padding: "6px 16px"}} onClick={onCancel}>Cancel</Button>
                   <Button
-                    type="primary"
+                    style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none", color: "#fff", borderRadius: "4px", padding: "6px 16px", cursor: "pointer" }}
                     htmlType="submit"
                     icon={<SaveOutlined />}
                     loading={loading}
                     onClick={() => form.submit()}
-                    style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
                   >
                     <span>{id ? "Update Category" : "Add Category"}</span>
                   </Button>

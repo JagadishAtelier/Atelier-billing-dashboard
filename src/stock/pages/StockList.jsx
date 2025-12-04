@@ -1,6 +1,7 @@
 // src/stock/pages/StockListTailwind.jsx
 import React, { useCallback, useEffect, useState } from "react";
 import { Plus, Warehouse , Search as SearchIcon, Edit, Trash2, Upload as UploadIcon, Download, Settings } from "lucide-react";
+import {RefreshCcw} from "lucide-react";
 import * as XLSX from "xlsx";
 
 import stockService from "../service/stockService"; // adjust path if needed
@@ -225,7 +226,7 @@ export default function StockListTailwind() {
             title="Refresh"
             style={{height: "40px"}}
           >
-            <Download size={16} />
+            <RefreshCcw size={16} />
             Refresh
           </div>
 

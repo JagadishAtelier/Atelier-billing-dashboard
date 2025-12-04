@@ -52,6 +52,8 @@ export default function Sidebar({ isOpen, onClose }) {
         { to: "/subcategory/list", label: "Subcategory List" },
       ],
     },
+    { to: "/user", label: "Users", icon: Users },
+    { to: "/vendor", label: "Vendors", icon: Building },
     { to: "/order", label: "Purchases / Orders", icon: ShoppingCart },
     {
       to: "/billing",

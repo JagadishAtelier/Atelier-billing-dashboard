@@ -16,7 +16,6 @@ const columns = [
   "Total Qty",
   "Total Amount",
   "Status",
-  "Details",
   "Actions",
 ];
 
@@ -388,17 +387,15 @@ function InwardList() {
                     {inv.status ?? "-"}
                   </td>
 
-                  <td className="py-4 px-4 border-b border-gray-300">
+                  
+
+                  <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
                     <button
                       onClick={() => handleView(inv.id)}
                       className="bg-[#506ee4] !text-white py-1 px-3 text-xs font-semibold rounded-sm hover:opacity-90 inline-flex items-center gap-1"
                     >
                       <Eye size={14} />
-                      View
                     </button>
-                  </td>
-
-                  <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
                     <button
                       onClick={() => handleEdit(inv.id)}
                       className="flex bg-[#f6f7ff] items-center gap-1 px-2 py-1 !text-[#000] rounded text-sm"

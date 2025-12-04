@@ -762,7 +762,7 @@ const InwardForm = () => {
 
                   <Col xs={24} style={{ marginTop: 16 }}>
                     <Space>
-                      <Button style={{ backgroundColor: "#0E1680" }} type="primary" htmlType="submit" loading={loading}>
+                      <Button style={{ backgroundColor: "#506ee4" }} type="primary" htmlType="submit" loading={loading}>
                         {id ? "Update Inward" : "Add Inward"}
                       </Button>
                       <Button onClick={() => navigate("/inward/list")}>Cancel</Button>

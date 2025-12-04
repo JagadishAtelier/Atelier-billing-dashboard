@@ -6,6 +6,7 @@ import { Table, Input, Button, Space, Popconfirm, message } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import subcategoryService from "../services/subcategoryService";
 import debounce from "lodash.debounce";
+import { Replace } from "lucide-react";
 
 const { Search } = Input;
 
@@ -125,25 +126,7 @@ const SubCategoryList = () => {
       transition={{ duration: 0.8 }}
       className="bg-white shadow-sm rounded-sm p-1.5 border border-gray-200"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="inline-block text-gray-600"
-      >
-        <path d="M6 9h6" />
-        <path d="M12 5v8" />
-        <path d="M18 13h-6" />
-        <circle cx="6" cy="9" r="2" />
-        <circle cx="18" cy="13" r="2" />
-        <circle cx="12" cy="5" r="2" />
-      </svg>
+      <Replace size={20} className="inline-block text-gray-600" />
     </div>
     <div>
       <h2 className="!text-[24px] pt-1.5 text-foreground" style={{ fontWeight: 700 }}>

@@ -34,8 +34,7 @@ export default function StatCard({
         </div>
 
         <div>
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-800">{value}</h2>
-        <h4 className="text-[13px] uppercase text-gray-500 font-medium ">{title}</h4>
+          <h2 className="text-xl sm:text-3xl pt-4 font-bold text-gray-800">{value}</h2>
       </div>
         
       </div>

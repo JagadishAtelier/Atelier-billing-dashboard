@@ -198,7 +198,7 @@ const ProductFormSimple = () => {
             </Select>
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" style={{ marginTop: 10 }}>
+          <Button  htmlType="submit" style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none", color: "#fff", borderRadius: "4px", padding: "6px 16px", cursor: "pointer" }}>
             {routeId ? "Update Product" : "Create Product"}
           </Button>
         </Form>

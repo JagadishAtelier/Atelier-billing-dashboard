@@ -240,6 +240,7 @@ function AddVendor() {
           <button
             type="submit"
             disabled={loading}
+            style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none", color: "#fff", borderRadius: "4px", padding: "6px 16px", cursor: "pointer" }}
             className="bg-[#0E1680] !text-white py-2 px-8 font-semibold rounded-md hover:opacity-90"
           >
             {loading ? "Saving..." : "Save"}

@@ -141,10 +141,8 @@ function OrderPage() {
   </svg>
 </div>
 
-{/* HEADING */}
-<h1 className="text-[30px] font-bold text-[#1F2937]">
-  Purchases / Orders
-</h1>
+
+<h2 className="!text-[24px] pt-1.5  text-foreground" style={{fontWeight:700}}>Purchases / Orders</h2>
 
 </div>
 

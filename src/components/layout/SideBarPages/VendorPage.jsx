@@ -2,6 +2,7 @@ import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import vendorService from "./services/vendorService";
+import { Building } from "lucide-react";
 
 const columns = [
   "S.No",
@@ -67,23 +68,24 @@ function VendorPage() {
     <div>
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6">
-        {/* Search */}
-        <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
-          <Search size={16} className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search by name, contact, or phone..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(1);
-            }}
-            className="outline-none text-sm"
-          />
+        <div className="flex items-center gap-3">
+          <div
+            initial={{ rotate: -45, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="bg-white  shadow-sm rounded-sm p-1.5 border border-gray-200"
+          >
+            <Building size={20} className="inline-block text-gray-600" />
+          </div>
+          <div >
+            <h2 className="!text-[24px] pt-1.5  text-foreground" style={{fontWeight:700}}>Vendor</h2>
+          </div>
+          
         </div>
-
+        
         {/* Add Vendor */}
         <div
+        style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none", color: "#fff", borderRadius: "4px", padding: "6px 16px", cursor: "pointer" }}
           className="bg-[#0E1680] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
           onClick={() => navigate("/vendor/add")}
         >

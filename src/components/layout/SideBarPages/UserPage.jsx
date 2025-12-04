@@ -2,6 +2,7 @@ import { ChevronDown, Plus, Search, Sliders, Edit, Trash2 } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import userService from "./services/userService";
+import { Users } from "lucide-react";
 
 const columns = ["S.No", "Name", "Email", "Phone", "Role", "Status", "Actions"];
 
@@ -99,21 +100,28 @@ function UserPage() {
       <div className="flex items-center justify-between gap-4 mb-6">
         {/* Search + Filter */}
         <div className="flex items-center gap-2 relative">
-          <div className="flex items-center gap-2 border border-gray-300 rounded-md px-2 py-1">
-            <Search size={16} className="text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search by name or phone..."
-              value={searchTerm}
-              onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-              className="outline-none text-sm"
-            />
+          <div
+            initial={{ rotate: -45, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="bg-white  shadow-sm rounded-sm p-1.5 border border-gray-200"
+          >
+            <Users size={20} className="inline-block text-gray-600" />
+          </div>
+          <div >
+            <h2 className="!text-[24px] pt-1.5  text-foreground" style={{fontWeight:700}}>Users</h2>
           </div>
 
+          
+        </div>
+
+        {/* Add Users */}
+        <div className="flex items-center gap-3">
           {/* Filter button */}
           <button
             onClick={() => setFilterOpen(!filterOpen)}
             className="flex items-center gap-1 border border-gray-300 rounded-md px-2 py-1 text-sm bg-white"
+            style={{height: "40px"}}
           >
             <Sliders size={16} />
             Filter
@@ -123,7 +131,7 @@ function UserPage() {
           {filterOpen && (
             <div
               ref={filterRef}
-              className="absolute top-10 left-0 bg-white border border-gray-300 rounded-md p-4 shadow-lg z-50 w-64"
+              className="absolute top-35 right-0 bg-white border border-gray-300 rounded-md p-4 shadow-lg z-50 w-64"
             >
               {/* Role Filter */}
               <div className="mb-2">
@@ -158,6 +166,7 @@ function UserPage() {
               <div className="flex justify-end gap-2 mt-2">
                 <button
                   onClick={() => setFilterOpen(false)}
+                  
                   className="px-3 py-1 bg-gray-200 rounded text-sm"
                 >
                   Close
@@ -171,16 +180,16 @@ function UserPage() {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Add Users */}
-        <div
+          <div
           className="bg-[#0E1680] text-white py-3 px-6 font-semibold flex items-center justify-center gap-2 rounded-md cursor-pointer"
           onClick={() => navigate("/user/add")}
+          style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none", color: "#fff", borderRadius: "4px", padding: "6px 16px", cursor: "pointer" }}
         >
           <Plus size={16} />
           Add Users
         </div>
+        </div>
+        
       </div>
 
       {/* Table */}

@@ -20,6 +20,7 @@ import { ArrowLeftOutlined, SaveOutlined, TagsOutlined, CheckCircleTwoTone } fro
 import { useNavigate, useParams } from "react-router-dom";
 import categoryService from "../services/categoryService";
 import subcategoryService from "../services/subcategoryService";
+import { Replace } from "lucide-react";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -171,19 +172,13 @@ const SubcategoryForm = () => {
           {/* Header */}
           <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 8 }}>
             <div
-              style={{
-                background: "linear-gradient(135deg,#7C3AED 0%, #06B6D4 100%)",
-                width: 64,
-                height: 64,
-                borderRadius: 12,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 6px 20px rgba(99,102,241,0.14)",
-              }}
-            >
-              <Avatar shape="square" size={40} icon={<TagsOutlined style={{ color: "white", fontSize: 20 }} />} />
-            </div>
+      initial={{ rotate: -45, opacity: 0 }}
+      animate={{ rotate: 0, opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      className="bg-white shadow-sm rounded-sm p-1.5 border border-gray-200"
+    >
+      <Replace size={20} className="inline-block text-gray-600" />
+    </div>
 
             <div style={{ flex: 1 }}>
               <Title level={4} style={{ margin: 0 }}>
@@ -262,9 +257,9 @@ const SubcategoryForm = () => {
                 </div>
 
                 <div style={{ display: "flex", gap: 8 }}>
-                  <Button onClick={onCancel}>Cancel</Button>
+                  <Button style={{height: "40px", padding: "6px 16px"}} onClick={onCancel}>Cancel</Button>
                   <Button
-                    type="primary"
+                    style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none", color: "#fff", borderRadius: "4px", padding: "6px 16px", cursor: "pointer" }}
                     icon={<SaveOutlined />}
                     onClick={() => form.submit()}
                     loading={loading}

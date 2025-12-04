@@ -23,6 +23,7 @@ import {
 import dayjs from "dayjs";
 import productService from "../../Product/services/productService";
 import billingService from "../service/billingService";
+import { Trash } from 'lucide-react';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -482,17 +483,17 @@ function BillingForm() {
 
   // table columns (editable with Form.Item like InwardForm)
   const columns = [
-    {
-      title: "Product Code",
-      dataIndex: "product_code",
-      key: "product_code",
-      width: 140,
-      render: (_, __, index) => (
-        <Form.Item name={[index, "product_code"]} style={{ margin: 0 }}>
-          <Input disabled />
-        </Form.Item>
-      ),
-    },
+    // {
+    //   title: "Product Code",
+    //   dataIndex: "product_code",
+    //   key: "product_code",
+    //   width: 100,
+    //   render: (_, __, index) => (
+    //     <Form.Item name={[index, "product_code"]} style={{ margin: 0 }}>
+    //       <Input disabled />
+    //     </Form.Item>
+    //   ),
+    // },
     {
       title: "Product Name",
       dataIndex: "product_name",
@@ -533,7 +534,7 @@ function BillingForm() {
     {
       title: "Qty",
       key: "qty",
-      width: 120,
+      width: 80,
       render: (_, record, index) => (
         <Form.Item
           name={[index, "quantity"]}
@@ -552,7 +553,7 @@ function BillingForm() {
       title: "Unit Price",
       dataIndex: "unit_price",
       key: "unit_price",
-      width: 140,
+      width: 100,
       render: (_, record, index) => (
         <Form.Item
           name={[index, "unit_price"]}
@@ -572,7 +573,7 @@ function BillingForm() {
     {
       title: "Discount",
       key: "disc",
-      width: 140,
+      width: 60,
       render: (_, record, index) => (
         <Form.Item name={[index, "discount_amount"]} style={{ margin: 0 }}>
           <InputNumber
@@ -587,7 +588,7 @@ function BillingForm() {
       title: "Tax",
       dataIndex: "tax_amount",
       key: "tax",
-      width: 120,
+      width: 80,
       render: (_, record, index) => (
         <Form.Item name={[index, "tax_amount"]} style={{ margin: 0 }}>
           <InputNumber value={record.tax_amount} disabled style={{ width: "100%" }} formatter={(v)=>`₹${Number(v||0).toFixed(2)}`} />
@@ -608,10 +609,10 @@ function BillingForm() {
     {
       title: "",
       key: "actions",
-      width: 100,
+      width: 40,
       render: (_, __, idx) => (
-        <Button danger size="small" onClick={() => removeItem(idx)}>
-          Remove
+        <Button  style={{border:"none"}} onClick={() => removeItem(idx)}>
+           <Trash size={14} style={{color:"red"}} />
         </Button>
       ),
     },
