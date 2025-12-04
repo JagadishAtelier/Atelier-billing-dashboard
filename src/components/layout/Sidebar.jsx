@@ -44,7 +44,7 @@ export default function Sidebar({ isOpen, onClose }) {
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     {
       to: "/product",
-      label: "Products & Stock",
+      label: "Products",
       icon: PackageIcon,
       children: [
         { to: "/product/list", label: "Product List" },
@@ -100,10 +100,10 @@ export default function Sidebar({ isOpen, onClose }) {
   const SidebarContent = () => (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between gap-2 px-4 h-[60px] bg-white" style={{ borderBottom: ".5px solid #66708550" }}>
+      <div className="flex items-center justify-between w-full gap-2 px-4 h-[70px] bg-white" style={{ borderBottom: ".5px solid #66708550", alignItems: "center !important" }}>
         <div className="flex items-center gap-2">
           <img src={logo} alt="logo" className="w-8 h-8 object-contain" />
-          <h1 className="text-lg font-semibold">Atelier Inventory</h1>
+          <h1 className="text-xl pt-2" style={{fontWeight:"700"}}>Atelier Inventory</h1>
         </div>
 
         {/* Mobile close button */}
@@ -125,7 +125,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 {/* parent item */}
                 <div
                   className={cn(
-                    "w-full flex items-center justify-between text-[#667085] rounded-md text-[14px] font-medium gap-3 p-2 hover:bg-[#DDE4FF] transition-colors duration-200",
+                    "w-full flex items-center justify-between text-[#667085] rounded-md text-[17px]  gap-3 p-2 hover:bg-[#DDE4FF] transition-colors duration-200",
                     active ? "bg-[#F2F5FF] !text-[#3D5EE1]" : "text-[#667085]"
                   )}
                 >
@@ -143,7 +143,7 @@ export default function Sidebar({ isOpen, onClose }) {
                     {hasChildren ? (
                       <button
                         onClick={() => setOpenParent(openParent === item.to ? null : item.to)}
-                        className="flex-1 text-left !text-[#667085]"
+                        className={cn("flex-1 text-left !text-[#667085]", active ? " !text-[#3D5EE1]" : "!text-[#667085]")}
                         aria-expanded={openParent === item.to}
                       >
                         {item.label}
@@ -152,7 +152,8 @@ export default function Sidebar({ isOpen, onClose }) {
                       <Link
                         to={item.to}
                         onClick={() => onClose?.()}
-                        className="flex-1 text-left !text-[#667085]"
+                        className={cn("flex-1 text-left !text-[#667085]", active ? " !text-[#3D5EE1]" : "!text-[#667085]")}
+                        
                       >
                         {item.label}
                       </Link>
@@ -196,8 +197,8 @@ export default function Sidebar({ isOpen, onClose }) {
                           to={child.to}
                           onClick={() => onClose?.()}
                           className={cn(
-                            "w-full text-[13px] py-2 px-3 rounded-md text-left !text-[#667085] hover:bg-gray-100",
-                            childActive ? "bg-blue-50 font-semibold text-[#3D5EE1]" : "text-[#667085] hover:bg-gray-50"
+                            "w-full text-[16px] py-2 px-3 rounded-md text-left !text-[#667085] hover:bg-gray-100",
+                            childActive ? "bg-blue-50 !text-[#3D5EE1]" : "text-[#667085] hover:bg-gray-50"
                           )}
                         >
                           {child.label}
@@ -222,13 +223,6 @@ export default function Sidebar({ isOpen, onClose }) {
           Settings
         </div>
 
-        <div
-          onClick={handleLogout}
-          className="mt-2 flex items-center justify-start gap-2 w-full font-medium p-2 rounded-md cursor-pointer hover:bg-gray-100 text-[#667085]"
-        >
-          <LogOut size={16} />
-          Logout
-        </div>
       </div>
     </>
   );

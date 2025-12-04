@@ -23,7 +23,7 @@ export default function StatCard({
       {/* Header Section */}
       <div className="flex gap-3 items-start">
         <div
-          className="w-16 h-16 mt-2 flex justify-center items-center rounded-lg"
+          className="w-14 h-14 mt-2 flex justify-center items-center rounded-lg"
           style={{ background: `${color}15` }}
         >
           {icon ? (
@@ -34,20 +34,11 @@ export default function StatCard({
         </div>
 
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">{value}</h2>
-        <h4 className="text-[16px] uppercase text-gray-500 font-medium ">{title}</h4>
-        
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-800">{value}</h2>
+        <h4 className="text-[13px] uppercase text-gray-500 font-medium ">{title}</h4>
       </div>
         
       </div>
-
-      {/* Content */}
-      
-
-      
-
-      {/* Divider */}
-      <div className="border-t border-dashed border-gray-100 my-1"></div>
 
       {/* Extra summary (optional UI area) */}
       <div className="flex justify-between items-center text-gray-500">
