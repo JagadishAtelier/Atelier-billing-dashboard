@@ -9,10 +9,10 @@ import IncomingPOs from "./IncomingPOs";
 import LowStockAlerts from "./LowStockAlerts";
 import TopProducts from "./TopProducts";
 import { LATEST_COLLECTIONS } from "../../data/dummyData";
-import Billingicon from "../../../public/icon/billing-machine-svgrepo-com.svg"
-import Usericon from "../../../public/icon/user.svg"
-import Producticon from "../../../public/icon/product.svg"
-import Walleticon from "../../../public/icon/wallet.svg"
+import Billingicon from "../../../public/icon/billing-machine-svgrepo-com.png"
+import Usericon from "../../../public/icon/user.png"
+import Producticon from "../../../public/icon/product.png"
+import Walleticon from "../../../public/icon/wallet.png"
 import {
   ReceiptIndianRupee,
   Users,
@@ -23,6 +23,7 @@ import {
   Minus,
 } from "lucide-react";
 import dashboardService from "../service/dashboardService";
+import { color } from "framer-motion";
 
 const { Title, Text } = Typography;
 
@@ -347,6 +348,7 @@ const DashboardFull = () => {
       value: summary.totalBills ?? 0,
       meta: "Number of bills",
       icon: <img src={Billingicon} alt="Total Bills" className="w-10 h-10" />,
+      color: "#d27b3d39",
     },
     {
       id: "users",
@@ -354,6 +356,7 @@ const DashboardFull = () => {
       value: summary.totalUsers ?? 0,
       meta: "Registered users",
       icon: <img src={Usericon} alt="Total Users" className="w-10 h-10" />,
+      color: "#3b83f633",
     },
     {
       id: "products",
@@ -361,6 +364,7 @@ const DashboardFull = () => {
       value: summary.totalProducts ?? 0,
       meta: "Available products",
       icon: <img src={Producticon} alt="Total Products" className="w-10 h-10" />,
+      color: "#5110b92b",
     },
     {
       id: "revenue",
@@ -368,6 +372,7 @@ const DashboardFull = () => {
       value: `₹${summary.totalRevenue ?? 0}`,
       meta: "Revenue generated",
       icon: <img src={Walleticon} alt="Total Revenue" className="w-10 h-10" />,
+      color: "#4ab7403b",
     },
   ];
 

@@ -8,7 +8,7 @@ export default function StatCard({
   percentage,
   meta,
   icon,
-  color = "#506EE4",
+  color,
 }) {
   const isPositive = percentage >= 1;
 
@@ -24,7 +24,7 @@ export default function StatCard({
       <div className="flex gap-3 items-start">
         <div
           className="w-14 h-14 mt-2 flex justify-center items-center rounded-lg"
-          style={{ background: `${color}15` }}
+          style={{ background: `${color}` }}
         >
           {icon ? (
             icon

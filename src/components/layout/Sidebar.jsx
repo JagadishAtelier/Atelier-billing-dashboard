@@ -127,7 +127,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 {/* parent item */}
                 <div
                   className={cn(
-                    "w-full flex items-center justify-between text-[#667085] rounded-md text-[17px]  gap-3 p-2 hover:bg-[#DDE4FF] transition-colors duration-200",
+                    "w-full flex items-center justify-between text-[#667085] rounded-md text-[16px]  gap-3 p-2 hover:bg-[#DDE4FF] transition-colors duration-200",
                     active ? "bg-[#F2F5FF] !text-[#3D5EE1]" : "text-[#667085]"
                   )}
                 >
