@@ -109,102 +109,130 @@ function OrderPage() {
   const handleEdit = (id) => {
     navigate(`/order/edit/${id}`);
   };
+  const handleViewDetails = (id) => {
+    navigate(`/order/view/${id}`);
+  };
+  
 
   
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3 relative">
-        <h1 className="text-[30px] font-bold text-[#1F2937]">
+     <div className="flex items-center justify-between mb-6">
+     <div className="flex items-center gap-3 relative">
+
+{/* ICON BOX */}
+<div className="bg-white shadow-sm rounded-md p-2 border border-gray-200 flex items-center justify-center">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="text-gray-600"
+  >
+    <path d="M3 3h2l3 12h11l3-8H6" />
+    <circle cx="9" cy="20" r="1" />
+    <circle cx="20" cy="20" r="1" />
+  </svg>
+</div>
+
+{/* HEADING */}
+<h1 className="text-[30px] font-bold text-[#1F2937]">
   Purchases / Orders
 </h1>
 
-
-
-          {/* Filter button */}
-          <button
-            onClick={() => setFilterOpen(!filterOpen)}
-            className="flex items-center gap-1 border border-gray-300 rounded-md px-2 py-1 text-sm bg-white"
-          >
-            <Sliders size={16} />
-            Filter
-          </button>
-
-          {/* Filter popup */}
-          {filterOpen && (
-            <div
-              ref={filterRef}
-              className="absolute top-10 left-0 bg-white border border-gray-300 rounded-md p-4 shadow-lg z-50 w-64"
-            >
-              {/* Vendor Filter */}
-              <div className="mb-2">
-                <label className="text-sm font-medium">Vendor:</label>
-                <select
-                  value={vendorFilter}
-                  onChange={(e) => {
-                    setVendorFilter(e.target.value);
-                    setPage(1);
-                  }}
-                  className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
-                >
-                  <option value="">All Vendors</option>
-                  {vendors.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.vendor_name || v.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Status Filter */}
-              <div className="mb-2">
-                <label className="text-sm font-medium">Status:</label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => {
-                    setStatusFilter(e.target.value);
-                    setPage(1);
-                  }}
-                  className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
-                >
-                  <option value="">All</option>
-                  <option value="pending">Pending</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex justify-end gap-2 mt-2">
-                <button
-                  onClick={() => setFilterOpen(false)}
-                  className="px-3 py-1 bg-gray-200 rounded text-sm"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={resetFilters}
-                  className="px-3 py-1 bg-red-500 text-white rounded text-sm"
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Add Order */}
-<div
-  className="bg-[#506EE4] text-white py-2.5 px-6 text-[15px] font-medium flex items-center justify-center gap-2 rounded-md cursor-pointer"
-  onClick={() => navigate("/order/add")}
->
-  <Plus size={18} />
-  Add Order
 </div>
 
+  <div className="flex items-center gap-3 relative">
+
+    {/* Filter button */}
+    <button
+      onClick={() => setFilterOpen(!filterOpen)}
+      className="flex items-center gap-1 border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+    >
+      <Sliders size={16} />
+      Filter
+    </button>
+
+    {/* Filter popup */}
+    {filterOpen && (
+      <div
+        ref={filterRef}
+        className="absolute top-12 right-0 bg-white border border-gray-300 rounded-md p-4 shadow-lg z-50 w-64"
+      >
+        {/* Vendor Filter */}
+        <div className="mb-2">
+          <label className="text-sm font-medium">Vendor:</label>
+          <select
+            value={vendorFilter}
+            onChange={(e) => {
+              setVendorFilter(e.target.value);
+              setPage(1);
+            }}
+            className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
+          >
+            <option value="">All Vendors</option>
+            {vendors.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.vendor_name || v.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Status Filter */}
+        <div className="mb-2">
+          <label className="text-sm font-medium">Status:</label>
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
+            className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
+          >
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        {/* Buttons */}
+        <div className="flex justify-end gap-2 mt-2">
+          <button
+            onClick={() => setFilterOpen(false)}
+            className="px-3 py-1 bg-gray-200 rounded text-sm"
+          >
+            Close
+          </button>
+          <button
+            onClick={resetFilters}
+            className="px-3 py-1 bg-red-500 text-white rounded text-sm"
+          >
+            Reset
+          </button>
+        </div>
       </div>
+    )}
+
+    {/* Add Order */}
+    <div
+      className="bg-[#506EE4] text-white py-2.5 px-6 text-[15px] font-medium flex items-center justify-center gap-2 rounded-md cursor-pointer"
+      onClick={() => navigate("/order/add")}
+    >
+      <Plus size={18} />
+      Add Order
+    </div>
+
+  </div>
+</div>
+
 
       {/* Table */}
       <div className="overflow-x-auto">

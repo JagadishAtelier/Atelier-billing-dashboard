@@ -157,7 +157,8 @@ const SubCategoryList = () => {
             style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none" }}
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => navigate("/product/add")}
+            onClick={() => navigate("/subcategory/add")}
+
           >
             Add Sub Category
           </Button>

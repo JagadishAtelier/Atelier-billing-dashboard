@@ -454,75 +454,104 @@ export default function CRMModule() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button onClick={handleOpenAdd} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 !text-white hover:opacity-95">
+          <button onClick={handleOpenAdd} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#4C6EF5] to-[#A259FF] !text-white hover:opacity-95">
             <Plus className="w-4 h-4" /> Add Lead
           </button>
         </div>
       </div>
       {/* Summary cards */}
-<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+  {/* TOTAL LEADS */}
+  <div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">
+    <div className="flex items-center gap-4">
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#FFECE0]">
+        <img src="/icon/crm-leads.svg" alt="leads" className="w-10 h-10" />
+      </div>
 
-{/* Total Leads */}
-<div className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4">
-
-<div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#F3F5FF]">
-    <img src="/icon/crm-leads.svg" alt="leads" className="w-14 h-14" />
-  </div>
-  <div>
-    <h2 className="text-3xl font-bold">{leads.length}</h2>
-    <p className="text-gray-700 font-semibold">TOTAL LEADS</p>
-    <p className="text-gray-500 text-sm mt-2">
+      {/* number + heading stacked like card 1 */}
+      <div>
+        <p className="text-3xl font-semibold text-[#111827]">
+          {leads.length}
+        </p>
+        <p className="text-gray-600 font-semibold">
+          TOTAL LEADS
+        </p>
+      </div>
+    </div>
+    <p className="mt-3 text-gray-500 text-sm">
       {leads.filter(l => (l.status || "new").toLowerCase() === "new").length} New
     </p>
   </div>
-</div>
 
-{/* Active Customers */}
-<div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
 
-  <div className="w-14 h-14 rounded-xl flex items-center justify-center">
-    <img src="/icon/crm-customers.svg" alt="customers" className="w-14 h-14" />
-  </div>
-  <div>
-    <h2 className="text-3xl font-bold">
-      {customers.filter(c => c.is_active !== false).length}
-    </h2>
-    <p className="text-gray-700 font-semibold">ACTIVE CUSTOMERS</p>
-    <p className="text-gray-500 text-sm mt-2">
+{/* ACTIVE CUSTOMERS */}
+<div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">    
+
+    <div className="flex items-center gap-4">
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#EEE8FF]">
+        <img src="/icon/crm-customers.svg" alt="customers" className="w-10 h-10" />
+      </div>
+
+      <div>
+        <p className="text-3xl font-semibold text-[#111827]">
+          {customers.filter(c => c.is_active !== false).length}
+        </p>
+        <p className="text-gray-600 font-semibold">
+          ACTIVE CUSTOMERS
+        </p>
+      </div>
+    </div>
+    <p className="mt-3 text-gray-500 text-sm">
       {customers.filter(c => c.segment === "high_value").length} High Value
     </p>
   </div>
-</div>
 
 {/* Customer LTV */}
-<div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-  <div className="w-14 h-14 rounded-xl flex items-center justify-center">
-    <img src="/icon/crm-ltv.svg" alt="ltv" className="w-14 h-14" />
+<div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">
+    <div className="flex items-center gap-4">
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#FFF1C9]">
+        <img src="/icon/crm-ltv.svg" alt="ltv" className="w-10 h-10" />
+      </div>
+
+      <div>
+        <p className="text-3xl font-semibold text-[#111827]">
+          ₹{(
+            (customers.reduce((s, c) => s + (c.totalSpent || 0), 0) /
+              Math.max(customers.length || 1, 1)) /
+            1000
+          ).toFixed(1)}K
+        </p>
+        <p className="text-gray-600 font-semibold">
+          CUSTOMER LTV
+        </p>
+      </div>
+    </div>
+    <p className="mt-3 text-gray-500 text-sm">
+      Avg per customer
+    </p>
   </div>
-  <div>
-    <h2 className="text-3xl font-bold">
-      ₹{(
-        (customers.reduce((s, c) => s + (c.totalSpent || 0), 0) /
-          Math.max(customers.length, 1)) /
-        1000
-      ).toFixed(1)}K
-    </h2>
-    <p className="text-gray-700 font-semibold">CUSTOMER LTV</p>
-    <p className="text-gray-500 text-sm mt-2">Avg per customer</p>
-  </div>
-</div>
+
 
 {/* Conversion Rate */}
-<div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-  <div className="w-14 h-14 rounded-xl flex items-center justify-center">
-    <img src="/icon/crm-conversion.svg" alt="conversion" className="w-14 h-14" />
+<div className="bg-white rounded-xl shadow-sm p-5 h-[160px]">
+    <div className="flex items-center gap-4">
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#E2FFE9]">
+        <img src="/icon/crm-conversion.svg" alt="conversion" className="w-10 h-10" />
+      </div>
+
+      <div>
+        <p className="text-3xl font-semibold text-[#111827]">
+          24%
+        </p>
+        <p className="text-gray-600 font-semibold">
+          CONVERSION RATE
+        </p>
+      </div>
+    </div>
+    <p className="mt-3 text-gray-500 text-sm">
+      +5% this month
+    </p>
   </div>
-  <div>
-    <h2 className="text-3xl font-bold">24%</h2>
-    <p className="text-gray-700 font-semibold">CONVERSION RATE</p>
-    <p className="text-gray-500 text-sm mt-2">+5% this month</p>
-  </div>
-</div>
 
 </div>
 
@@ -761,7 +790,7 @@ export default function CRMModule() {
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-start justify-center pt-24">
           <div className="fixed inset-0 bg-black/40" onClick={() => { setIsAddLeadOpen(false); setIsEditing(false); setEditingId(null); }} />
           <div className="relative bg-white w-full max-w-2xl mx-4 rounded-xl shadow-lg z-10">
-            <div className="flex items-center justify-between px-6 py-4 border-b">
+          <div className="flex items-center justify-between px-6 py-4">
               <h3 className="text-lg font-medium">{isEditing ? "Edit Lead" : "Add New Lead"}</h3>
               <button onClick={() => { setIsAddLeadOpen(false); setIsEditing(false); setEditingId(null); }} className="text-gray-500 hover:text-gray-700">Close</button>
             </div>
@@ -811,9 +840,10 @@ export default function CRMModule() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 p-4 border-t">
+            <div className="flex justify-end gap-3 p-4">
               <button onClick={() => { setIsAddLeadOpen(false); setIsEditing(false); setEditingId(null); }} className="px-4 py-2 rounded-md border">Cancel</button>
-              {isEditing ? <button onClick={handleUpdateLead} className="px-4 py-2 rounded-md bg-purple-600 text-white">Update Lead</button> : <button onClick={handleAddLead} className="px-4 py-2 rounded-md bg-purple-600 text-white">Add Lead</button>}
+              {isEditing ? <button onClick={handleUpdateLead} className="px-4 py-2 rounded-md bg-purple-600 text-white">Update Lead</button> : <button onClick={handleAddLead} className="px-4 py-2 rounded-full text-white 
+  bg-gradient-to-r from-[#4C6EF5] to-[#A259FF] text-white transition">Add Lead</button>}
             </div>
           </div>
         </div>
