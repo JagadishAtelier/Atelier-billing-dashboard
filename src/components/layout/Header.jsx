@@ -6,12 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Bell, User, LogOut, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 import companyLogo from "../assets/Company_logo.png";
-
-/**
- * Header.jsx
- * - Matches the visual style used by Sidebar
- * - Keeps AntD Popover & Dropdown for notifications & user menu
- */
+import { Input } from "antd"; 
 
 const HeaderBar = ({ collapsed /* optional */ }) => {
   const { theme, headerBgColor, headerGradient } = useTheme();
@@ -79,29 +74,37 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
   );
 
   const isGradient = headerGradient && headerGradient.includes("gradient");
-  const headerStyle = isGradient ? { background: headerGradient } : { backgroundColor: "transparent" };
+  const headerStyle = isGradient ? { background: headerGradient } : { backgroundColor: "#fff" };
   const textColor = theme === "dark" || isGradient ? "#fff" : "#011D4A";
 
   return (
     <header
       style={{
         ...headerStyle,
-        height: 56,
+        height: 68.5,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0 16px",
         position: "fixed",
         top: 0,
-        left: collapsed ? 100 : 320,
+        left: collapsed ? 255 : 320,
         right: 0,
         zIndex: 100,
+        boxShadow: "0 2px 2px rgba(0,0,0,0.12)"
       }}
     >
+
+      {/* LEFT SIDE SEARCH INPUT ADDED HERE */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        
+        <Input.Search
+          placeholder="Search..."
+          style={{ width: 280, borderRadius: 8 }}
+          onSearch={(value) => console.log(value)}
+        />
       </div>
 
+      {/* RIGHT SIDE (No change) */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <Popover content={notificationContent} trigger="click" placement="bottomRight">
           <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.96 }} aria-label="Notifications" style={{ position: "relative", padding: 8, borderRadius: 9999, background: theme === "dark" ? "#374151" : "#f3f4f6", border: "none", cursor: "pointer" }}>
@@ -113,6 +116,7 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
         </Popover>
 
         <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
+          
           <motion.button whileHover={{ scale: 1.03 }} style={{ display: "flex", gap: 10, alignItems: "center", padding: 6, borderRadius: 10, background: theme === "dark" ? "#374151" : "#f3f4f6", border: "none", cursor: "pointer" }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#3b82f6,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700 }}>JD</div>
             <div style={{ display: isMobile ? "none" : "flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -123,6 +127,7 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
           </motion.button>
         </Dropdown>
       </div>
+
     </header>
   );
 };

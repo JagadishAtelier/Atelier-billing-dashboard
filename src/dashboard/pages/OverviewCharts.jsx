@@ -1,5 +1,5 @@
 // src/components/OverviewCharts.jsx
-import React from "react";
+import React, { useState } from "react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -13,20 +13,13 @@ import {
   Cell,
 } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card";
-
-/**
- * OverviewCharts
- *
- * Renders:
- *  - Sales & Profit Overview (Area chart)
- *  - Sales by Category (Pie chart + legend)
- *
- * Props (all optional):
- *  - salesData: Array<{ name, sales, purchases, profit }>
- *  - categoryData: Array<{ name, value, color }>
- *
- * Drop this file into your project and import <OverviewCharts /> where needed.
- */
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
 
 const defaultSalesData = [
   { name: "Mon", sales: 4000, purchases: 2400, profit: 1600 },
@@ -50,13 +43,31 @@ export default function OverviewCharts({
   salesData = defaultSalesData,
   categoryData = defaultCategoryData,
 }) {
+  const [filter, setFilter] = useState("monthly");
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Sales & Profit Overview (Left - spans 2 columns) */}
+
+      {/* Sales & Profit Overview */}
       <Card className="lg:col-span-2 border-0 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
+
             <span>Sales & Profit Overview</span>
+
+            {/* Dropdown Box */}
+            {/* Dropdown Box */}
+            <Select value={filter} onValueChange={(v) => setFilter(v)}>
+              <SelectTrigger className="w-[140px] bg-white border border-gray-200 shadow-sm">
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#fff]">
+                <SelectItem value="monthly" className="hover:bg-gray-100">Monthly</SelectItem>
+                <SelectItem value="weekly" className="hover:bg-gray-100">Weekly</SelectItem>
+              </SelectContent>
+            </Select>
+
+
           </CardTitle>
         </CardHeader>
 
@@ -100,10 +111,22 @@ export default function OverviewCharts({
         </CardContent>
       </Card>
 
-      {/* Sales by Category (Right) */}
+      {/* Sales by Category */}
       <Card className="border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>Sales by Category</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>Sales by Category</span>
+            <Select value={filter} onValueChange={(v) => setFilter(v)}>
+              <SelectTrigger className="w-[130px] bg-white border border-gray-200 shadow-sm">
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#fff]">
+                <SelectItem value="monthly" className="hover:bg-gray-100">Monthly</SelectItem>
+                <SelectItem value="weekly" className="hover:bg-gray-100">Weekly</SelectItem>
+              </SelectContent>
+            </Select>
+            </CardTitle>
+          
         </CardHeader>
 
         <CardContent>
@@ -143,6 +166,7 @@ export default function OverviewCharts({
           </div>
         </CardContent>
       </Card>
+
     </div>
   );
 }

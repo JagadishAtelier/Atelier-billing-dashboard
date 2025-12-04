@@ -346,28 +346,28 @@ const DashboardFull = () => {
       title: "Total Bills",
       value: summary.totalBills ?? 0,
       meta: "Number of bills",
-      icon: <img src={Billingicon} alt="Total Bills" className="w-12 h-12" />,
+      icon: <img src={Billingicon} alt="Total Bills" className="w-10 h-10" />,
     },
     {
       id: "users",
       title: "Total Users",
       value: summary.totalUsers ?? 0,
       meta: "Registered users",
-      icon: <img src={Usericon} alt="Total Users" className="w-12 h-12" />,
+      icon: <img src={Usericon} alt="Total Users" className="w-10 h-10" />,
     },
     {
       id: "products",
       title: "Total Products",
       value: summary.totalProducts ?? 0,
       meta: "Available products",
-      icon: <img src={Producticon} alt="Total Products" className="w-12 h-12" />,
+      icon: <img src={Producticon} alt="Total Products" className="w-10 h-10" />,
     },
     {
       id: "revenue",
       title: "Total Revenue",
       value: `₹${summary.totalRevenue ?? 0}`,
       meta: "Revenue generated",
-      icon: <img src={Walleticon} alt="Total Revenue" className="w-12 h-12" />,
+      icon: <img src={Walleticon} alt="Total Revenue" className="w-10 h-10" />,
     },
   ];
 

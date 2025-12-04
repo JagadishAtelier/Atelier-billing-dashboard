@@ -101,7 +101,7 @@ const MainLayout = ({ menuItems }) => {
   // header height constant
   const HEADER_HEIGHT = 0;
   const SIDER_WIDTH = 280;
-  const COLLAPSED_WIDTH = 280;
+  const COLLAPSED_WIDTH = 260;
 
   // content left margin for desktop
   const contentMarginLeft = isMobile ? 0 : (collapsed ? COLLAPSED_WIDTH : SIDER_WIDTH);
@@ -218,8 +218,7 @@ const MainLayout = ({ menuItems }) => {
 
         <Layout style={{ marginLeft: contentMarginLeft, transition: "margin-left 0.24s", minHeight: "100vh", backgroundColor: contentBgColor }}>
           {/* Header - fixed at top */}
-          <HeaderBar collapsed={collapsed} />
-
+          <HeaderBar collapsed={collapsed} style={{marginLeft: contentMarginLeft}} />
           {/* Mobile Floating Hamburger - opens drawer */}
           {isMobile && (
             <Button
@@ -244,7 +243,7 @@ const MainLayout = ({ menuItems }) => {
     padding: 2,
     minHeight: `calc(100vh - 100px)`,
     overflow: "auto",
-    marginTop: 65,
+    marginTop: 80,
   }}
 >
 
