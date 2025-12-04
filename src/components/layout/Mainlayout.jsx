@@ -101,7 +101,7 @@ const MainLayout = ({ menuItems }) => {
   // header height constant
   const HEADER_HEIGHT = 0;
   const SIDER_WIDTH = 280;
-  const COLLAPSED_WIDTH = 80;
+  const COLLAPSED_WIDTH = 280;
 
   // content left margin for desktop
   const contentMarginLeft = isMobile ? 0 : (collapsed ? COLLAPSED_WIDTH : SIDER_WIDTH);
