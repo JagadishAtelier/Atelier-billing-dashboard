@@ -459,89 +459,98 @@ export default function CRMModule() {
           </button>
         </div>
       </div>
+
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-3">
-
   {/* TOTAL LEADS */}
-  <div className="bg-white rounded-2xl shadow-sm px-6 py-4 h-[150px] flex flex-col justify-between">
-    <div className="flex items-center gap-4">
+  <div className="bg-white rounded-2xl shadow-sm px-5 py-4 h-[140px]">
+    <div className="flex gap-3 items-start">
 
+      {/* Icon */}
       <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#FFECE0]">
-        <img src="/icon/crm-leads.svg" className="w-9 h-9" alt="leads" />
+        <img src="/icon/crm-leads.svg" className="w-10 h-10" />
       </div>
 
-      <div>
-        <p className="text-3xl font-semibold text-[#111827]">{leads.length}</p>
-        <p className="text-gray-600 font-semibold text-[13px] tracking-wide">TOTAL LEADS</p>
+      {/* Number + Title */}
+      <div className="flex flex-col">
+        <p className="text-3xl font-semibold text-[#111827] leading-tight">{leads.length}</p>
+        <p className="text-gray-600 font-semibold text-[13px] mt-1 tracking-wide">
+          TOTAL LEADS
+        </p>
       </div>
-
     </div>
-
-    <p className="text-gray-500 text-[14px]"> 
-      {leads.filter(l => (l.status || "new") === "new").length} New
-    </p>
+    <p className="text-gray-500 text-[14px] mt-1">
+  {leads.filter(l => (l.status || "new") === "new").length} New
+</p>
   </div>
-
   {/* ACTIVE CUSTOMERS */}
-  <div className="bg-white rounded-2xl shadow-sm px-6 py-4 h-[150px] flex flex-col justify-between">
-    <div className="flex items-center gap-4">
+  <div className="bg-white rounded-2xl shadow-sm px-5 py-4 h-[140px]">
+    <div className="flex gap-3 items-start">
 
       <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#EEE8FF]">
-        <img src="/icon/crm-customers.svg" className="w-9 h-9" alt="customers" />
+        <img src="/icon/crm-customers.svg" className="w-10 h-10" />
       </div>
 
-      <div>
-        <p className="text-3xl font-semibold text-[#111827]">
+      <div className="flex flex-col">
+        <p className="text-3xl font-semibold text-[#111827] leading-tight">
           {customers.filter(c => c.is_active !== false).length}
         </p>
-        <p className="text-gray-600 font-semibold text-[13px] tracking-wide">ACTIVE CUSTOMERS</p>
+        <p className="text-gray-600 font-semibold text-[13px] mt-1 tracking-wide">
+          ACTIVE CUSTOMERS
+        </p>
       </div>
-
     </div>
-
-    <p className="text-gray-500 text-[14px]">
-      {customers.filter(c => c.segment === "high_value").length} High Value
-    </p>
+    <p className="text-gray-500 text-[14px] mt-1">
+  {customers.filter(c => c.segment === "high_value").length} High Value
+</p>
   </div>
+
 
   {/* CUSTOMER LTV */}
-  <div className="bg-white rounded-2xl shadow-sm px-6 py-4 h-[150px] flex flex-col justify-between">
-    <div className="flex items-center gap-4">
+  <div className="bg-white rounded-2xl shadow-sm px-5 py-4 h-[140px]">
+    <div className="flex gap-3 items-start">
 
       <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#FFF1C9]">
-        <img src="/icon/crm-ltv.svg" className="w-9 h-9" alt="ltv" />
+        <img src="/icon/crm-ltv.svg" className="w-10 h-10" />
       </div>
 
-      <div>
-        <p className="text-3xl font-semibold text-[#111827]">
+      <div className="flex flex-col">
+        <p className="text-3xl font-semibold text-[#111827] leading-tight">
           ₹{(
             (customers.reduce((s, c) => s + (c.totalSpent || 0), 0) /
-            Math.max(customers.length || 1, 1)
-          ) / 1000).toFixed(1)}K
+              Math.max(customers.length || 1, 1)) /
+            1000
+          ).toFixed(1)}K
         </p>
-        <p className="text-gray-600 font-semibold text-[13px] tracking-wide">CUSTOMER LTV</p>
+        <p className="text-gray-600 font-semibold text-[13px] mt-1 tracking-wide">
+          CUSTOMER LTV
+        </p>
       </div>
-
     </div>
-
-    <p className="text-gray-500 text-[14px]">Avg per customer</p>
+    <p className="text-gray-500 text-[14px] mt-1">
+  Avg per customer
+</p>
   </div>
 
+
   {/* CONVERSION RATE */}
-  <div className="bg-white rounded-2xl shadow-sm px-6 py-4 h-[150px] flex flex-col justify-between">
-    <div className="flex items-center gap-4">
+  <div className="bg-white rounded-2xl shadow-sm px-5 py-4 h-[140px]">
+    <div className="flex gap-3 items-start">
 
-      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#FFECE0]">
-        <img src="/icon/crm-conversion.svg" className="w-9 h-9" alt="conversion" />
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#E3FFE8]">
+        <img src="/icon/crm-conversion.svg" className="w-10 h-10" />
       </div>
 
-      <div>
-        <p className="text-3xl font-semibold text-[#111827]">24%</p>
-        <p className="text-gray-600 font-semibold text-[13px] tracking-wide">CONVERSION RATE</p>
+      <div className="flex flex-col">
+        <p className="text-3xl font-semibold text-[#111827] leading-tight">24%</p>
+        <p className="text-gray-600 font-semibold text-[13px] mt-1 tracking-wide">
+          CONVERSION RATE
+        </p>
       </div>
-
     </div>
-
-    <p className="text-gray-500 text-[14px]">+5% this month</p>
+    <p className="text-gray-500 text-[14px] mt-1">
+  +5% this month
+</p>
   </div>
 
 </div>

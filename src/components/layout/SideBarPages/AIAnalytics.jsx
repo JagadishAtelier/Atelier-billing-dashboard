@@ -144,7 +144,7 @@ export default function AIAnalytics() {
   </div>
 
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  STOCK RUNOUT ALERTS
+  STOCK ALERTS
 </p>
 
   <p className="text-gray-600 text-sm">Next 30 days</p>
