@@ -144,7 +144,7 @@ export default function AIAnalytics() {
   </div>
 
   {/* ================= PREDICTED SALES ================= */}
-  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 w-full">
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 w-full">
     <div className="flex items-start gap-4">
 
       <div className="w-16 h-16 rounded-xl bg-[#DDE8FF] flex items-center justify-center">
@@ -165,7 +165,7 @@ export default function AIAnalytics() {
   </div>
 
   {/* ================= FAST-MOVING ITEMS ================= */}
-  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 w-full">
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 w-full">
     <div className="flex items-start gap-4">
 
       <div className="w-16 h-16 rounded-xl bg-[#D6FFE7] flex items-center justify-center">
@@ -186,7 +186,7 @@ export default function AIAnalytics() {
   </div>
 
   {/* ================= SLOW MOVERS ================= */}
-  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 w-full">
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 w-full">
     <div className="flex items-start gap-4">
 
       <div className="w-16 h-16 rounded-xl bg-[#FFE1CC] flex items-center justify-center">

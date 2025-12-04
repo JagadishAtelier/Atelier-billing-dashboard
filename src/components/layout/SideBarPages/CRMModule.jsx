@@ -463,7 +463,7 @@ export default function CRMModule() {
 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
 {/* Total Leads */}
-<div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
+<div className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4">
 
 <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#F3F5FF]">
     <img src="/icon/crm-leads.svg" alt="leads" className="w-14 h-14" />
