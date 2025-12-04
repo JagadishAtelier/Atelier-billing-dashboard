@@ -126,119 +126,122 @@ function ReturnPage() {
       {/* Header Section */}
       
           {/* Search */}
-          <div className="flex items-center justify-between gap-4 mb-6">
-          <div className="flex items-center justify-between gap-4 mb-6">
+          <div className="flex items-center justify-between mb-6">
+     <div className="flex items-center gap-3 relative">
 
-{/* LEFT — ICON + TITLE */}
-<div className="flex items-center gap-3">
-
-  {/* ICON BOX */}
-  <div className="bg-white shadow-sm rounded-md p-2 border border-gray-200">
-  <svg
+{/* ICON BOX */}
+<div className="bg-white shadow-sm rounded-md p-2 border border-gray-200 flex items-center justify-center">
+<svg
   xmlns="http://www.w3.org/2000/svg"
-  width="20"
-  height="20"
+  width="22"
+  height="22"
   viewBox="0 0 24 24"
   fill="none"
   stroke="currentColor"
   strokeWidth="2"
   strokeLinecap="round"
   strokeLinejoin="round"
+  className="text-gray-600"
 >
-  <path d="M3 7h18v13H3z" />
-  <polyline points="3 7 12 3 21 7"></polyline>
-  <polyline points="12 12 9 9 12 6" />
-  <path d="M9 9h6" />
+  <path d="M9 14H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4" />
+  <polyline points="7 18 12 23 17 18" />
+  <line x1="12" y1="23" x2="12" y2="12" />
 </svg>
 
-
-  </div>
-
-  {/* HEADING */}
-  <h1 className="text-[28px] font-bold text-[#1F2937]">
-    Returns
-  </h1>
 </div>
 
-          {/* Filter Button */}
-          <button
-            onClick={() => setFilterOpen(!filterOpen)}
-            className="flex items-center gap-1 border border-gray-300 rounded-md px-2 py-1 text-sm bg-white"
+{/* HEADING */}
+<h1 className="text-[30px] font-bold text-[#1F2937]">
+  Returns
+</h1>
+
+</div>
+
+  <div className="flex items-center gap-3 relative">
+<div className="flex items-center gap-3 relative">
+
+{/* Filter button */}
+<button
+  onClick={() => setFilterOpen(!filterOpen)}
+  className="flex items-center gap-1 border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
+>
+  <Sliders size={16} />
+  Filter
+</button>
+
+{/* Filter popup */}
+{filterOpen && (
+  <div
+    ref={filterRef}
+    className="absolute top-12 right-0 bg-white border border-gray-300 rounded-md p-4 shadow-lg z-50 w-64"
+  >
+    
+        {/* Vendor Filter */}
+        <div className="mb-2">
+          <label className="text-sm font-medium">Vendor:</label>
+          <select
+            value={vendorFilter}
+            onChange={(e) => {
+              setVendorFilter(e.target.value);
+              setPage(1);
+            }}
+            className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
           >
-            <Sliders size={16} />
-            Filter
-          </button>
-
-          {/* Filter Popup */}
-          {filterOpen && (
-            <div
-              ref={filterRef}
-              className="absolute top-10 left-0 bg-white border border-gray-300 rounded-md p-4 shadow-lg z-50 w-64"
-            >
-              {/* Vendor Filter */}
-              <div className="mb-2">
-                <label className="text-sm font-medium">Vendor:</label>
-                <select
-                  value={vendorFilter}
-                  onChange={(e) => {
-                    setVendorFilter(e.target.value);
-                    setPage(1);
-                  }}
-                  className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
-                >
-                  <option value="">All Vendors</option>
-                  {vendors.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.vendor_name || v.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Status Filter */}
-              <div className="mb-2">
-                <label className="text-sm font-medium">Status:</label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => {
-                    setStatusFilter(e.target.value);
-                    setPage(1);
-                  }}
-                  className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
-                >
-                  <option value="">All</option>
-                  <option value="pending">Pending</option>
-                  <option value="processed">Processed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex justify-end gap-2 mt-2">
-                <button
-                  onClick={() => setFilterOpen(false)}
-                  className="px-3 py-1 bg-gray-200 rounded text-sm"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={resetFilters}
-                  className="px-3 py-1 bg-red-500 text-white rounded text-sm"
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-          )}
+            <option value="">All Vendors</option>
+            {vendors.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.vendor_name || v.name}
+              </option>
+            ))}
+          </select>
         </div>
+
+        {/* Status Filter */}
+        <div className="mb-2">
+          <label className="text-sm font-medium">Status:</label>
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
+            className="border border-gray-300 rounded-md px-2 py-1 text-sm ml-2 w-full"
+          >
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        {/* Buttons */}
+        <div className="flex justify-end gap-2 mt-2">
+          <button
+            onClick={() => setFilterOpen(false)}
+            className="px-3 py-1 bg-gray-200 rounded text-sm"
+          >
+            Close
+          </button>
+          <button
+            onClick={resetFilters}
+            className="px-3 py-1 bg-red-500 text-white rounded text-sm"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+    )}        </div>
+    
 
         {/* Add Button */}
         <div
   className="bg-[#506EE4] text-white py-2.5 px-6 text-[15px] font-medium flex items-center justify-center gap-2 rounded-md cursor-pointer"
-  onClick={() => navigate("/order/add")}
+  onClick={() => navigate("/return/add")}
+
 >
   <Plus size={18} />
   Add Return
+</div>
 </div>
 
       </div>
@@ -309,7 +312,7 @@ function ReturnPage() {
 
   {/* VIEW BUTTON */}
   <button
-    onClick={() => handleViewDetails(order.id)}
+    onClick={() => handleView(ret.id)}
     className="p-2 rounded-md border border-gray-300 bg-gray-50 hover:bg-gray-100"
   >
     <Eye size={18} className="text-gray-700" />
@@ -317,7 +320,7 @@ function ReturnPage() {
 
   {/* EDIT BUTTON */}
   <button
-    onClick={() => handleEdit(order.id)}
+    onClick={() => handleEdit(ret.id)}
     className="p-2 rounded-md border border-gray-300 bg-gray-50 hover:bg-gray-100"
   >
     <Edit size={18} className="text-gray-700" />
@@ -325,14 +328,13 @@ function ReturnPage() {
 
   {/* DELETE BUTTON */}
   <button
-    onClick={() => handleDelete(order.id)}
+    onClick={() => handleDelete(ret.id)}
     className="p-2 rounded-md border border-red-400 bg-transparent hover:bg-red-50"
   >
     <Trash2 size={18} className="text-red-500" />
   </button>
 
 </td>
-
                 </tr>
               ))
             ) : (
