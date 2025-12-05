@@ -467,8 +467,9 @@ export default function CRMModule() {
       </div>
 
 
-      <div className="grid grid-cols-4 gap-4">
-      <div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
+      <div className="flex gap-4 pb-2 overflow-x-auto whitespace-nowrap no-scrollbar">
+
+      <div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
 
 <div className="flex items-start justify-between">
   
@@ -494,7 +495,7 @@ export default function CRMModule() {
   <p className="text-gray-600 text-sm">Total leads</p>
 </div>
 
-<div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
+<div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
     <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#E7EBFF]">
@@ -514,7 +515,7 @@ export default function CRMModule() {
     <p className="text-gray-600 text-sm">Active customer</p>
   </div>
 
-  <div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
     <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#E8FFEF]">
@@ -535,7 +536,7 @@ export default function CRMModule() {
   </p>
     <p className="text-gray-600 text-sm">Customer Ltv</p>
   </div>
-  <div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
   <div className="flex items-start justify-between">
 
     <div className="flex items-center gap-4">
