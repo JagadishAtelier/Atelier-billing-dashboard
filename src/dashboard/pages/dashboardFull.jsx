@@ -14,6 +14,15 @@ import Usericon from "../../../public/icon/user.png"
 import Producticon from "../../../public/icon/product.png"
 import Walleticon from "../../../public/icon/wallet.png"
 import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../../components/ui/breadcrumb";
+import { Link } from "react-router-dom";
+import {
   ReceiptIndianRupee,
   Users,
   ShoppingBasket,
@@ -347,32 +356,36 @@ const DashboardFull = () => {
       title: "Total Bills",
       value: summary.totalBills ?? 0,
       meta: "Number of bills",
-      icon: <img src={Billingicon} alt="Total Bills" className="w-10 h-10" />,
-      color: "#d27b3d39",
+      icon: <img src={Billingicon} alt="Total Bills" className="w-8 h-8" />,
+      color: "#d27b3d16",
+      linkTo: "/billing/list",
     },
     {
       id: "users",
       title: "Total Users",
       value: summary.totalUsers ?? 0,
       meta: "Registered users",
-      icon: <img src={Usericon} alt="Total Users" className="w-10 h-10" />,
-      color: "#3b83f633",
+      icon: <img src={Usericon} alt="Total Users" className="w-8 h-8" />,
+      color: "#3b83f615",
+      linkTo: "/user",
     },
     {
       id: "products",
       title: "Total Products",
       value: summary.totalProducts ?? 0,
       meta: "Available products",
-      icon: <img src={Producticon} alt="Total Products" className="w-10 h-10" />,
-      color: "#5110b92b",
+      icon: <img src={Producticon} alt="Total Products" className="w-8 h-8" />,
+      color: "#5110b90e",
+      linkTo: "/product/list",
     },
     {
       id: "revenue",
       title: "Total Revenue",
       value: `₹${summary.totalRevenue ?? 0}`,
       meta: "Revenue generated",
-      icon: <img src={Walleticon} alt="Total Revenue" className="w-10 h-10" />,
-      color: "#4ab7403b",
+      icon: <img src={Walleticon} alt="Total Revenue" className="w-8 h-8" />,
+      color: "#4ab74011",
+      linkTo: "/report",
     },
   ];
 
@@ -380,20 +393,44 @@ const DashboardFull = () => {
   return (
     <div style={styles.page}>
 
-      {/* ⭐ ADDED LAST UPDATED LABEL ⭐ */}
-      <Row justify="space-between" align="middle">
-        <Col>
-          <Title level={4} style={{ margin: 0 }}>
-            Dashboard
-          </Title>
-        </Col>
 
-        <Col>
-          <Text style={{ fontSize: 12, color: "#6b7280" }}>
-            Last updated: {lastUpdated || "—"}
-          </Text>
-        </Col>
-      </Row>
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1" style={{fontWeight:"700"}}>
+              Admin Dashboard
+            </h1>
+            <Breadcrumb className="mb-2 sm:mb-4">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink style={{color:"#000"}}  href="/">Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink style={{color:"#000"}} href="/admin">Admin</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+
+          <div className="flex flex-wrap gap-2 justify-start md:justify-end">
+            <Link
+              to="/product/add"
+              className="text-sm !bg-[#506EE4] py-2 px-3 !text-white shadow-sm rounded-sm"
+            >
+              Add Product
+            </Link>
+            <Link
+              to="/billing/add"
+              className="text-sm !bg-[#E9EDF4] py-2 px-3 !text-gray-700 shadow-sm rounded-sm"
+            >
+              Add Bill
+            </Link>
+          </div>
+        </div>
 
       {/* Summary */}
       <Row gutter={[12, 12]} style={{ marginTop: 12 }}>
@@ -416,8 +453,8 @@ const DashboardFull = () => {
       <Row gutter={[12, 12]} style={{ marginTop: 16 }}>
         <Col xs={24}>
           <OverviewCharts
-            salesData={loadingCharts ? undefined : salesData}
-            categoryData={loadingCharts ? undefined : categoryData}
+            // salesData={loadingCharts ? undefined : salesData}
+            // categoryData={loadingCharts ? undefined : categoryData}
           />
         </Col>
       </Row>
@@ -426,7 +463,7 @@ const DashboardFull = () => {
       <Row gutter={[12, 12]} style={{ marginTop: 16 }}>
         <Col xs={24} lg={12}>
           <LowStockAlerts items={lowStockItems} />
-          <LatestPayments
+          {/* <LatestPayments
             payments={payments}
             filterKey={filterKey}
             setFilterKey={setFilterKey}
@@ -434,7 +471,7 @@ const DashboardFull = () => {
             setSearchQ={setSearchQ}
             expandedRowKeys={expandedRowKeys}
             setExpandedRowKeys={setExpandedRowKeys}
-          />
+          /> */}
           
         </Col>
 

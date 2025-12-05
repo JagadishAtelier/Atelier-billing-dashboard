@@ -49,7 +49,7 @@ export default function OverviewCharts({
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
       {/* Sales & Profit Overview */}
-      <Card className="lg:col-span-2 border-0 shadow-lg">
+      <Card className="lg:col-span-2 border-0 shadow-lg bg-white">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
 
@@ -112,7 +112,7 @@ export default function OverviewCharts({
       </Card>
 
       {/* Sales by Category */}
-      <Card className="border-0 shadow-lg">
+      <Card className="border-0 shadow-lg bg-white">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Sales by Category</span>
