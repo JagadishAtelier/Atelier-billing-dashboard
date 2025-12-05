@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 // DATA (unchanged)
 const predictedStockData = [
@@ -62,6 +63,8 @@ const seasonalInsights = [
 export default function AIAnalytics() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [tab, setTab] = useState("predictions");
+  const navigate = useNavigate();
+
 
   const handleGenerateReorder = () => {
     setIsGenerating(true);
@@ -105,9 +108,10 @@ export default function AIAnalytics() {
   onClick={handleGenerateReorder}
   disabled={isGenerating}
   className="px-5 py-2 rounded-lg text-white font-medium 
-  flex items-center shadow hover:opacity-90 
-  bg-[linear-gradient(90deg,#4D6BFF,#A066FF)]"
+  flex items-center shadow 
+  bg-[#4C6EF5] hover:bg-[#3f5cd6]"
 >
+
   {isGenerating ? (
     <div className="flex items-center gap-2">
       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -125,16 +129,19 @@ export default function AIAnalytics() {
       <div className="grid grid-cols-4 gap-4">
 
   {/* ================= STOCK RUNOUT ALERTS ================= */}
-  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
   <div className="flex items-start justify-between">
 
     {/* ICON + NUMBER */}
     <div className="flex items-center gap-3">
       <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" strokeWidth="2">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+ stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 19h18L12 4 3 19z"/>
+  <path d="M12 10v4"/>
+  <path d="M12 16h0.01"/>
+</svg>
+
       </div>
       <h2 className="text-3xl font-bold text-[#1F2937]">4</h2>
     </div>
@@ -155,7 +162,7 @@ export default function AIAnalytics() {
 </div>
 
   {/* ================= PREDICTED SALES ================= */}
-  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
   <div className="flex items-start justify-between">
 
     {/* ICON + NUMBER */}
@@ -188,18 +195,22 @@ export default function AIAnalytics() {
 
 
   {/* ================= FAST-MOVING ITEMS ================= */}
-  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
   <div className="flex items-start justify-between">
 
     {/* ICON + NUMBER */}
     <div className="flex items-center gap-3">
       <div className="w-14 h-14 bg-[#E8FFEF] rounded-xl flex items-center justify-center">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" strokeWidth="2">
-          <path d="M3 12h10" />
-          <path d="M6 8h12" />
-          <path d="M6 16h8" />
-          <circle cx="19" cy="12" r="3" />
-        </svg>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+  stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 5h2l2 10h11l2-6H8" />
+  <circle cx="9" cy="18" r="1.8" />
+  <circle cx="17" cy="18" r="1.8" />
+  <path d="M1.5 8h2.5" />
+  <path d="M1.5 11h2" />
+</svg>
+
+
       </div>
       <h2 className="text-3xl font-bold text-[#1F2937]">4</h2>
     </div>
@@ -220,17 +231,20 @@ export default function AIAnalytics() {
 
 
   {/* ================= SLOW MOVERS ================= */}
-  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
   <div className="flex items-start justify-between">
 
     {/* ICON + NUMBER */}
     <div className="flex items-center gap-3">
       <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00A637" strokeWidth="2">
-          <path d="M3 6 L9 12 L13 8 L21 16" />
-          <polyline points="21 12 21 16 17 16" />
-        </svg>
-      </div>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+ stroke="#FF1493" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="9"/>
+  <path d="M12 12l-3 3"/>
+  <path d="M12 7v5"/>
+  <path d="M4 12h2"/>
+</svg>
+</div>
       <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
     </div>
 
@@ -318,11 +332,12 @@ export default function AIAnalytics() {
 
             </div>
             <button
-  className="px-4 py-2 rounded-md text-white font-medium text-[15px] hover:opacity-90 shadow"
-  style={{ background: "linear-gradient(90deg, #4D6BFF, #A066FF)" }}
+  className="px-4 py-2 rounded-md text-white font-medium text-[15px] hover:bg-[#3f5cd6] shadow"
+  style={{ background: "#4C6EF5" }}
 >
   <span className="text-white">Reorder {item.reorderQty} Units</span>
 </button>
+
 
               </div>
               <div className="mt-4">

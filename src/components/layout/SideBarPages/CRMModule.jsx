@@ -455,15 +455,20 @@ export default function CRMModule() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button onClick={handleOpenAdd} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#4C6EF5] to-[#A259FF] !text-white hover:opacity-95">
-            <Plus className="w-4 h-4" /> Add Lead
-          </button>
-        </div>
+        <button 
+  onClick={handleOpenAdd}
+  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg 
+             bg-[#4C6EF5] hover:bg-[#3f5cd6] text-white font-semibold text-[15px]"
+>
+  <Plus className="w-5 h-5 text-white" />
+  <span className="!text-white">Add Lead</span>
+</button>
+  </div>
       </div>
 
 
       <div className="grid grid-cols-4 gap-4">
-      <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+      <div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
 
 <div className="flex items-start justify-between">
   
@@ -479,116 +484,74 @@ export default function CRMModule() {
     <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
   </div>
 
-  {/* ARROW BUTTON */}
-  <div className="w-10 h-10 rounded-full bg-[#FFF4EC] shadow flex items-center justify-center">
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#3B3F51"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M5 12h14" />
-    <path d="M13 6l6 6-6 6" />
-  </svg>
+  {/* ret*/}
+  <div className="px-3 py-1 rounded-md bg-[#FF8A4C] flex items-center justify-center">
+  <span className="text-white text-sm font-semibold">1.8%</span>
 </div>
-
 </div>
-
 <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  
 </p>
   <p className="text-gray-600 text-sm">Total leads</p>
-
 </div>
-<div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+
+<div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
   <div className="flex items-start justify-between">
-
     <div className="flex items-center gap-4">
-      <div className="w-14 h-14 bg-[#E7EBFF] rounded-xl flex items-center justify-center">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-          stroke="#1E55FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="13 2 3 14 12 14 11 22 21 10 13 10" />
-        </svg>
-      </div>
-
-      <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
+    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#E7EBFF]">
+  <img src="/icon/crm-customers.svg" className="w-8 h-8" />
+</div>
+<h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
     </div>
-
-    {/* ARROW → */}
-    <div className="w-10 h-10 rounded-full bg-[#EEF1FF] shadow flex items-center justify-center">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-        stroke="#3B3F51" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M5 12h14" />
-        <path d="M13 6l6 6-6 6" />
-      </svg>
-    </div>
+    {/* ret*/}
+    <div className="px-3 py-1 rounded-md bg-[#4C6EF5] flex items-center justify-center">
+  <span className="text-white text-sm font-semibold">1.8%</span>
+</div>
 
   </div>
-
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
   
   </p>
     <p className="text-gray-600 text-sm">Active customer</p>
   </div>
 
-  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
-      <div className="w-14 h-14 bg-[#E8FFEF] rounded-xl flex items-center justify-center">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-          stroke="#00A637" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="14" width="3" height="6" rx="1" />
-          <rect x="8" y="10" width="3" height="10" rx="1" />
-          <rect x="13" y="6" width="3" height="14" rx="1" />
-          <path d="M18 4h4" />
-          <path d="M18 8h4" />
-          <path d="M22 4c0 4-4 6-6 6h2c3 0 4 2 4 5" />
-        </svg>
-      </div>
+    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#E8FFEF]">
+  <img src="/icon/crm-ltv.svg" className="w-8 h-8" />
+</div>
+
       <h2 className="text-3xl font-bold text-[#1F2937]">₹0.5K</h2>
     </div>
 
-    {/* ARROW → */}
-    <div className="w-10 h-10 rounded-full bg-[#E8FFEF] shadow flex items-center justify-center">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-        stroke="#3B3F51" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M5 12h14" />
-        <path d="M13 6l6 6-6 6" />
-      </svg>
-    </div>
+    {/* Ret */}
+    <div className="px-3 py-1 rounded-md bg-[#FACC15] flex items-center justify-center">
+  <span className="text-white text-sm font-semibold">1.8%</span>
+</div>
+
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
   
   </p>
     <p className="text-gray-600 text-sm">Customer Ltv</p>
   </div>
-  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[270px] h-[130px] border border-gray-200">
   <div className="flex items-start justify-between">
 
     <div className="flex items-center gap-4">
-      <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-          stroke="#FF6A00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="6" y1="18" x2="18" y2="6" />
-          <circle cx="7" cy="7" r="3" />
-          <circle cx="17" cy="17" r="3" />
-        </svg>
-      </div>
+    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#FFE7DA]">
+  <img src="/icon/crm-conversion.svg" className="w-8 h-8" />
+</div>
+
       <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
     </div>
 
-    {/* ARROW → */}
-    <div className="w-10 h-10 rounded-full bg-[#FFF4EC] shadow flex items-center justify-center">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-        stroke="#3B3F51" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M5 12h14" />
-        <path d="M13 6l6 6-6 6" />
-      </svg>
-    </div>
+    {/* Ret*/}
+    <div className="px-3 py-1 rounded-md bg-[#22C55E] flex items-center justify-center">
+  <span className="text-white text-sm font-semibold">1.8%</span>
+</div>
+
+
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
   </p>
@@ -637,7 +600,7 @@ export default function CRMModule() {
                         <div className="p-6">
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center bg-[#4C6EF5]">
                                 <span className="text-white font-medium">{(lead.name || "U").charAt(0)}</span>
                               </div>
                               <div>
@@ -720,7 +683,8 @@ export default function CRMModule() {
                       <div className="p-6">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-4 flex-1">
-                            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+                          <div className="w-16 h-16 rounded-full flex items-center justify-center"
+     style={{ backgroundColor: "#4C6EF5" }}>
                               <span className="text-white text-xl font-medium">{(customer.name || "U").charAt(0)}</span>
                             </div>
                             <div className="flex-1">
@@ -882,8 +846,13 @@ export default function CRMModule() {
 
             <div className="flex justify-end gap-3 p-4">
               <button onClick={() => { setIsAddLeadOpen(false); setIsEditing(false); setEditingId(null); }} className="px-4 py-2 rounded-md border">Cancel</button>
-              {isEditing ? <button onClick={handleUpdateLead} className="px-4 py-2 rounded-md bg-purple-600 text-white">Update Lead</button> : <button onClick={handleAddLead} className="px-4 py-2 rounded-full text-white 
-  bg-gradient-to-r from-[#4C6EF5] to-[#A259FF] text-white transition">Add Lead</button>}
+              {isEditing ? <button onClick={handleUpdateLead} className="px-4 py-2 rounded-md bg-purple-600 text-white">Update Lead</button> : <button 
+  onClick={handleAddLead} 
+  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg 
+             bg-[#4C6EF5] hover:bg-[#3f5cd6] !text-white font-semibold transition"
+>
+  Add Lead
+</button>}
             </div>
           </div>
         </div>
