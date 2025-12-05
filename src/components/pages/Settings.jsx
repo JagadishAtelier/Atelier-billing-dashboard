@@ -194,7 +194,7 @@ const Settings = () => {
               </Row> */}
             </TabPane>
 
-            <TabPane
+            {/* <TabPane
               tab={
                 <span>
                   <SettingOutlined /> Config
@@ -277,9 +277,9 @@ const Settings = () => {
                   </Form.Item>
                 </Col>
               </Row>
-            </TabPane>
+            </TabPane> */}
 
-            <TabPane
+            {/* <TabPane
               tab={
                 <span>
                   <BellOutlined /> Notifications
@@ -324,9 +324,9 @@ const Settings = () => {
                   <Option value="weekly">Weekly Digest</Option>
                 </Select>
               </Form.Item>
-            </TabPane>
+            </TabPane> */}
 
-            <TabPane
+            {/* <TabPane
               tab={
                 <span>
                   <SecurityScanOutlined /> Security
@@ -431,9 +431,9 @@ const Settings = () => {
                   <Option value="forever">Forever</Option>
                 </Select>
               </Form.Item>
-            </TabPane>
+            </TabPane> */}
 
-            <TabPane
+            {/* <TabPane
               tab={
                 <span>
                   <PlusOutlined /> Sub Fields
@@ -441,8 +441,7 @@ const Settings = () => {
               }
               key="subfields" 
             >
-             {/* <AddMachineType /> */}
-            </TabPane>
+            </TabPane> */}
           </Tabs>
 
           <Divider />

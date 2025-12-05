@@ -399,21 +399,9 @@ const DashboardFull = () => {
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1" style={{fontWeight:"700"}}>
               Admin Dashboard
             </h1>
-            <Breadcrumb className="mb-2 sm:mb-4">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink style={{color:"#000"}}  href="/">Home</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink style={{color:"#000"}} href="/admin">Admin</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <Text style={{ fontSize: 12, color: "#6b7280" }}>
+            Last updated: {lastUpdated || "—"}
+          </Text>
           </div>
 
           <div className="flex flex-wrap gap-2 justify-start md:justify-end">
@@ -434,20 +422,21 @@ const DashboardFull = () => {
 
       {/* Summary */}
       <Row gutter={[12, 12]} style={{ marginTop: 12 }}>
-        {loadingSummary
-          ? [0, 1, 2, 3].map((i) => (
-            <Col xs={24} sm={12} md={6} key={i}>
-              <Card style={{ borderRadius: 14 }}>
-                <Skeleton active paragraph={{ rows: 2 }} />
-              </Card>
-            </Col>
-          ))
-          : summaryCards.map((s) => (
-            <Col xs={24} sm={12} md={6} key={s.id}>
-              <StatCard {...s} />
-            </Col>
-          ))}
-      </Row>
+  {loadingSummary
+    ? [0, 1, 2, 3].map((i) => (
+        <Col xs={24} sm={12} md={12} lg={6} key={i}>
+          <Card style={{ borderRadius: 14 }}>
+            <Skeleton active paragraph={{ rows: 2 }} />
+          </Card>
+        </Col>
+      ))
+    : summaryCards.map((s) => (
+        <Col xs={24} sm={12} md={12} lg={6} key={s.id}>
+          <StatCard {...s} />
+        </Col>
+      ))}
+</Row>
+
 
       {/* Charts */}
       <Row gutter={[12, 12]} style={{ marginTop: 16 }}>

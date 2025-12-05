@@ -81,7 +81,7 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
     <header
       style={{
         ...headerStyle,
-        height: 58.5,
+        height: 60,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -91,7 +91,8 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
         left: collapsed ? 255 : 320,
         right: 0,
         zIndex: 100,
-        boxShadow: "0 2px 2px rgba(0,0,0,0.12)"
+        borderBottom: ".5px solid #66708550",
+        // boxShadow: "0 2px 4px rgba(0,0,0,0.12)"
       }}
     >
 

@@ -1,4 +1,4 @@
-// Sidebar.jsx
+// Sidebar.jsx (fixed)
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ScrollArea } from "../ui/scroll-area";
@@ -25,7 +25,6 @@ import {
   Package,
   ClipboardCheck,
   X,
-  Package as PackageIcon,
   Receipt,
   Box,
   Truck,
@@ -34,18 +33,36 @@ import {
   LogOut,
 } from "lucide-react";
 
-export default function Sidebar({ isOpen, onClose }) {
+export default function Sidebar({
+  // MainLayout passes some props; accept them but keep sensible defaults so this component
+  // works both when mounted directly or inside antd Sider / Drawer.
+  isOpen,
+  onClose,
+  collapsed = false,
+  setCollapsed,
+  selectedParent: selectedParentProp = null,
+  setSelectedParent,
+}) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [openParent, setOpenParent] = useState(null);
 
-  // menu structure adapted from your original Sidebar
+  // internal state for which parent menu is open in the sidebar (for nested menus)
+  const [openParent, setOpenParent] = useState(selectedParentProp);
+
+  // keep internal openParent in sync when parent is controlled from outside
+  useEffect(() => setOpenParent(selectedParentProp), [selectedParentProp]);
+
+  // reset open parent when route changes
+  useEffect(() => {
+    setOpenParent(null);
+  }, [pathname]);
+
   const menu = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     {
       to: "/product",
       label: "Products",
-      icon: PackageIcon,
+      icon: Package,
       children: [
         { to: "/product/list", label: "Product List" },
         { to: "/category/list", label: "Category List" },
@@ -72,25 +89,15 @@ export default function Sidebar({ isOpen, onClose }) {
     { to: "/report", label: "Reports", icon: FileText },
   ];
 
-  useEffect(() => {
-    // close any open parent when route changes
-    setOpenParent(null);
-  }, [pathname]);
-
   const isLinkActive = (to, children) => {
     if (!to) return false;
     if (children && children.length) {
       return children.some(
-        (c) =>
-          pathname === c.to ||
-          pathname.startsWith(c.to + "/") ||
-          pathname.startsWith(to + "/")
+        (c) => pathname === c.to || pathname.startsWith(c.to + "/") || pathname.startsWith(to + "/")
       );
     }
     return (
-      pathname === to ||
-      pathname.startsWith(to + "/") ||
-      pathname.includes(to.replace("/list", "").replace("/add", ""))
+      pathname === to || pathname.startsWith(to + "/") || pathname.includes(to.replace("/list", "").replace("/add", ""))
     );
   };
 
@@ -99,18 +106,37 @@ export default function Sidebar({ isOpen, onClose }) {
     navigate("/login");
   };
 
+  // when toggling a parent menu, notify parent if a setter was provided
+  const toggleParent = (to) => {
+    const next = openParent === to ? null : to;
+    setOpenParent(next);
+    if (typeof setSelectedParent === "function") setSelectedParent(next);
+  };
+
   const SidebarContent = () => (
-    <>
+    <div className="flex flex-col h-full shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between w-full gap-2 px-4 h-[60px] bg-white" style={{ borderBottom: ".5px solid #66708550", alignItems: "center !important" }}>
+      <div
+        className="flex items-center justify-between w-full gap-2 px-4 h-[60px] bg-white"
+        style={{ borderBottom: ".5px solid #66708550", alignItems: "center" }}
+      >
         <div className="flex items-center gap-2">
           <img src={logo} alt="logo" className="w-8 h-8 object-contain" />
-          <h1 className="text-xl pt-2" style={{fontWeight:"700"}}>Atelier Inventory</h1>
+          <h1 className="text-xl pt-2" style={{ fontWeight: "700" }}>
+            Atelier Inventory
+          </h1>
         </div>
 
-        {/* Mobile close button */}
-        <button onClick={onClose} className="lg:hidden p-2 text-gray-600 hover:text-gray-900">
-          <X size={18} />
+        {/* Mobile close button (Drawer provides onClose) */}
+        <button
+          onClick={() => {
+            if (typeof onClose === "function") onClose();
+            if (typeof setCollapsed === "function") setCollapsed(true);
+          }}
+          className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+          aria-label="close sidebar"
+        >
+          {/* <X size={18} /> */}
         </button>
       </div>
 
@@ -127,7 +153,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 {/* parent item */}
                 <div
                   className={cn(
-                    "w-full flex items-center justify-between font-medium  text-[#667085] rounded-md text-[14.5px]  gap-3 p-2 hover:bg-[#DDE4FF] transition-colors duration-200",
+                    "w-full flex items-center justify-between font-medium text-[#667085] rounded-md text-[14.5px] gap-3 p-2 hover:bg-[#DDE4FF] transition-colors duration-200",
                     active ? "bg-[#F2F5FF] !text-[#3D5EE1]" : "text-[#667085]"
                   )}
                 >
@@ -141,10 +167,9 @@ export default function Sidebar({ isOpen, onClose }) {
                       {Icon ? <Icon size={18} /> : null}
                     </div>
 
-                    {/* If has children, clicking here toggles submenu; otherwise navigate via Link */}
                     {hasChildren ? (
                       <button
-                        onClick={() => setOpenParent(openParent === item.to ? null : item.to)}
+                        onClick={() => toggleParent(item.to)}
                         className={cn("flex-1 text-left !text-[#667085]", active ? " !text-[#3D5EE1]" : "!text-[#667085]")}
                         aria-expanded={openParent === item.to}
                       >
@@ -153,9 +178,10 @@ export default function Sidebar({ isOpen, onClose }) {
                     ) : (
                       <Link
                         to={item.to}
-                        onClick={() => onClose?.()}
+                        onClick={() => {
+                          if (typeof onClose === "function") onClose();
+                        }}
                         className={cn("flex-1 text-left !text-[#667085]", active ? " !text-[#3D5EE1]" : "!text-[#667085]")}
-                        
                       >
                         {item.label}
                       </Link>
@@ -165,11 +191,8 @@ export default function Sidebar({ isOpen, onClose }) {
                   {/* chevron for parents */}
                   {hasChildren && (
                     <button
-                      onClick={() => setOpenParent(openParent === item.to ? null : item.to)}
-                      className={cn(
-                        "text-sm px-2 py-1 rounded !text-[#667085]",
-                        openParent === item.to ? "rotate-180" : ""
-                      )}
+                      onClick={() => toggleParent(item.to)}
+                      className={cn("text-sm px-2 py-1 rounded !text-[#667085]", openParent === item.to ? "rotate-180" : "")}
                       aria-label="toggle submenu"
                     >
                       <svg
@@ -191,13 +214,14 @@ export default function Sidebar({ isOpen, onClose }) {
                 {hasChildren && openParent === item.to && (
                   <div className="mt-1 ml-8 flex flex-col gap-1">
                     {item.children.map((child) => {
-                      const childActive =
-                        pathname === child.to || pathname.startsWith(child.to + "/");
+                      const childActive = pathname === child.to || pathname.startsWith(child.to + "/");
                       return (
                         <Link
                           key={child.to}
                           to={child.to}
-                          onClick={() => onClose?.()}
+                          onClick={() => {
+                            if (typeof onClose === "function") onClose();
+                          }}
                           className={cn(
                             "w-full text-[16px] py-2 px-3 rounded-md text-left !text-[#667085] hover:bg-gray-100",
                             childActive ? "bg-blue-50 !text-[#3D5EE1]" : "text-[#667085] hover:bg-gray-50"
@@ -225,31 +249,21 @@ export default function Sidebar({ isOpen, onClose }) {
           Settings
         </div>
 
+        <div className="mt-2 flex items-center gap-2 justify-between">
+          <button
+            onClick={handleLogout}
+            className="w-full text-left font-medium p-2 rounded-md hover:bg-gray-100 text-[#667085]"
+          >
+            <div className="flex items-center gap-2">
+              <LogOut size={16} />
+              <span>Logout</span>
+            </div>
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 
-  return (
-    <>
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 h-screen bg-white shadow-lg sticky top-0">
-        <SidebarContent />
-      </aside>
-
-      {/* Backdrop for mobile */}
-      {isOpen && (
-        <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={onClose} />
-      )}
-
-      {/* Mobile slide-in */}
-      <aside
-        className={cn(
-          "fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 lg:hidden",
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        <SidebarContent />
-      </aside>
-    </>
-  );
+  // Return only the content (do not render extra asides). MainLayout already provides Sider / Drawer wrappers.
+  return <SidebarContent className="shadow-lg" />;
 }
