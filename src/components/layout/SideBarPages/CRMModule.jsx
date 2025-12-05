@@ -449,7 +449,7 @@ export default function CRMModule() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Customer Relationship Management</h1>
+          <h1 className="text-[30px] font-bold text-[#1F2937]">Customer Relationship Management</h1>
           <p className="text-gray-500 mt-1">Manage leads, track engagement, and boost loyalty</p>
         </div>
 
@@ -462,15 +462,16 @@ export default function CRMModule() {
 
 
       <div className="grid grid-cols-4 gap-4">
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
   <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
     <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
      stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M17 21v-2a4 4 0 0 0-3-3.87"/>
-  <path d="M7 21v-2a4 4 0 0 1 3-3.87"/>
-  <circle cx="12" cy="7" r="4"/>
+  <circle cx="8" cy="7" r="3"/>
+  <path d="M4 17v-1a4 4 0 0 1 8 0v1"/>
+  <circle cx="17" cy="9" r="3"/>
+  <path d="M13.5 17v-1a4 4 0 0 1 7 0v1"/>
 </svg>
 </div>
     </div>
@@ -481,7 +482,7 @@ export default function CRMModule() {
 </p>
   <p className="text-gray-600 text-sm">0 New</p>
 </div>
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
   <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#E7EBFF] rounded-xl flex items-center justify-center">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
@@ -497,7 +498,7 @@ export default function CRMModule() {
   <p className="text-gray-600 text-sm">0 High Value</p>
 </div>
 
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
   <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#E8FFEF] rounded-xl flex items-center justify-center">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
@@ -519,7 +520,7 @@ export default function CRMModule() {
 </p>
   <p className="text-gray-600 text-sm">Avg per customer</p>
 </div>
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
   <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none"

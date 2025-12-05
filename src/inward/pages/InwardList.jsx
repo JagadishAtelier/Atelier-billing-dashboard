@@ -386,29 +386,28 @@ function InwardList() {
                   >
                     {inv.status ?? "-"}
                   </td>
-
-                  
-
                   <td className="py-4 px-4 border-b border-gray-300 flex gap-2">
-                    <button
-                      onClick={() => handleView(inv.id)}
-                      className="bg-[#506ee4] !text-white py-1 px-3 text-xs font-semibold rounded-sm hover:opacity-90 inline-flex items-center gap-1"
+                  <button
+                    onClick={() => handleView(inv.id)}
+                    className="p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 bg-transparent"
                     >
-                      <Eye size={14} />
-                    </button>
-                    <button
-                      onClick={() => handleEdit(inv.id)}
-                      className="flex bg-[#f6f7ff] items-center gap-1 px-2 py-1 !text-[#000] rounded text-sm"
-                    >
-                      <Edit size={16} className="text-black" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(inv.id)}
-                      className="flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded text-sm"
-                    >
-                      <Trash2 size={16} className="text-white" />
-                    </button>
-                  </td>
+                  <Eye size={16} />
+                  </button>
+                  <button
+                  onClick={() => handleEdit(inv.id)}
+                 className="flex bg-[#f6f7ff] items-center gap-1 px-2 py-1 text-black rounded text-sm"
+  >
+                <Edit size={16} />
+              </button>
+              <button
+              onClick={() => handleDelete(inv.id)}
+              className="p-2 rounded-md bg-white border border-red-500 text-red-500 hover:bg-red-50"
+          >
+            <Trash2 size={16} />
+              </button>
+
+              </td>
+
                 </tr>
               ))
             ) : (

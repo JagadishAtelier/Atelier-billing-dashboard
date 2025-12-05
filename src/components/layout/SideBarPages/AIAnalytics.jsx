@@ -77,11 +77,13 @@ export default function AIAnalytics() {
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
   <Brain className="w-8 h-8 text-purple-600" />
-  <span className="text-[22px] font-normal text-gray-800">
+
+  <h1 className="text-[30px] font-bold text-[#1F2937]">
     AI-Powered Analytics
-  </span>
+  </h1>
+
   <span
   className="flex items-center gap-2 text-white text-xs font-semibold px-3 py-1 rounded-full"
   style={{
@@ -93,15 +95,18 @@ export default function AIAnalytics() {
 </span>
 </div>
 
-          <p className="text-gray-500 mt-1 text-sm">
-            Intelligent predictions and automated recommendations for your business
-          </p>
+<p className="text-gray-500 text-sm mt-1">
+  Intelligent predictions and automated recommendations for your business
+</p>
+
         </div>
 
         <button
   onClick={handleGenerateReorder}
   disabled={isGenerating}
-  className="px-5 py-2 rounded-lg text-white font-medium bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 flex items-center shadow"
+  className="px-5 py-2 rounded-lg text-white font-medium 
+  flex items-center shadow hover:opacity-90 
+  bg-[linear-gradient(90deg,#4D6BFF,#A066FF)]"
 >
   {isGenerating ? (
     <div className="flex items-center gap-2">
@@ -115,13 +120,12 @@ export default function AIAnalytics() {
     </>
   )}
 </button>
-
       </div>
 
       <div className="grid grid-cols-4 gap-4">
 
   {/* ================= STOCK RUNOUT ALERTS ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
   <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
     <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
@@ -137,7 +141,6 @@ export default function AIAnalytics() {
     <polyline points="12 6 12 12 16 14" />
   </svg>
 </div>
-
     </div>
 
     <h2 className="text-3xl font-bold text-[#1F2937]">4</h2>
@@ -150,14 +153,18 @@ export default function AIAnalytics() {
   <p className="text-gray-600 text-sm">Next 30 days</p>
 </div>
   {/* ================= PREDICTED SALES ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
   <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#E7EBFF] rounded-xl flex items-center justify-center">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1E55FF" strokeWidth="2">
-          <polyline points="4 14 10 8 14 12 20 6" />
-        </svg>
+    <svg width="120" height="120" viewBox="0 0 24 24" fill="none"
+     stroke="#1E55FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="14" width="3" height="7" rx="1" fill="#1E55FF" />
+  <rect x="9" y="10" width="3" height="11" rx="1" fill="#1E55FF" />
+  <rect x="15" y="6" width="3" height="15" rx="1" fill="#1E55FF" />
+  <polyline points="3 14 9 8 15 12 21 6" stroke="#00A637" stroke-width="2"/>
+  <polyline points="19 6 21 4 23 6" stroke="#00A637" stroke-width="2"/>
+</svg>
     </div>
-
     <h2 className="text-3xl font-bold text-[#1F2937]">$58K</h2>
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
@@ -168,13 +175,16 @@ export default function AIAnalytics() {
 </div>
 
   {/* ================= FAST-MOVING ITEMS ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
   <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#E8FFEF] rounded-xl flex items-center justify-center">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00A637" strokeWidth="2">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 13 10" />
-        </svg>
-
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+  stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 12h10" />
+  <path d="M6 8h12" />
+  <path d="M6 16h8" />
+  <circle cx="19" cy="12" r="3" />
+</svg>
     </div>
 
     <h2 className="text-3xl font-bold text-[#1F2937]">4</h2>
@@ -186,14 +196,15 @@ export default function AIAnalytics() {
 </div>
 
   {/* ================= SLOW MOVERS ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
   <div className="flex items-center gap-3">
     <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" 
-     stroke="#FF6A00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+     stroke="#00A637" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M3 6 L9 12 L13 8 L21 16" />
   <polyline points="21 12 21 16 17 16" />
 </svg>
+
   </div>
 
     <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
@@ -234,10 +245,11 @@ export default function AIAnalytics() {
       ------------------------------------------------------------ */}
   {tab === "predictions" && (
   <>
-    <h2 className="text-[15px]  !font-normal font-[300] flex items-center gap-2 mb-4 text-gray-900">
-      <Brain className="w-6 h-6 text-purple-600" />
-      AI Stock Runout Prediction
-    </h2>
+   <h2 className="text-base font-medium text-gray-900 flex items-center gap-2 mb-4">
+  <Brain className="w-6 h-6 text-purple-600" />
+  AI Stock Runout Prediction
+</h2>
+
 
     <div className="space-y-4">
       {predictedStockData.map((item, i) => (
@@ -271,9 +283,13 @@ export default function AIAnalytics() {
                       </div>
 
             </div>
-            <button className="px-4 py-2 rounded-md text-white font-medium text-[15px] bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 shadow">
-              <span className="text-white">Reorder {item.reorderQty} Units</span>
-              </button>
+            <button
+  className="px-4 py-2 rounded-md text-white font-medium text-[15px] hover:opacity-90 shadow"
+  style={{ background: "linear-gradient(90deg, #4D6BFF, #A066FF)" }}
+>
+  <span className="text-white">Reorder {item.reorderQty} Units</span>
+</button>
+
               </div>
               <div className="mt-4">
                 <div className="flex justify-between text-[15px] text-white mb-1 font-medium">
