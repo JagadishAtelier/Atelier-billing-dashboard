@@ -461,98 +461,81 @@ export default function CRMModule() {
       </div>
 
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-3">
-  {/* TOTAL LEADS */}
-  <div className="bg-white rounded-2xl shadow-sm px-5 py-4 h-[140px]">
-    <div className="flex gap-3 items-start">
-
-      {/* Icon */}
-      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#FFECE0]">
-        <img src="/icon/crm-leads.svg" className="w-10 h-10" />
-      </div>
-
-      {/* Number + Title */}
-      <div className="flex flex-col">
-        <p className="text-3xl font-semibold text-[#111827] leading-tight">{leads.length}</p>
-        <p className="text-gray-600 font-semibold text-[13px] mt-1 tracking-wide">
-          TOTAL LEADS
-        </p>
-      </div>
+      <div className="grid grid-cols-4 gap-4">
+  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="flex items-center gap-3">
+    <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
+    <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+     stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M17 21v-2a4 4 0 0 0-3-3.87"/>
+  <path d="M7 21v-2a4 4 0 0 1 3-3.87"/>
+  <circle cx="12" cy="7" r="4"/>
+</svg>
+</div>
     </div>
-    <p className="text-gray-500 text-[14px] mt-1">
-  {leads.filter(l => (l.status || "new") === "new").length} New
-</p>
+    <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
   </div>
-  {/* ACTIVE CUSTOMERS */}
-  <div className="bg-white rounded-2xl shadow-sm px-5 py-4 h-[140px]">
-    <div className="flex gap-3 items-start">
-
-      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#EEE8FF]">
-        <img src="/icon/crm-customers.svg" className="w-10 h-10" />
-      </div>
-
-      <div className="flex flex-col">
-        <p className="text-3xl font-semibold text-[#111827] leading-tight">
-          {customers.filter(c => c.is_active !== false).length}
-        </p>
-        <p className="text-gray-600 font-semibold text-[13px] mt-1 tracking-wide">
-          ACTIVE CUSTOMERS
-        </p>
-      </div>
+  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
+  TOTAL LEADS
+</p>
+  <p className="text-gray-600 text-sm">0 New</p>
+</div>
+  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="flex items-center gap-3">
+    <div className="w-14 h-14 bg-[#E7EBFF] rounded-xl flex items-center justify-center">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+     stroke="#1E55FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="13 2 3 14 12 14 11 22 21 10 13 10" />
+</svg>
     </div>
-    <p className="text-gray-500 text-[14px] mt-1">
-  {customers.filter(c => c.segment === "high_value").length} High Value
-</p>
+    <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
   </div>
+  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
+  ACTIVE CUSTOMER
+</p>
+  <p className="text-gray-600 text-sm">0 High Value</p>
+</div>
 
+  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="flex items-center gap-3">
+    <div className="w-14 h-14 bg-[#E8FFEF] rounded-xl flex items-center justify-center">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+     stroke="#00A637" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="14" width="3" height="6" rx="1" />
+  <rect x="8" y="10" width="3" height="10" rx="1" />
+  <rect x="13" y="6" width="3" height="14" rx="1" />
+  <path d="M18 4h4" />
+  <path d="M18 8h4" />
+  <path d="M22 4c0 4-4 6-6 6h2c3 0 4 2 4 5" />
 
-  {/* CUSTOMER LTV */}
-  <div className="bg-white rounded-2xl shadow-sm px-5 py-4 h-[140px]">
-    <div className="flex gap-3 items-start">
+</svg>
 
-      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#FFF1C9]">
-        <img src="/icon/crm-ltv.svg" className="w-10 h-10" />
-      </div>
-
-      <div className="flex flex-col">
-        <p className="text-3xl font-semibold text-[#111827] leading-tight">
-          ₹{(
-            (customers.reduce((s, c) => s + (c.totalSpent || 0), 0) /
-              Math.max(customers.length || 1, 1)) /
-            1000
-          ).toFixed(1)}K
-        </p>
-        <p className="text-gray-600 font-semibold text-[13px] mt-1 tracking-wide">
-          CUSTOMER LTV
-        </p>
-      </div>
     </div>
-    <p className="text-gray-500 text-[14px] mt-1">
-  Avg per customer
-</p>
+    <h2 className="text-3xl font-bold text-[#1F2937]">₹0.5K</h2>
   </div>
-
-
-  {/* CONVERSION RATE */}
-  <div className="bg-white rounded-2xl shadow-sm px-5 py-4 h-[140px]">
-    <div className="flex gap-3 items-start">
-
-      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#E3FFE8]">
-        <img src="/icon/crm-conversion.svg" className="w-10 h-10" />
-      </div>
-
-      <div className="flex flex-col">
-        <p className="text-3xl font-semibold text-[#111827] leading-tight">24%</p>
-        <p className="text-gray-600 font-semibold text-[13px] mt-1 tracking-wide">
-          CONVERSION RATE
-        </p>
-      </div>
-    </div>
-    <p className="text-gray-500 text-[14px] mt-1">
-  +5% this month
+  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
+  CUSTOMER LTV
 </p>
+  <p className="text-gray-600 text-sm">Avg per customer</p>
+</div>
+  <div className="bg-white rounded-xl shadow-sm p-5 h-[140px]">
+  <div className="flex items-center gap-3">
+    <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+     stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="6" y1="18" x2="18" y2="6" />
+  <circle cx="7" cy="7" r="3" />
+  <circle cx="17" cy="17" r="3" />
+</svg>
   </div>
-
+    <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
+  </div>
+  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
+  CONVERSION RATE
+</p>
+  <p className="text-gray-600 text-sm">+5% this month</p>
+</div>
 </div>
 
       {/* Tabs */}
