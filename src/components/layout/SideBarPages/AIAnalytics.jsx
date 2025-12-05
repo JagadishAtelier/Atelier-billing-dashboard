@@ -125,95 +125,129 @@ export default function AIAnalytics() {
       <div className="grid grid-cols-4 gap-4">
 
   {/* ================= STOCK RUNOUT ALERTS ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
-  <div className="flex items-center gap-3">
-    <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-    <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-  <svg 
-    width="40" 
-    height="40" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="#FF6A00" 
-    strokeWidth="2"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <polyline points="12 6 12 12 16 14" />
-  </svg>
-</div>
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="flex items-start justify-between">
+
+    {/* ICON + NUMBER */}
+    <div className="flex items-center gap-3">
+      <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" strokeWidth="2">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      </div>
+      <h2 className="text-3xl font-bold text-[#1F2937]">4</h2>
     </div>
 
-    <h2 className="text-3xl font-bold text-[#1F2937]">4</h2>
-  </div>
+    {/* ARROW → */}
+    <div className="w-10 h-10 rounded-full bg-[#F5F5FF] shadow flex items-center justify-center cursor-pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B3F51" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12h14" />
+        <path d="M13 6l6 6-6 6" />
+      </svg>
+    </div>
 
+  </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  STOCK ALERTS
 </p>
 
-  <p className="text-gray-600 text-sm">Next 30 days</p>
+  <p className="text-gray-600 text-sm">Stock alerts</p>
 </div>
+
   {/* ================= PREDICTED SALES ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
-  <div className="flex items-center gap-3">
-    <div className="w-14 h-14 bg-[#E7EBFF] rounded-xl flex items-center justify-center">
-    <svg width="120" height="120" viewBox="0 0 24 24" fill="none"
-     stroke="#1E55FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="3" y="14" width="3" height="7" rx="1" fill="#1E55FF" />
-  <rect x="9" y="10" width="3" height="11" rx="1" fill="#1E55FF" />
-  <rect x="15" y="6" width="3" height="15" rx="1" fill="#1E55FF" />
-  <polyline points="3 14 9 8 15 12 21 6" stroke="#00A637" stroke-width="2"/>
-  <polyline points="19 6 21 4 23 6" stroke="#00A637" stroke-width="2"/>
-</svg>
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="flex items-start justify-between">
+
+    {/* ICON + NUMBER */}
+    <div className="flex items-center gap-3">
+      <div className="w-14 h-14 bg-[#E7EBFF] rounded-xl flex items-center justify-center">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1E55FF" strokeWidth="2">
+          <rect x="3" y="14" width="3" height="7" rx="1" fill="#1E55FF" />
+          <rect x="9" y="10" width="3" height="11" rx="1" fill="#1E55FF" />
+          <rect x="15" y="6" width="3" height="15" rx="1" fill="#1E55FF" />
+          <polyline points="3 14 9 8 15 12 21 6" stroke="#00A637" strokeWidth="2" />
+        </svg>
+      </div>
+      <h2 className="text-3xl font-bold text-[#1F2937]">$58K</h2>
     </div>
-    <h2 className="text-3xl font-bold text-[#1F2937]">$58K</h2>
+
+    {/* ARROW → */}
+    <div className="w-10 h-10 rounded-full bg-[#F0F2FF] shadow flex items-center justify-center cursor-pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B3F51" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12h14" />
+        <path d="M13 6l6 6-6 6" />
+      </svg>
+    </div>
+
   </div>
+
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  PREDICTED SALES
 </p>
 
-  <p className="text-gray-600 text-sm">Next month</p>
-</div>
+  <p className="text-gray-600 text-sm">Predicted sales</p></div>
+
 
   {/* ================= FAST-MOVING ITEMS ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
-  <div className="flex items-center gap-3">
-    <div className="w-14 h-14 bg-[#E8FFEF] rounded-xl flex items-center justify-center">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-  stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M3 12h10" />
-  <path d="M6 8h12" />
-  <path d="M6 16h8" />
-  <circle cx="19" cy="12" r="3" />
-</svg>
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="flex items-start justify-between">
+
+    {/* ICON + NUMBER */}
+    <div className="flex items-center gap-3">
+      <div className="w-14 h-14 bg-[#E8FFEF] rounded-xl flex items-center justify-center">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" strokeWidth="2">
+          <path d="M3 12h10" />
+          <path d="M6 8h12" />
+          <path d="M6 16h8" />
+          <circle cx="19" cy="12" r="3" />
+        </svg>
+      </div>
+      <h2 className="text-3xl font-bold text-[#1F2937]">4</h2>
     </div>
 
-    <h2 className="text-3xl font-bold text-[#1F2937]">4</h2>
+    {/* ARROW → */}
+    <div className="w-10 h-10 rounded-full bg-[#F3FFF5] shadow flex items-center justify-center cursor-pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B3F51" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12h14" />
+        <path d="M13 6l6 6-6 6" />
+      </svg>
+    </div>
+
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  FAST-MOVING ITEMS
 </p>
-  <p className="text-gray-600 text-sm">High velocity</p>
+  <p className="text-gray-600 text-sm">Fastmoving items</p>
 </div>
+
 
   {/* ================= SLOW MOVERS ================= */}
-  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
-  <div className="flex items-center gap-3">
-    <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" 
-     stroke="#00A637" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M3 6 L9 12 L13 8 L21 16" />
-  <polyline points="21 12 21 16 17 16" />
-</svg>
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="flex items-start justify-between">
 
-  </div>
+    {/* ICON + NUMBER */}
+    <div className="flex items-center gap-3">
+      <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00A637" strokeWidth="2">
+          <path d="M3 6 L9 12 L13 8 L21 16" />
+          <polyline points="21 12 21 16 17 16" />
+        </svg>
+      </div>
+      <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
+    </div>
 
-    <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
+    {/* ARROW → */}
+    <div className="w-10 h-10 rounded-full bg-[#FFF1E9] shadow flex items-center justify-center cursor-pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B3F51" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12h14" />
+        <path d="M13 6l6 6-6 6" />
+      </svg>
+    </div>
+
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  SLOW MOVERS
 </p>
-  <p className="text-gray-600 text-sm">Needs action</p>
+  <p className="text-gray-600 text-sm">Slow movers</p>
 </div>
+
 </div>
 
 

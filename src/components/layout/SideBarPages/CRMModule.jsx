@@ -22,6 +22,7 @@ import leadsService from "./services/leadsService"; // adjust path if needed
 import userService from "./services/userService"; // adjust path if needed
 import customersService from "./services/customersService"; // adjust path if needed
 
+
 export default function CRMModule() {
   // Data state
   const [leads, setLeads] = useState([]);
@@ -462,81 +463,137 @@ export default function CRMModule() {
 
 
       <div className="grid grid-cols-4 gap-4">
-  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
-  <div className="flex items-center gap-3">
+      <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+
+<div className="flex items-start justify-between">
+  
+  {/* LEFT: ICON + NUMBER */}
+  <div className="flex items-center gap-4">
+    
+    {/* ICON BOX */}
     <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-    <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-     stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="8" cy="7" r="3"/>
-  <path d="M4 17v-1a4 4 0 0 1 8 0v1"/>
-  <circle cx="17" cy="9" r="3"/>
-  <path d="M13.5 17v-1a4 4 0 0 1 7 0v1"/>
-</svg>
-</div>
+      <img src="/icon/crm-leads.svg" className="w-8 h-8" />
     </div>
+
+    {/* NUMBER */}
     <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
   </div>
-  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  TOTAL LEADS
-</p>
-  <p className="text-gray-600 text-sm">0 New</p>
+
+  {/* ARROW BUTTON */}
+  <div className="w-10 h-10 rounded-full bg-[#FFF4EC] shadow flex items-center justify-center">
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#3B3F51"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M5 12h14" />
+    <path d="M13 6l6 6-6 6" />
+  </svg>
 </div>
-  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
-  <div className="flex items-center gap-3">
-    <div className="w-14 h-14 bg-[#E7EBFF] rounded-xl flex items-center justify-center">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-     stroke="#1E55FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <polyline points="13 2 3 14 12 14 11 22 21 10 13 10" />
-</svg>
+
+</div>
+
+<p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
+  
+</p>
+  <p className="text-gray-600 text-sm">Total leads</p>
+
+</div>
+<div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="flex items-start justify-between">
+
+    <div className="flex items-center gap-4">
+      <div className="w-14 h-14 bg-[#E7EBFF] rounded-xl flex items-center justify-center">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+          stroke="#1E55FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="13 2 3 14 12 14 11 22 21 10 13 10" />
+        </svg>
+      </div>
+
+      <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
     </div>
-    <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
-  </div>
-  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  ACTIVE CUSTOMER
-</p>
-  <p className="text-gray-600 text-sm">0 High Value</p>
-</div>
 
-  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
-  <div className="flex items-center gap-3">
-    <div className="w-14 h-14 bg-[#E8FFEF] rounded-xl flex items-center justify-center">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-     stroke="#00A637" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="3" y="14" width="3" height="6" rx="1" />
-  <rect x="8" y="10" width="3" height="10" rx="1" />
-  <rect x="13" y="6" width="3" height="14" rx="1" />
-  <path d="M18 4h4" />
-  <path d="M18 8h4" />
-  <path d="M22 4c0 4-4 6-6 6h2c3 0 4 2 4 5" />
-
-</svg>
-
+    {/* ARROW → */}
+    <div className="w-10 h-10 rounded-full bg-[#EEF1FF] shadow flex items-center justify-center">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="#3B3F51" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12h14" />
+        <path d="M13 6l6 6-6 6" />
+      </svg>
     </div>
-    <h2 className="text-3xl font-bold text-[#1F2937]">₹0.5K</h2>
+
+  </div>
+
+  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
+  
+  </p>
+    <p className="text-gray-600 text-sm">Active customer</p>
+  </div>
+
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="flex items-start justify-between">
+    <div className="flex items-center gap-4">
+      <div className="w-14 h-14 bg-[#E8FFEF] rounded-xl flex items-center justify-center">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+          stroke="#00A637" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="14" width="3" height="6" rx="1" />
+          <rect x="8" y="10" width="3" height="10" rx="1" />
+          <rect x="13" y="6" width="3" height="14" rx="1" />
+          <path d="M18 4h4" />
+          <path d="M18 8h4" />
+          <path d="M22 4c0 4-4 6-6 6h2c3 0 4 2 4 5" />
+        </svg>
+      </div>
+      <h2 className="text-3xl font-bold text-[#1F2937]">₹0.5K</h2>
+    </div>
+
+    {/* ARROW → */}
+    <div className="w-10 h-10 rounded-full bg-[#E8FFEF] shadow flex items-center justify-center">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="#3B3F51" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12h14" />
+        <path d="M13 6l6 6-6 6" />
+      </svg>
+    </div>
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  CUSTOMER LTV
-</p>
-  <p className="text-gray-600 text-sm">Avg per customer</p>
-</div>
-  <div className="bg-white rounded-xl shadow-sm p-3 h-[130px]">
-  <div className="flex items-center gap-3">
-    <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-     stroke="#FF6A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <line x1="6" y1="18" x2="18" y2="6" />
-  <circle cx="7" cy="7" r="3" />
-  <circle cx="17" cy="17" r="3" />
-</svg>
+  
+  </p>
+    <p className="text-gray-600 text-sm">Customer Ltv</p>
   </div>
-    <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
+  <div className="bg-white rounded-2xl shadow-sm p-4 w-[260px] h-[130px] border border-gray-200">
+  <div className="flex items-start justify-between">
+
+    <div className="flex items-center gap-4">
+      <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+          stroke="#FF6A00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="6" y1="18" x2="18" y2="6" />
+          <circle cx="7" cy="7" r="3" />
+          <circle cx="17" cy="17" r="3" />
+        </svg>
+      </div>
+      <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
+    </div>
+
+    {/* ARROW → */}
+    <div className="w-10 h-10 rounded-full bg-[#FFF4EC] shadow flex items-center justify-center">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="#3B3F51" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12h14" />
+        <path d="M13 6l6 6-6 6" />
+      </svg>
+    </div>
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  CONVERSION RATE
-</p>
-  <p className="text-gray-600 text-sm">+5% this month</p>
-</div>
+  </p>
+    <p className="text-gray-600 text-sm">Conversion rate</p>
+  </div>
 </div>
 
       {/* Tabs */}
