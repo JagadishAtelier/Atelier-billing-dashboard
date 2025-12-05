@@ -17,7 +17,7 @@ const styles = {
 };
 export default function LowStockAlerts({ items = [], className = "", onItemClick }) {
   return (
-    <Card className="lg:col-span-2 border-0 shadow-lg" >
+    <Card className="lg:col-span-2 border-0 shadow-lg bg-white" >
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <AlertTriangle className="w-5 h-5 text-orange-600" />

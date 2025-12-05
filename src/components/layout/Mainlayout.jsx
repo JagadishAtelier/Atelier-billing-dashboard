@@ -184,7 +184,7 @@ const MainLayout = ({ menuItems }) => {
               bottom: 0,
               zIndex: 100,
               height: "100%",
-              backgroundColor:"#fff" ,
+              backgroundColor:"#fbfbfd" ,
               overflow: "auto",
             }}
           >
@@ -240,10 +240,10 @@ const MainLayout = ({ menuItems }) => {
           <Content
   onClick={handleContentClick}
   style={{
-    padding: 2,
+    padding: "20px",
     minHeight: `calc(100vh - 100px)`,
     overflow: "auto",
-    marginTop: 80,
+    marginTop: 60,
   }}
 >
 

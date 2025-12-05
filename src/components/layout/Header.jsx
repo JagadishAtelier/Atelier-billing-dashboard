@@ -81,7 +81,7 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
     <header
       style={{
         ...headerStyle,
-        height: 68.5,
+        height: 58.5,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -107,7 +107,7 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
       {/* RIGHT SIDE (No change) */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <Popover content={notificationContent} trigger="click" placement="bottomRight">
-          <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.96 }} aria-label="Notifications" style={{ position: "relative", padding: 8, borderRadius: 9999, background: theme === "dark" ? "#374151" : "#f3f4f6", border: "none", cursor: "pointer" }}>
+          <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.96 }} aria-label="Notifications" style={{ position: "relative", padding: 8, borderRadius: 10, background: theme === "dark" ? "#374151" : "#f3f4f6", border: "none", cursor: "pointer" }}>
             <Bell style={{ width: 20, height: 20, color: textColor }} />
             <span style={{ position: "absolute", top: -6, right: -6, minWidth: 18, height: 18, padding: "0 5px", borderRadius: 9999, background: "#ef4444", color: "#fff", fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.12)" }}>
               {recentBills.length}
@@ -118,12 +118,12 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
         <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
           
           <motion.button whileHover={{ scale: 1.03 }} style={{ display: "flex", gap: 10, alignItems: "center", padding: 6, borderRadius: 10, background: theme === "dark" ? "#374151" : "#f3f4f6", border: "none", cursor: "pointer" }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#3b82f6,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700 }}>JD</div>
+            <div style={{ width: 36, height: 30, borderRadius: 10, background: "linear-gradient(135deg,#3b82f6,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700 }}>JD</div>
             <div style={{ display: isMobile ? "none" : "flex", flexDirection: "column", alignItems: "flex-start" }}>
-              <span style={{ color: textColor, fontWeight: 700, fontSize: 14 }}>John Doe</span>
-              <span style={{ color: theme === "dark" ? "#9CA3AF" : "#6B7280", fontSize: 12 }}>Super Admin</span>
+              <span style={{ color: textColor, fontWeight: 600, fontSize: 12 }}>John Doe</span>
+              <span style={{ color: theme === "dark" ? "#9CA3AF" : "#6B7280", fontSize: 10 }}>Super Admin</span>
             </div>
-            <ChevronDown style={{ width: 16, height: 16, color: "#9ca3af" }} />
+            <ChevronDown style={{ width: 14, height: 14, color: "#9ca3af" }} />
           </motion.button>
         </Dropdown>
       </div>

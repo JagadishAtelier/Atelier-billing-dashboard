@@ -102,7 +102,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const SidebarContent = () => (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between w-full gap-2 px-4 h-[70px] bg-white" style={{ borderBottom: ".5px solid #66708550", alignItems: "center !important" }}>
+      <div className="flex items-center justify-between w-full gap-2 px-4 h-[60px] bg-white" style={{ borderBottom: ".5px solid #66708550", alignItems: "center !important" }}>
         <div className="flex items-center gap-2">
           <img src={logo} alt="logo" className="w-8 h-8 object-contain" />
           <h1 className="text-xl pt-2" style={{fontWeight:"700"}}>Atelier Inventory</h1>
@@ -127,7 +127,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 {/* parent item */}
                 <div
                   className={cn(
-                    "w-full flex items-center justify-between text-[#667085] rounded-md text-[16px]  gap-3 p-2 hover:bg-[#DDE4FF] transition-colors duration-200",
+                    "w-full flex items-center justify-between font-medium  text-[#667085] rounded-md text-[14.5px]  gap-3 p-2 hover:bg-[#DDE4FF] transition-colors duration-200",
                     active ? "bg-[#F2F5FF] !text-[#3D5EE1]" : "text-[#667085]"
                   )}
                 >
