@@ -85,7 +85,6 @@ export default function Sidebar({
     { to: "/inward/list", label: "Inward", icon: Truck },
     { to: "/return", label: "Returns", icon: Receipt },
     { to: "/crm-module", label: "CRM Module", icon: Users },
-    { to: "/ai-analytics", label: "AI Analytics", icon: Target },
     { to: "/report", label: "Reports", icon: FileText },
   ];
 
@@ -249,17 +248,7 @@ export default function Sidebar({
           Settings
         </div>
 
-        <div className="mt-2 flex items-center gap-2 justify-between">
-          <button
-            onClick={handleLogout}
-            className="w-full text-left font-medium p-2 rounded-md hover:bg-gray-100 text-[#667085]"
-          >
-            <div className="flex items-center gap-2">
-              <LogOut size={16} />
-              <span>Logout</span>
-            </div>
-          </button>
-        </div>
+        
       </div>
     </div>
   );

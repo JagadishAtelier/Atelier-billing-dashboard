@@ -22,6 +22,7 @@ import {
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb";
 import { Link } from "react-router-dom";
+
 import {
   ReceiptIndianRupee,
   Users,
@@ -349,45 +350,45 @@ const DashboardFull = () => {
   }, []);
 
   const summaryCards =
-  summary &&
-  [
-    {
-      id: "bills",
-      title: "Total Bills",
-      value: summary.totalBills ?? 0,
-      meta: "Number of bills",
-      icon: <img src={Billingicon} alt="Total Bills" className="w-8 h-8" />,
-      color: "#d27b3d16",
-      linkTo: "/billing/list",
-    },
-    {
-      id: "users",
-      title: "Total Users",
-      value: summary.totalUsers ?? 0,
-      meta: "Registered users",
-      icon: <img src={Usericon} alt="Total Users" className="w-8 h-8" />,
-      color: "#3b83f615",
-      linkTo: "/user",
-    },
-    {
-      id: "products",
-      title: "Total Products",
-      value: summary.totalProducts ?? 0,
-      meta: "Available products",
-      icon: <img src={Producticon} alt="Total Products" className="w-8 h-8" />,
-      color: "#5110b90e",
-      linkTo: "/product/list",
-    },
-    {
-      id: "revenue",
-      title: "Total Revenue",
-      value: `₹${summary.totalRevenue ?? 0}`,
-      meta: "Revenue generated",
-      icon: <img src={Walleticon} alt="Total Revenue" className="w-8 h-8" />,
-      color: "#4ab74011",
-      linkTo: "/report",
-    },
-  ];
+    summary &&
+    [
+      {
+        id: "bills",
+        title: "Total Bills",
+        value: summary.totalBills ?? 0,
+        meta: "Number of bills",
+        icon: <img src={Billingicon} alt="Total Bills" className="w-8 h-8" />,
+        color: "#d27b3d16",
+        linkTo: "/billing/list",
+      },
+      {
+        id: "users",
+        title: "Total Users",
+        value: summary.totalUsers ?? 0,
+        meta: "Registered users",
+        icon: <img src={Usericon} alt="Total Users" className="w-8 h-8" />,
+        color: "#3b83f615",
+        linkTo: "/user",
+      },
+      {
+        id: "products",
+        title: "Total Products",
+        value: summary.totalProducts ?? 0,
+        meta: "Available products",
+        icon: <img src={Producticon} alt="Total Products" className="w-8 h-8" />,
+        color: "#5110b90e",
+        linkTo: "/product/list",
+      },
+      {
+        id: "revenue",
+        title: "Total Revenue",
+        value: `₹${summary.totalRevenue ?? 0}`,
+        meta: "Revenue generated",
+        icon: <img src={Walleticon} alt="Total Revenue" className="w-8 h-8" />,
+        color: "#4ab74011",
+        linkTo: "/report",
+      },
+    ];
 
 
   return (
@@ -395,55 +396,55 @@ const DashboardFull = () => {
 
 
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1" style={{fontWeight:"700"}}>
-              Admin Dashboard
-            </h1>
-            <Text style={{ fontSize: 12, color: "#6b7280" }}>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1" style={{ fontWeight: "700" }}>
+            Admin Dashboard
+          </h1>
+          <Text style={{ fontSize: 12, color: "#6b7280" }}>
             Last updated: {lastUpdated || "—"}
           </Text>
-          </div>
-
-          <div className="flex flex-wrap gap-2 justify-start md:justify-end">
-            <Link
-              to="/product/add"
-              className="text-sm !bg-[#506EE4] py-2 px-3 !text-white shadow-sm rounded-sm"
-            >
-              Add Product
-            </Link>
-            <Link
-              to="/billing/add"
-              className="text-sm !bg-[#E9EDF4] py-2 px-3 !text-gray-700 shadow-sm rounded-sm"
-            >
-              Add Bill
-            </Link>
-          </div>
         </div>
+
+        <div className="flex flex-wrap gap-2 justify-start md:justify-end">
+          <Link
+            to="/product/add"
+            className="text-sm !bg-[#506EE4] py-2 px-3 !text-white shadow-sm rounded-sm"
+          >
+            Add Product
+          </Link>
+          <Link
+            to="/billing/add"
+            className="text-sm !bg-[#E9EDF4] py-2 px-3 !text-gray-700 shadow-sm rounded-sm"
+          >
+            Add Bill
+          </Link>
+        </div>
+      </div>
 
       {/* Summary */}
       <Row gutter={[12, 12]} style={{ marginTop: 12 }}>
-  {loadingSummary
-    ? [0, 1, 2, 3].map((i) => (
-        <Col xs={24} sm={12} md={12} lg={6} key={i}>
-          <Card style={{ borderRadius: 14 }}>
-            <Skeleton active paragraph={{ rows: 2 }} />
-          </Card>
-        </Col>
-      ))
-    : summaryCards.map((s) => (
-        <Col xs={24} sm={12} md={12} lg={6} key={s.id}>
-          <StatCard {...s} />
-        </Col>
-      ))}
-</Row>
+        {loadingSummary
+          ? [0, 1, 2, 3].map((i) => (
+            <Col xs={24} sm={12} md={12} lg={6} key={i}>
+              <Card style={{ borderRadius: 14 }}>
+                <Skeleton active paragraph={{ rows: 2 }} />
+              </Card>
+            </Col>
+          ))
+          : summaryCards.map((s) => (
+            <Col xs={24} sm={12} md={12} lg={6} key={s.id}>
+              <StatCard {...s} />
+            </Col>
+          ))}
+      </Row>
 
 
       {/* Charts */}
       <Row gutter={[12, 12]} style={{ marginTop: 16 }}>
         <Col xs={24}>
           <OverviewCharts
-            // salesData={loadingCharts ? undefined : salesData}
-            // categoryData={loadingCharts ? undefined : categoryData}
+          // salesData={loadingCharts ? undefined : salesData}
+          // categoryData={loadingCharts ? undefined : categoryData}
           />
         </Col>
       </Row>
@@ -461,7 +462,7 @@ const DashboardFull = () => {
             expandedRowKeys={expandedRowKeys}
             setExpandedRowKeys={setExpandedRowKeys}
           /> */}
-          
+
         </Col>
 
         {/* Incoming POs */}
@@ -499,7 +500,9 @@ const DashboardFull = () => {
                   justifyContent: "center",
                 }}
               >
-                <span style={{ color: "#0ea5e9" }}>→</span>
+                <span style={{ color: "#0ea5e9" }}>
+                  <Link to="/order">→</Link>
+                </span>
               </div>
             </div>
           </Card>
