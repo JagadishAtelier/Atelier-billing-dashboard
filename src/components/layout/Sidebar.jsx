@@ -52,11 +52,7 @@ export default function Sidebar({
   // keep internal openParent in sync when parent is controlled from outside
   useEffect(() => setOpenParent(selectedParentProp), [selectedParentProp]);
 
-  // reset open parent when route changes
-  useEffect(() => {
-    setOpenParent(null);
-  }, [pathname]);
-
+  // menu definition
   const menu = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     {
@@ -92,11 +88,16 @@ export default function Sidebar({
     if (!to) return false;
     if (children && children.length) {
       return children.some(
-        (c) => pathname === c.to || pathname.startsWith(c.to + "/") || pathname.startsWith(to + "/")
+        (c) =>
+          pathname === c.to ||
+          pathname.startsWith(c.to + "/") ||
+          pathname.startsWith(to + "/")
       );
     }
     return (
-      pathname === to || pathname.startsWith(to + "/") || pathname.includes(to.replace("/list", "").replace("/add", ""))
+      pathname === to ||
+      pathname.startsWith(to + "/") ||
+      pathname.includes(to.replace("/list", "").replace("/add", ""))
     );
   };
 
@@ -111,6 +112,37 @@ export default function Sidebar({
     setOpenParent(next);
     if (typeof setSelectedParent === "function") setSelectedParent(next);
   };
+
+  // helper to find which parent (if any) contains the current pathname
+  const findParentForPath = (path) => {
+    for (const p of menu) {
+      if (p.children && p.children.length) {
+        // check child routes
+        for (const c of p.children) {
+          if (path === c.to || path.startsWith(c.to + "/")) {
+            return p.to;
+          }
+        }
+      }
+      // also check parent direct route
+      if (p.to && (path === p.to || path.startsWith(p.to + "/"))) {
+        return p.to;
+      }
+    }
+    return null;
+  };
+
+  // When the route changes, open the parent that matches the current path.
+  // This keeps the parent expanded when a child link is clicked.
+  useEffect(() => {
+    const parentForPath = findParentForPath(pathname);
+    if (parentForPath) {
+      setOpenParent(parentForPath);
+      if (typeof setSelectedParent === "function") setSelectedParent(parentForPath);
+    }
+    // NOTE: do not forcibly close openParent if path doesn't match any parent.
+    // That preserves user-controlled open state.
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full shadow-lg">
@@ -220,6 +252,7 @@ export default function Sidebar({
                           to={child.to}
                           onClick={() => {
                             if (typeof onClose === "function") onClose();
+                            // DO NOT close the parent here — we want the parent to remain expanded
                           }}
                           className={cn(
                             "w-full text-[16px] py-2 px-3 rounded-md text-left !text-[#667085] hover:bg-gray-100",
@@ -247,8 +280,6 @@ export default function Sidebar({
           <Settings size={16} />
           Settings
         </div>
-
-        
       </div>
     </div>
   );

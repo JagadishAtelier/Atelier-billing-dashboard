@@ -12,7 +12,9 @@ import {
   Pie,
   Cell,
 } from "recharts";
+
 import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card";
+
 import {
   Select,
   SelectContent,
@@ -43,30 +45,30 @@ export default function OverviewCharts({
   salesData = defaultSalesData,
   categoryData = defaultCategoryData,
 }) {
-  const [filter, setFilter] = useState("monthly");
+  // FIX ✔ Separate filters
+  const [salesFilter, setSalesFilter] = useState("monthly");
+  const [categoryFilter, setCategoryFilter] = useState("monthly");
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      {/* Sales & Profit Overview */}
+      {/* SALES & PROFIT CHART */}
       <Card className="lg:col-span-2 border-0 shadow-lg bg-white">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-
             <span>Sales & Profit Overview</span>
 
-            {/* Dropdown Box */}
-            {/* Dropdown Box */}
-            <Select value={filter} onValueChange={(v) => setFilter(v)}>
+            {/* INDEPENDENT SELECT */}
+            <Select value={salesFilter} onValueChange={(v) => setSalesFilter(v)}>
               <SelectTrigger className="w-[140px] bg-white border border-gray-200 shadow-sm">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
-              <SelectContent className="bg-[#fff]">
-                <SelectItem value="monthly" className="hover:bg-gray-100">Monthly</SelectItem>
-                <SelectItem value="weekly" className="hover:bg-gray-100">Weekly</SelectItem>
+
+              <SelectContent className="bg-white" position="popper">
+                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
               </SelectContent>
             </Select>
-
 
           </CardTitle>
         </CardHeader>
@@ -74,12 +76,13 @@ export default function OverviewCharts({
         <CardContent>
           <div style={{ width: "100%", height: 320 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={salesData} margin={{ top: 8, right: 20, left: 0, bottom: 0 }}>
+              <AreaChart data={salesData}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.32} />
                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                   </linearGradient>
+
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.28} />
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
@@ -91,47 +94,40 @@ export default function OverviewCharts({
                 <YAxis stroke="#6b7280" />
                 <Tooltip />
 
-                <Area
-                  type="monotone"
-                  dataKey="sales"
-                  stroke="#3b82f6"
-                  fill="url(#colorSales)"
-                  strokeWidth={2}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="profit"
-                  stroke="#10b981"
-                  fill="url(#colorProfit)"
-                  strokeWidth={2}
-                />
+                <Area type="monotone" dataKey="sales" stroke="#3b82f6" fill="url(#colorSales)" strokeWidth={2} />
+                <Area type="monotone" dataKey="profit" stroke="#10b981" fill="url(#colorProfit)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>
 
-      {/* Sales by Category */}
+      {/* CATEGORY PIE CHART */}
       <Card className="border-0 shadow-lg bg-white">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Sales by Category</span>
-            <Select value={filter} onValueChange={(v) => setFilter(v)}>
+
+            {/* INDEPENDENT SELECT */}
+            <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v)}>
               <SelectTrigger className="w-[130px] bg-white border border-gray-200 shadow-sm">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
-              <SelectContent className="bg-[#fff]">
-                <SelectItem value="monthly" className="hover:bg-gray-100">Monthly</SelectItem>
-                <SelectItem value="weekly" className="hover:bg-gray-100">Weekly</SelectItem>
+
+              <SelectContent className="bg-white" position="popper">
+                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
               </SelectContent>
             </Select>
-            </CardTitle>
-          
+
+          </CardTitle>
         </CardHeader>
 
         <CardContent>
+
+          {/* PIE CHART */}
           <div style={{ width: "100%", height: 220 }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer>
               <PieChart>
                 <Pie
                   data={categoryData}
@@ -139,31 +135,30 @@ export default function OverviewCharts({
                   cy="50%"
                   innerRadius={50}
                   outerRadius={80}
-                  paddingAngle={4}
                   dataKey="value"
+                  paddingAngle={4}
                 >
                   {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    <Cell key={index} fill={entry.color} />
                   ))}
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
           </div>
 
+          {/* LEGEND */}
           <div className="mt-4 space-y-2">
             {categoryData.map((item) => (
               <div key={item.name} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: item.color }}
-                  />
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                   <span className="text-gray-600">{item.name}</span>
                 </div>
                 <span className="text-gray-900">{item.value}%</span>
               </div>
             ))}
           </div>
+
         </CardContent>
       </Card>
 
