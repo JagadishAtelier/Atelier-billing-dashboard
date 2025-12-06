@@ -629,7 +629,7 @@ function BillingForm() {
   ];
 
   const styles = {
-    page: { background: "#f1f6fb", minHeight: "100vh", padding: 12 },
+    page: { background: "fbfbfd", minHeight: "100vh", padding: 12 },
     container: { maxWidth: 1100, margin: "0 auto" },
     mainGrid: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: 18 },
     leftCard: { background: "#fff", borderRadius: 8, padding: 12 },

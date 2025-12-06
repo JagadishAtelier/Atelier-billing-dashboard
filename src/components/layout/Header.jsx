@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { Popover, Dropdown, List, Avatar, message } from "antd";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import { Bell, User, LogOut, ChevronDown } from "lucide-react";
+import { Bell, User, LogOut, ChevronDown, Search, Command } from "lucide-react";
 import { motion } from "framer-motion";
 import companyLogo from "../assets/Company_logo.png";
-import { Input } from "antd"; 
+import { Input } from "antd";
 
 const HeaderBar = ({ collapsed /* optional */ }) => {
   const { theme, headerBgColor, headerGradient } = useTheme();
@@ -98,12 +98,24 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
 
       {/* LEFT SIDE SEARCH INPUT ADDED HERE */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <Input.Search
-          placeholder="Search..."
-          style={{ width: 280, borderRadius: 8 }}
-          onSearch={(value) => console.log(value)}
-        />
+        <div className="relative w-56 sm:w-64 hidden sm:block">
+          <Input
+            type="text"
+            placeholder="Search"
+            className="!pl-[30px] pr-10 py-4 text-lg border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+          />
+
+          <Search
+            size={16}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          />
+
+          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 shadow-sm p-1 rounded-sm border border-gray-100 bg-white hover:bg-gray-50 cursor-pointer">
+            <Command size={14} className="text-gray-400" />
+          </div>
+        </div>
       </div>
+
 
       {/* RIGHT SIDE (No change) */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -117,15 +129,12 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
         </Popover>
 
         <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
-          
-          <motion.button whileHover={{ scale: 1.03 }} style={{ display: "flex", gap: 10, alignItems: "center", padding: 6, borderRadius: 10, background: theme === "dark" ? "#374151" : "#f3f4f6", border: "none", cursor: "pointer" }}>
-            <div style={{ width: 36, height: 30, borderRadius: 10, background: "linear-gradient(135deg,#3b82f6,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700 }}>JD</div>
-            <div style={{ display: isMobile ? "none" : "flex", flexDirection: "column", alignItems: "flex-start" }}>
-              <span style={{ color: textColor, fontWeight: 600, fontSize: 12 }}>John Doe</span>
-              <span style={{ color: theme === "dark" ? "#9CA3AF" : "#6B7280", fontSize: 10 }}>Super Admin</span>
-            </div>
-            <ChevronDown style={{ width: 14, height: 14, color: "#9ca3af" }} />
-          </motion.button>
+
+          <img
+              src="https://static.vecteezy.com/system/resources/thumbnails/049/174/246/small/a-smiling-young-indian-man-with-formal-shirts-outdoors-photo.jpg"
+              alt="user"
+              className="h-9 w-9 rounded-full border border-gray-200 object-cover cursor-pointer hover:ring-2 hover:ring-indigo-100"
+            />
         </Dropdown>
       </div>
 

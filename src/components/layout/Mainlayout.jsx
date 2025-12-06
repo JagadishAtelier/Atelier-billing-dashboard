@@ -184,7 +184,7 @@ const MainLayout = ({ menuItems }) => {
               bottom: 0,
               zIndex: 100,
               height: "100%",
-              backgroundColor:"#fbfbfd" ,
+              backgroundColor:"#fbfbfd",
               overflow: "auto",
               
             }}
@@ -244,7 +244,6 @@ const MainLayout = ({ menuItems }) => {
   style={{
     padding: "20px",
     minHeight: `calc(100vh - 100px)`,
-    overflow: "auto",
     marginTop: 60,
     backgroundColor: "#fbfbfd !important",
   }}

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "../lib/utils";
-import logo from "../assets/Dark Logo.png";
+import logo from "../assets/inlogo.png";
 import {
   Users,
   Settings,
@@ -148,14 +148,12 @@ export default function Sidebar({
     <div className="flex flex-col h-full shadow-lg">
       {/* Header */}
       <div
-        className="flex items-center justify-between w-full gap-2 px-4 h-[60px] bg-white"
+        className="flex  justify-between w-full gap-2  h-[60px] bg-white"
         style={{ borderBottom: ".5px solid #66708550", alignItems: "center" }}
       >
-        <div className="flex items-center gap-2">
-          <img src={logo} alt="logo" className="w-8 h-8 object-contain" />
-          <h1 className="text-xl pt-2" style={{ fontWeight: "700" }}>
-            Atelier Inventory
-          </h1>
+        <div className="flex itams-left">
+          <img src={logo} alt="logo" className="w-[350px] h-[210px] object-contain ml-[-20px]" />
+          
         </div>
 
         {/* Mobile close button (Drawer provides onClose) */}

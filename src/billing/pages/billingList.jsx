@@ -38,6 +38,7 @@ import billingService from "../service/billingService.js";
 import debounce from "lodash.debounce";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
+import { Table2, Book } from "lucide-react";
 
 const { Search } = Input;
 
@@ -406,7 +407,7 @@ function BillingList() {
               ]}
             />
 
-            <Tabs
+            {/* <Tabs
               activeKey={typeFilter}
               onChange={(key) => {
                 setTypeFilter(key);
@@ -418,7 +419,7 @@ function BillingList() {
                 { key: "mobile", label: "Mobile" },
                 { key: "casier", label: "Casier" },
               ]}
-            />
+            /> */}
           </Space>
         </Col>
 
@@ -439,9 +440,10 @@ function BillingList() {
               optionType="button"
               buttonStyle="solid"
               className="view-mode-radio"
+              style={{display:"flex"}}
             >
-              <Radio.Button  value="table">Table</Radio.Button>
-              <Radio.Button value="card">Card</Radio.Button>
+              <Radio.Button  value="table" style={{display:"flex",  alignItems:"center", justifyContent:"center", width:"40px"}}><Table2 className="h-4 w-4" /></Radio.Button>
+              <Radio.Button value="card" style={{display:"flex", alignItems:"center", justifyContent:"center", width:"40px"}}><Book className="h-4 w-4" /></Radio.Button>
             </Radio.Group>
           </Space>
         </Col>
