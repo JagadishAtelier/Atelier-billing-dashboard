@@ -9,13 +9,14 @@ export default function StatCard({
   percentage,
   meta,
   icon,
-  color = "#3b82f6", // fallback color if not provided
+  color = "#3b82f6",
   linkTo,
+  arrowColor = "#000", 
 }) {
   const isPositive = percentage >= 1;
 
   // compute a simple readable icon color (white for colored background)
-  const arrowIconColor = "#000";
+  const arrowIconColor = arrowColor;
 
   return (
     <motion.div

@@ -548,12 +548,27 @@ export default function CRMModule() {
 
       {/* Tabs */}
       <div className="mt-4">
-        <div className="flex items-center gap-8 bg-white border border-gray-300 px-6 py-2 rounded-full shadow-sm w-fit">
-          {[{ key: "leads", label: "Leads Pipeline" }, { key: "customers", label: "Customer Insights" }, { key: "analytics", label: "Analytics" }].map((t) => (
-            <button key={t.key} onClick={() => setActiveTab(t.key)} className={`text-sm font-medium transition ${activeTab === t.key ? "text-purple-600 font-semibold" : "text-gray-800"}`}>{t.label}</button>
-          ))}
-        </div>
+  <div className="flex items-center gap-4 bg-white border border-gray-300 px-3 py-2 rounded-full shadow-sm w-fit">
+    {[
+      { key: "leads", label: "Leads Pipeline" },
+      { key: "customers", label: "Customer Insights" },
+      { key: "analytics", label: "Analytics" }
+    ].map((t) => (
+      <button
+  key={t.key}
+  onClick={() => setActiveTab(t.key)}
+  className={`
+    text-sm font-medium px-4 py-1 rounded-full transition-all
+    ${activeTab === t.key 
+      ? "bg-[#4F6CFB] !text-white shadow-sm"   // FORCE WHITE TEXT
+      : "bg-transparent text-gray-800"}
+  `}
+>
+  {t.label}
+</button>
 
+    ))}
+  </div>
         {/* Leads Tab */}
         {activeTab === "leads" && (
           <div className="space-y-6 mt-6">
