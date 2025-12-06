@@ -98,7 +98,7 @@ const commonColorSchemes = [
     name: "Default Light",
     headerBgColor: "#ffffff",
     sidebarBgColor: "#ffffff",
-    contentBgColor: "#f9fafb",
+    contentBgColor: "#fbfbfd",
     footerBgColor: "#f4e6ff",
     primaryColor: "#8e2de2",
     headerGradient: "linear-gradient(90deg, #722ed1 0%, #9254de 100%)",
