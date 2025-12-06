@@ -446,8 +446,8 @@ export default function CRMModule() {
 
   // UI -------------------------------------------------------------------
   return (
-    <div className="p-2 space-y-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-      {/* Header */}
+    <div className="min-h-screen w-full bg-white px-4 py-4">
+    {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[30px] font-bold text-[#1F2937]">Customer Relationship Management</h1>
@@ -536,9 +536,10 @@ export default function CRMModule() {
     </div>
 
     {/* Ret*/}
-    <div className="px-3 py-1 rounded-md bg-[#4C6EF5] flex items-center justify-center">
+    <div className="px-3 py-1 rounded-md bg-[#A0522D] flex items-center justify-center">
   <span className="text-white text-sm font-semibold">2.5%</span>
 </div>
+
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
   </p>
@@ -560,7 +561,7 @@ export default function CRMModule() {
   className={`
     text-sm font-medium px-4 py-1 rounded-full transition-all
     ${activeTab === t.key 
-      ? "bg-[#4F6CFB] !text-white shadow-sm"   // FORCE WHITE TEXT
+      ? "bg-[#4F6CFB] !text-white shadow-sm"   
       : "bg-transparent text-gray-800"}
   `}
 >
@@ -575,12 +576,12 @@ export default function CRMModule() {
             <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm">
               <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 w-full">
                 <Search className="w-4 h-4 text-gray-400 mr-2" />
-                <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search leads..." className="bg-gray-100 w-full focus:outline-none text-sm text-gray-700" />
+                <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search leads..." className="bg-white w-full focus:outline-none text-sm text-gray-700" />
               </div>
 
               <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 cursor-pointer">
                 <Filter className="w-4 h-4 text-gray-500 mr-2" />
-                <select onChange={(e) => { const status = e.target.value; if (status === "all") fetchLeads(); else fetchLeads({ status }); }} className="bg-gray-100 text-sm text-gray-700 focus:outline-none">
+                <select onChange={(e) => { const status = e.target.value; if (status === "all") fetchLeads(); else fetchLeads({ status }); }} className="bg-white text-sm text-gray-700 focus:outline-none">
                   <option value="all">Filter by status</option>
                   <option value="New">New</option>
                   <option value="Contacted">Contacted</option>
