@@ -1,15 +1,8 @@
-<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Soft rounded background -->
-  <rect x="0" y="0" width="60" height="60" rx="16" fill="#F4F1FF"/>
-
-  <!-- Box -->
-  <rect x="18" y="20" width="24" height="18" rx="3" fill="#FFB300"/>
-  <rect x="18" y="20" width="24" height="6" fill="#FFCE47"/>
-
-  <!-- Rupee Symbol (LTV indicator) -->
-  <text x="22" y="36" font-size="12" fill="#333" font-family="Arial" font-weight="bold">₹</text>
-
-  <!-- Green Check Badge -->
-  <circle cx="38" cy="36" r="8" fill="#12C060"/>
-  <path d="M34 36l3 3 5-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="26" cy="26" r="10" fill="#FDBA74"/>
+  <circle cx="26" cy="26" r="7" fill="#F97316"/>
+  <path d="M23 22h7M23 25h6c2 0 3 1 3 3s-1 3-3 3h-6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M30 32l-2 3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M36 18l7-7 9 9" stroke="#16A34A" stroke-width="3" stroke-linecap="round"/>
+  <path d="M52 11v9h-9" stroke="#16A34A" stroke-width="3" stroke-linecap="round"/>
 </svg>

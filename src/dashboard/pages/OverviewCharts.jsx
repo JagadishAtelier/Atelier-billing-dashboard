@@ -1,5 +1,5 @@
 // src/components/OverviewCharts.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 
+// Default Data
 const defaultSalesData = [
   { name: "Mon", sales: 4000, purchases: 2400, profit: 1600 },
   { name: "Tue", sales: 3000, purchases: 1398, profit: 1602 },
@@ -45,9 +46,15 @@ export default function OverviewCharts({
   salesData = defaultSalesData,
   categoryData = defaultCategoryData,
 }) {
-  // FIX ✔ Separate filters
   const [salesFilter, setSalesFilter] = useState("monthly");
   const [categoryFilter, setCategoryFilter] = useState("monthly");
+  useEffect(() => {
+    const content = document.querySelector(".ant-layout-content");
+    if (content) {
+      content.style.overflowY = "scroll";    // scrollbar ALWAYS visible
+    }
+  }, []);
+  
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -58,7 +65,6 @@ export default function OverviewCharts({
           <CardTitle className="flex items-center justify-between">
             <span>Sales & Profit Overview</span>
 
-            {/* INDEPENDENT SELECT */}
             <Select value={salesFilter} onValueChange={(v) => setSalesFilter(v)}>
               <SelectTrigger className="w-[140px] bg-white border border-gray-200 shadow-sm">
                 <SelectValue placeholder="Select" />
@@ -108,7 +114,6 @@ export default function OverviewCharts({
           <CardTitle className="flex items-center justify-between">
             <span>Sales by Category</span>
 
-            {/* INDEPENDENT SELECT */}
             <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v)}>
               <SelectTrigger className="w-[130px] bg-white border border-gray-200 shadow-sm">
                 <SelectValue placeholder="Select" />
@@ -124,8 +129,6 @@ export default function OverviewCharts({
         </CardHeader>
 
         <CardContent>
-
-          {/* PIE CHART */}
           <div style={{ width: "100%", height: 220 }}>
             <ResponsiveContainer>
               <PieChart>
@@ -146,7 +149,6 @@ export default function OverviewCharts({
             </ResponsiveContainer>
           </div>
 
-          {/* LEGEND */}
           <div className="mt-4 space-y-2">
             {categoryData.map((item) => (
               <div key={item.name} className="flex items-center justify-between">

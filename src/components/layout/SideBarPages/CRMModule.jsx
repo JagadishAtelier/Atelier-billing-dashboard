@@ -477,11 +477,14 @@ export default function CRMModule() {
   <div className="flex items-center gap-4">
     
     {/* ICON BOX */}
-    <div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
-      <img src="/icon/crm-leads.svg" className="w-8 h-8" />
-    </div>
+    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent border border-gray-200">
+  <img src="/icon/leads.gif" className="w-10 h-10" alt="Leads Icon" />
+</div>
 
-    {/* NUMBER */}
+
+
+
+{/* NUMBER */}
     <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
   </div>
 
@@ -498,14 +501,16 @@ export default function CRMModule() {
 <div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
-    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#E7EBFF]">
-  <img src="/icon/crm-customers.svg" className="w-8 h-8" />
+    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+  <img src="/icon/customer-care.gif" className="w-10 h-10" alt="Customer Icon" />
 </div>
+
+
 <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
     </div>
     {/* ret*/}
-    <div className="px-3 py-1 rounded-md bg-[#4C6EF5] flex items-center justify-center">
-  <span className="text-white text-sm font-semibold">1.8%</span>
+    <div className="px-3 py-1 rounded-md bg-[#22C55E] flex items-center justify-center">
+  <span className="text-white text-sm font-semibold">2.1%</span>
 </div>
 
   </div>
@@ -518,16 +523,18 @@ export default function CRMModule() {
   <div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
-    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#E8FFEF]">
-  <img src="/icon/crm-ltv.svg" className="w-8 h-8" />
+    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+  <img src="/icon/sales.gif" className="w-10 h-10" alt="Sales Icon" />
 </div>
+
+
 
       <h2 className="text-3xl font-bold text-[#1F2937]">₹0.5K</h2>
     </div>
 
     {/* Ret */}
     <div className="px-3 py-1 rounded-md bg-[#FACC15] flex items-center justify-center">
-  <span className="text-white text-sm font-semibold">1.8%</span>
+  <span className="text-white text-sm font-semibold">1.04%</span>
 </div>
 
   </div>
@@ -540,19 +547,18 @@ export default function CRMModule() {
   <div className="flex items-start justify-between">
 
     <div className="flex items-center gap-4">
-    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#FFE7DA]">
-  <img src="/icon/crm-conversion.svg" className="w-8 h-8" />
+    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+  <img src="/icon/money-exchange.gif" className="w-10 h-10" alt="Sales Icon" />
 </div>
 
-      <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
+
+   <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
     </div>
 
     {/* Ret*/}
-    <div className="px-3 py-1 rounded-md bg-[#22C55E] flex items-center justify-center">
-  <span className="text-white text-sm font-semibold">1.8%</span>
+    <div className="px-3 py-1 rounded-md bg-[#4C6EF5] flex items-center justify-center">
+  <span className="text-white text-sm font-semibold">2.5%</span>
 </div>
-
-
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
   </p>

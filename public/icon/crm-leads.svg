@@ -1,6 +1,9 @@
-<svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="90" height="90" rx="20" fill="#FFE4D5"/>
-  <circle cx="32" cy="32" r="10" fill="#FF8A00"/>
-  <circle cx="58" cy="32" r="10" fill="#FFB866"/>
-  <rect x="20" y="50" width="50" height="20" rx="10" fill="#FF8A00"/>
-</svg>
+<div className="w-14 h-14 bg-[#FFE7DA] rounded-xl flex items-center justify-center">
+        <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M32 48C22.06 48 14 39.94 14 30V22" stroke="#06367A" strokeWidth="4" strokeLinecap="round"/>
+          <path d="M32 48C41.94 48 50 39.94 50 30V22" stroke="#06367A" strokeWidth="4" strokeLinecap="round"/>
+          <circle cx="18" cy="14" r="8" fill="#8CC63F" stroke="#06367A" strokeWidth="4"/>
+          <circle cx="32" cy="14" r="8" fill="#B788F5" stroke="#06367A" strokeWidth="4"/>
+          <circle cx="46" cy="14" r="8" fill="#FFC93C" stroke="#06367A" strokeWidth="4"/>
+        </svg>
+      </div>
