@@ -246,6 +246,7 @@ const MainLayout = ({ menuItems }) => {
     minHeight: `calc(100vh - 100px)`,
     overflow: "auto",
     marginTop: 60,
+    backgroundColor: "#fbfbfd !important",
   }}
 >
 
