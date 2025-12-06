@@ -417,7 +417,7 @@ export default function CRMModule() {
           setLeads((prev) => prev.map((l) => (l.id === leadToConvert.id ? { ...l, status: "Converted" } : l)));
         } catch (err) {
           console.error("Failed to update lead status after convert:", err);
-          toast.warning("Customer added but failed to update lead status");
+            toast.warning("Customer added but failed to update lead status");
         }
       }
 
@@ -472,19 +472,10 @@ export default function CRMModule() {
       <div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
 
 <div className="flex items-start justify-between">
-  
-  {/* LEFT: ICON + NUMBER */}
   <div className="flex items-center gap-4">
-    
-    {/* ICON BOX */}
-    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent border border-gray-200">
-  <img src="/icon/leads.gif" className="w-10 h-10" alt="Leads Icon" />
+    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+  <img src="/icon/leads.gif" className="w-10 h-10" alt="Customer Icon" />
 </div>
-
-
-
-
-{/* NUMBER */}
     <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
   </div>
 
@@ -504,18 +495,14 @@ export default function CRMModule() {
     <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
   <img src="/icon/customer-care.gif" className="w-10 h-10" alt="Customer Icon" />
 </div>
-
-
 <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
     </div>
     {/* ret*/}
     <div className="px-3 py-1 rounded-md bg-[#22C55E] flex items-center justify-center">
   <span className="text-white text-sm font-semibold">2.1%</span>
 </div>
-
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  
   </p>
     <p className="text-gray-600 text-sm">Active customer</p>
   </div>
@@ -526,26 +513,19 @@ export default function CRMModule() {
     <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
   <img src="/icon/sales.gif" className="w-10 h-10" alt="Sales Icon" />
 </div>
-
-
-
       <h2 className="text-3xl font-bold text-[#1F2937]">₹0.5K</h2>
     </div>
-
     {/* Ret */}
     <div className="px-3 py-1 rounded-md bg-[#FACC15] flex items-center justify-center">
   <span className="text-white text-sm font-semibold">1.04%</span>
 </div>
-
   </div>
   <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  
   </p>
-    <p className="text-gray-600 text-sm">Customer Ltv</p>
+    <p className="text-gray-600 text-sm">Revenue</p>
   </div>
   <div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
   <div className="flex items-start justify-between">
-
     <div className="flex items-center gap-4">
     <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
   <img src="/icon/money-exchange.gif" className="w-10 h-10" alt="Sales Icon" />

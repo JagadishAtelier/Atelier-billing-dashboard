@@ -13,6 +13,10 @@ import Billingicon from "../../../public/icon/billing-machine-svgrepo-com.png"
 import Usericon from "../../../public/icon/user.png"
 import Producticon from "../../../public/icon/product.png"
 import Walleticon from "../../../public/icon/wallet.png"
+import RevenueGrowth from "../../../public/icon/revenue-growth.gif";
+import ProductGIF from "../../../public/Product.gif";
+import UserGIF from "../../../public/icon/user.gif";
+import BillsGIF from "../../../public/icon/invoice-bill.gif";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -357,37 +361,43 @@ const DashboardFull = () => {
         title: "Total Bills",
         value: summary.totalBills ?? 0,
         meta: "Number of bills",
-        icon: <img src={Billingicon} alt="Total Bills" className="w-8 h-8" />,
-        color: "#d27b3d16",
+        icon: <img src={BillsGIF} alt="Total Bills" className="w-10 h-10" />,
+        color: "transparent",   
+        noBg: true,             
         linkTo: "/billing/list",
-      },
+      },      
       {
         id: "users",
         title: "Total Users",
         value: summary.totalUsers ?? 0,
         meta: "Registered users",
-        icon: <img src={Usericon} alt="Total Users" className="w-8 h-8" />,
-        color: "#3b83f615",
+        icon: <img src={UserGIF} alt="Total Users" className="w-10 h-10" />,
+        color: "transparent",  
+        noBg: true,            
         linkTo: "/user",
-      },
+      },      
       {
         id: "products",
         title: "Total Products",
         value: summary.totalProducts ?? 0,
         meta: "Available products",
-        icon: <img src={Producticon} alt="Total Products" className="w-8 h-8" />,
-        color: "#5110b90e",
+        icon: <img src={ProductGIF} alt="Total Products" className="w-10 h-10" />,
+        color: "transparent",   
+        noBg: true,             
         linkTo: "/product/list",
-      },
+      },      
       {
         id: "revenue",
         title: "Total Revenue",
         value: `₹${summary.totalRevenue ?? 0}`,
         meta: "Revenue generated",
-        icon: <img src={Walleticon} alt="Total Revenue" className="w-8 h-8" />,
-        color: "#4ab74011",
+        icon: <img src={RevenueGrowth} alt="Revenue Growth" className="w-10 h-10" />,
+        color: "transparent",   
+        noBg: true,             
         linkTo: "/report",
-      },
+      }
+      
+      
     ];
 
 
