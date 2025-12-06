@@ -442,7 +442,7 @@ function BillingList() {
               className="view-mode-radio"
               style={{display:"flex"}}
             >
-              <Radio.Button  value="table" style={{display:"flex",  alignItems:"center", justifyContent:"center", width:"40px"}}><Table2 className="h-4 w-4" /></Radio.Button>
+              <Radio.Button  value="table" style={{display:"flex",  alignItems:"center", justifyContent:"center", width:"40px", borderTopRightRadius:"0px !important", borderBottomRightRadius:"0px !important"}}><Table2 className="h-4 w-4" /></Radio.Button>
               <Radio.Button value="card" style={{display:"flex", alignItems:"center", justifyContent:"center", width:"40px"}}><Book className="h-4 w-4" /></Radio.Button>
             </Radio.Group>
           </Space>
@@ -602,7 +602,6 @@ function BillingList() {
     }
 
     .view-mode-radio .ant-radio-button-wrapper {
-      border-radius: 8px;
       overflow: hidden;
     }
 
