@@ -444,15 +444,12 @@ export default function CRMModule() {
     [l.name, l.email, l.phone, l.source].join(" ").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // UI -------------------------------------------------------------------
+  // UI ------------
   return (
 <div
   className="min-h-screen w-full px-4 py-4"
   style={{ backgroundColor: "transparent" }}
-
-
 >
-
 
     {/* Header */}
       <div className="flex items-center justify-between">
@@ -472,16 +469,16 @@ export default function CRMModule() {
 </button>
   </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mt-6">
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
 {/* CARD 1 — Total Leads */}
+
 <motion.div
   initial={{ opacity: 0, scale: 0.95 }}
   animate={{ opacity: 1, scale: 1 }}
   whileHover={{ y: -8, scale: 1.03 }}
   transition={{ duration: 0.25, ease: "easeOut" }}
-  className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] 
-             border border-gray-200 inline-block align-top"
+  className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
+
 >
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
@@ -504,8 +501,8 @@ export default function CRMModule() {
   animate={{ opacity: 1, scale: 1 }}
   whileHover={{ y: -8, scale: 1.03 }}
   transition={{ duration: 0.25, ease: "easeOut" }}
-  className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] 
-             border border-gray-200 inline-block align-top"
+  className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
+
 >
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
@@ -528,19 +525,19 @@ export default function CRMModule() {
   animate={{ opacity: 1, scale: 1 }}
   whileHover={{ y: -8, scale: 1.03 }}
   transition={{ duration: 0.25, ease: "easeOut" }}
-  className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] 
-             border border-gray-200 inline-block align-top"
+  className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
+
 >
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
       <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
         <img src="/icon/sales.gif" className="w-10 h-10" alt="Sales Icon" />
       </div>
-      <h2 className="text-3xl font-bold text-[#1F2937]">₹0.5K</h2>
+      <h2 className="text-3xl font-bold text-[#1F2937]">₹1.5K</h2>
     </div>
 
     <div className="px-3 py-1 rounded-md bg-[#FACC15] flex items-center justify-center">
-      <span className="text-white text-sm font-semibold">1.04%</span>
+      <span className="text-white text-sm font-semibold">1.05%</span>
     </div>
   </div>
   <p className="text-gray-600 text-sm">Revenue</p>
@@ -552,8 +549,8 @@ export default function CRMModule() {
   animate={{ opacity: 1, scale: 1 }}
   whileHover={{ y: -8, scale: 1.03 }}
   transition={{ duration: 0.25, ease: "easeOut" }}
-  className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] 
-             border border-gray-200 inline-block align-top"
+  className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
+
 >
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
@@ -598,9 +595,9 @@ export default function CRMModule() {
   </div>
         {/* Leads Tab */}
         {activeTab === "leads" && (
-          <div className="space-y-6 mt-6">
+          <div className="space-y-4 mt-4">
             <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm">
-            <div className="flex items-center bg-white border border-gray-300 rounded-xl px-4 h-10 w-full shadow-sm">
+            <div className="flex items-center bg-[#F3F4F6] rounded-xl px-4 h-10 w-full">
                 <Search className="w-4 h-4 text-gray-400 mr-2" />
                 <input
   value={searchTerm}
@@ -609,7 +606,7 @@ export default function CRMModule() {
   className="bg-transparent w-full focus:outline-none text-base text-gray-700"
 />
               </div>
-              <div className="flex items-center bg-white border border-gray-300 rounded-xl px-4 h-10 cursor-pointer shadow-sm">
+              <div className="flex items-center bg-[#F3F4F6] rounded-xl px-4 h-10 cursor-pointer">
                 <Filter className="w-4 h-4 text-gray-500 mr-2" />
                 <select
   onChange={(e) => {
