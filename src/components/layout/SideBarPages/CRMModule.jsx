@@ -446,7 +446,14 @@ export default function CRMModule() {
 
   // UI -------------------------------------------------------------------
   return (
-    <div className="min-h-screen w-full bg-white px-4 py-4">
+<div
+  className="min-h-screen w-full px-4 py-4"
+  style={{ backgroundColor: "transparent" }}
+
+
+>
+
+
     {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -465,87 +472,106 @@ export default function CRMModule() {
 </button>
   </div>
       </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mt-6">
 
-
-      <div className="flex gap-4 pb-2 overflow-x-auto whitespace-nowrap no-scrollbar">
-
-      <div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
-
-<div className="flex items-start justify-between">
-  <div className="flex items-center gap-4">
-    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
-  <img src="/icon/leads.gif" className="w-10 h-10" alt="Customer Icon" />
-</div>
-    <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
-  </div>
-
-  {/* ret*/}
-  <div className="px-3 py-1 rounded-md bg-[#FF8A4C] flex items-center justify-center">
-  <span className="text-white text-sm font-semibold">1.8%</span>
-</div>
-</div>
-<p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-</p>
-  <p className="text-gray-600 text-sm">Total leads</p>
-</div>
-
-<div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
+{/* CARD 1 — Total Leads */}
+<motion.div
+  initial={{ opacity: 0, scale: 0.95 }}
+  animate={{ opacity: 1, scale: 1 }}
+  whileHover={{ y: -8, scale: 1.03 }}
+  transition={{ duration: 0.25, ease: "easeOut" }}
+  className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] 
+             border border-gray-200 inline-block align-top"
+>
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
-    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
-  <img src="/icon/customer-care.gif" className="w-10 h-10" alt="Customer Icon" />
-</div>
-<h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+        <img src="/icon/leads.gif" className="w-10 h-10" alt="Customer Icon" />
+      </div>
+      <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
     </div>
-    {/* ret*/}
-    <div className="px-3 py-1 rounded-md bg-[#22C55E] flex items-center justify-center">
-  <span className="text-white text-sm font-semibold">2.1%</span>
-</div>
-  </div>
-  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  </p>
-    <p className="text-gray-600 text-sm">Active customer</p>
-  </div>
 
-  <div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
+    <div className="px-3 py-1 rounded-md bg-[#FF8A4C] flex items-center justify-center">
+      <span className="text-white text-sm font-semibold">1.8%</span>
+    </div>
+  </div>
+  <p className="text-gray-600 text-sm mt-1">Total leads</p>
+</motion.div>
+
+{/* CARD 2 — Active Customers */}
+<motion.div
+  initial={{ opacity: 0, scale: 0.95 }}
+  animate={{ opacity: 1, scale: 1 }}
+  whileHover={{ y: -8, scale: 1.03 }}
+  transition={{ duration: 0.25, ease: "easeOut" }}
+  className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] 
+             border border-gray-200 inline-block align-top"
+>
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
-    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
-  <img src="/icon/sales.gif" className="w-10 h-10" alt="Sales Icon" />
-</div>
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+        <img src="/icon/customer-care.gif" className="w-10 h-10" alt="Customer Icon" />
+      </div>
+      <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
+    </div>
+
+    <div className="px-3 py-1 rounded-md bg-[#22C55E] flex items-center justify-center">
+      <span className="text-white text-sm font-semibold">2.1%</span>
+    </div>
+  </div>
+  <p className="text-gray-600 text-sm">Active customer</p>
+</motion.div>
+
+{/* CARD 3 — Revenue */}
+<motion.div
+  initial={{ opacity: 0, scale: 0.95 }}
+  animate={{ opacity: 1, scale: 1 }}
+  whileHover={{ y: -8, scale: 1.03 }}
+  transition={{ duration: 0.25, ease: "easeOut" }}
+  className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] 
+             border border-gray-200 inline-block align-top"
+>
+  <div className="flex items-start justify-between">
+    <div className="flex items-center gap-4">
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+        <img src="/icon/sales.gif" className="w-10 h-10" alt="Sales Icon" />
+      </div>
       <h2 className="text-3xl font-bold text-[#1F2937]">₹0.5K</h2>
     </div>
-    {/* Ret */}
+
     <div className="px-3 py-1 rounded-md bg-[#FACC15] flex items-center justify-center">
-  <span className="text-white text-sm font-semibold">1.04%</span>
-</div>
+      <span className="text-white text-sm font-semibold">1.04%</span>
+    </div>
   </div>
-  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  </p>
-    <p className="text-gray-600 text-sm">Revenue</p>
-  </div>
-  <div className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] border border-gray-200 inline-block align-top">
+  <p className="text-gray-600 text-sm">Revenue</p>
+</motion.div>
+
+{/* CARD 4 — Conversion Rate */}
+<motion.div
+  initial={{ opacity: 0, scale: 0.95 }}
+  animate={{ opacity: 1, scale: 1 }}
+  whileHover={{ y: -8, scale: 1.03 }}
+  transition={{ duration: 0.25, ease: "easeOut" }}
+  className="bg-white rounded-2xl shadow-sm p-4 w-[280px] h-[130px] 
+             border border-gray-200 inline-block align-top"
+>
   <div className="flex items-start justify-between">
     <div className="flex items-center gap-4">
-    <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
-  <img src="/icon/money-exchange.gif" className="w-10 h-10" alt="Sales Icon" />
-</div>
-
-
-   <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+        <img src="/icon/money-exchange.gif" className="w-10 h-10" alt="Sales Icon" />
+      </div>
+      <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
     </div>
 
-    {/* Ret*/}
     <div className="px-3 py-1 rounded-md bg-[#A0522D] flex items-center justify-center">
-  <span className="text-white text-sm font-semibold">2.5%</span>
+      <span className="text-white text-sm font-semibold">2.5%</span>
+    </div>
+  </div>
+  <p className="text-gray-600 text-sm">Conversion rate</p>
+</motion.div>
+
 </div>
 
-  </div>
-  <p className="text-[13px] text-[#475467] font-semibold mt-1 ml-[4.5rem]">
-  </p>
-    <p className="text-gray-600 text-sm">Conversion rate</p>
-  </div>
-</div>
 
       {/* Tabs */}
       <div className="mt-4">
@@ -574,14 +600,25 @@ export default function CRMModule() {
         {activeTab === "leads" && (
           <div className="space-y-6 mt-6">
             <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm">
-              <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 w-full">
+            <div className="flex items-center bg-white border border-gray-300 rounded-xl px-4 h-10 w-full shadow-sm">
                 <Search className="w-4 h-4 text-gray-400 mr-2" />
-                <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search leads..." className="bg-white w-full focus:outline-none text-sm text-gray-700" />
+                <input
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+  placeholder="Search leads..."
+  className="bg-transparent w-full focus:outline-none text-base text-gray-700"
+/>
               </div>
-
-              <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 cursor-pointer">
+              <div className="flex items-center bg-white border border-gray-300 rounded-xl px-4 h-10 cursor-pointer shadow-sm">
                 <Filter className="w-4 h-4 text-gray-500 mr-2" />
-                <select onChange={(e) => { const status = e.target.value; if (status === "all") fetchLeads(); else fetchLeads({ status }); }} className="bg-white text-sm text-gray-700 focus:outline-none">
+                <select
+  onChange={(e) => {
+    const status = e.target.value;
+    if (status === "all") fetchLeads();
+    else fetchLeads({ status });
+  }}
+  className="bg-transparent text-base text-gray-800 focus:outline-none"
+>
                   <option value="all">Filter by status</option>
                   <option value="New">New</option>
                   <option value="Contacted">Contacted</option>
