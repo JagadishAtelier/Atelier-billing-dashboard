@@ -153,9 +153,12 @@ export default function Reports() {
   transition={{ duration: 0.25, ease: "easeOut" }}
   className="bg-white shadow rounded-lg p-6 flex items-center gap-4 cursor-pointer"
 >
-  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-    <DollarSign className="w-6 h-6 text-blue-600" />
-  </div>
+<img 
+    src="/icon/totalsales.gif"
+    alt="Totalsales Icon"
+    className="w-10 h-10 object-contain"
+  />
+
   <div>
     <p className="text-gray-500 text-sm">Total Sales</p>
     <p className="text-gray-900 mt-1 font-semibold">₹328,000</p>
@@ -171,9 +174,11 @@ export default function Reports() {
   transition={{ duration: 0.28, ease: "easeOut" }}
   className="bg-white shadow rounded-lg p-6 flex items-center gap-4 cursor-pointer"
 >
-  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-    <ShoppingCart className="w-6 h-6 text-purple-600" />
-  </div>
+<img 
+    src="/icon/purchases.gif"
+    alt="Purchases Icon"
+    className="w-10 h-10 object-contain"
+  />
   <div>
     <p className="text-gray-500 text-sm">Total Purchases</p>
     <p className="text-gray-900 mt-1 font-semibold">₹231,000</p>
@@ -189,15 +194,17 @@ export default function Reports() {
   transition={{ duration: 0.30, ease: "easeOut" }}
   className="bg-white shadow rounded-lg p-6 flex items-center gap-4 cursor-pointer"
 >
-  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-    <TrendingUp className="w-6 h-6 text-green-600" />
-  </div>
+  <img 
+    src="/icon/profit.gif"
+    alt="Profit Icon"
+    className="w-10 h-10 object-contain"
+  />
+
   <div>
     <p className="text-gray-500 text-sm">Total Profit</p>
     <p className="text-gray-900 mt-1 font-semibold">₹94,500</p>
   </div>
 </motion.div>
-
 {/* Stock Value */}
 <motion.div
   initial={{ opacity: 0, scale: 0.9, y: 15 }}
@@ -207,9 +214,11 @@ export default function Reports() {
   transition={{ duration: 0.33, ease: "easeOut" }}
   className="bg-white shadow rounded-lg p-6 flex items-center gap-4 cursor-pointer"
 >
-  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-    <Package className="w-6 h-6 text-orange-600" />
-  </div>
+<img 
+    src="/icon/stock.gif"
+    alt="Stock Icon"
+    className="w-10 h-10 object-contain"
+  />
   <div>
     <p className="text-gray-500 text-sm">Stock Value</p>
     <p className="text-gray-900 mt-1 font-semibold">₹456,789</p>
