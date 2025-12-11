@@ -24,6 +24,8 @@ import ReturnPage from "./ReturnPage/ReturnPage";
 import AddReturn from "./ReturnPage/AddReturn"
 import ReportPage from "./ReportPage/ReportPage";
 import ViewReturn from "./ReturnPage/ViewReturn";
+import BranchPage from "./components/layout/SideBarPages/BranchPage";
+import AddBranch from "./components/layout/SideBarPages/AddBranch";
 import AIAnalytics from "./components/layout/SideBarPages/AIAnalytics";
 import CRMModule from "./components/layout/SideBarPages/CRMModule";
 import { Toaster } from "sonner";
@@ -164,6 +166,30 @@ const App = () => {
   element={
     <ProtectedRoute>
       <AddVendor />
+    </ProtectedRoute>
+  }
+/>
+<Route
+path="/branch"
+element={
+    <ProtectedRoute>
+      <BranchPage />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/branch/add"
+  element={
+    <ProtectedRoute>
+      <AddBranch />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/branch/edit/:id"
+  element={
+    <ProtectedRoute>
+      <AddBranch />
     </ProtectedRoute>
   }
 />

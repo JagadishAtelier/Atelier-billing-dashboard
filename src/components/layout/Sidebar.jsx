@@ -68,6 +68,7 @@ export default function Sidebar({
     { to: "/user", label: "Users", icon: Users },
     { to: "/vendor", label: "Vendors", icon: Building },
     { to: "/order", label: "Purchases / Orders", icon: ShoppingCart },
+    { to: "/branch", label: "Branches", icon: HousePlus },
     {
       to: "/billing",
       label: "Sales & Billing",
