@@ -21,6 +21,8 @@ import {
   Legend,
 } from "recharts";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+
 
 const salesReportData = [
   { month: "Jan", sales: 45000, profit: 12000 },
@@ -141,46 +143,89 @@ export default function Reports() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white shadow rounded-lg p-6 flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-            <DollarSign className="w-6 h-6 text-blue-600" />
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm">Total Sales</p>
-            <p className="text-gray-900 mt-1 font-semibold">₹328,000</p>
-          </div>
-        </div>
 
-        <div className="bg-white shadow rounded-lg p-6 flex items-center gap-4">
-          <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-            <ShoppingCart className="w-6 h-6 text-purple-600" />
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm">Total Purchases</p>
-            <p className="text-gray-900 mt-1 font-semibold">₹231,000</p>
-          </div>
-        </div>
+{/* Total Sales */}
+<motion.div
+  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+  animate={{ opacity: 1, scale: 1, y: 0 }}
+  whileHover={{ scale: 1.05, y: -6 }}
+  whileTap={{ scale: 0.97 }}
+  transition={{ duration: 0.25, ease: "easeOut" }}
+  className="bg-white shadow rounded-lg p-6 flex items-center gap-4 cursor-pointer"
+>
+<img 
+    src="/icon/totalsales.gif"
+    alt="Totalsales Icon"
+    className="w-10 h-10 object-contain"
+  />
 
-        <div className="bg-white shadow rounded-lg p-6 flex items-center gap-4">
-          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-green-600" />
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm">Total Profit</p>
-            <p className="text-gray-900 mt-1 font-semibold">₹94,500</p>
-          </div>
-        </div>
+  <div>
+    <p className="text-gray-500 text-sm">Total Sales</p>
+    <p className="text-gray-900 mt-1 font-semibold">₹328,000</p>
+  </div>
+</motion.div>
 
-        <div className="bg-white shadow rounded-lg p-6 flex items-center gap-4">
-          <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-            <Package className="w-6 h-6 text-orange-600" />
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm">Stock Value</p>
-            <p className="text-gray-900 mt-1 font-semibold">₹456,789</p>
-          </div>
-        </div>
-      </div>
+{/* Total Purchases */}
+<motion.div
+  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+  animate={{ opacity: 1, scale: 1, y: 0 }}
+  whileHover={{ scale: 1.05, y: -6 }}
+  whileTap={{ scale: 0.97 }}
+  transition={{ duration: 0.28, ease: "easeOut" }}
+  className="bg-white shadow rounded-lg p-6 flex items-center gap-4 cursor-pointer"
+>
+<img 
+    src="/icon/purchases.gif"
+    alt="Purchases Icon"
+    className="w-10 h-10 object-contain"
+  />
+  <div>
+    <p className="text-gray-500 text-sm">Total Purchases</p>
+    <p className="text-gray-900 mt-1 font-semibold">₹231,000</p>
+  </div>
+</motion.div>
+
+{/* Total Profit */}
+<motion.div
+  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+  animate={{ opacity: 1, scale: 1, y: 0 }}
+  whileHover={{ scale: 1.05, y: -6 }}
+  whileTap={{ scale: 0.97 }}
+  transition={{ duration: 0.30, ease: "easeOut" }}
+  className="bg-white shadow rounded-lg p-6 flex items-center gap-4 cursor-pointer"
+>
+  <img 
+    src="/icon/profit.gif"
+    alt="Profit Icon"
+    className="w-10 h-10 object-contain"
+  />
+
+  <div>
+    <p className="text-gray-500 text-sm">Total Profit</p>
+    <p className="text-gray-900 mt-1 font-semibold">₹94,500</p>
+  </div>
+</motion.div>
+{/* Stock Value */}
+<motion.div
+  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+  animate={{ opacity: 1, scale: 1, y: 0 }}
+  whileHover={{ scale: 1.05, y: -6 }}
+  whileTap={{ scale: 0.97 }}
+  transition={{ duration: 0.33, ease: "easeOut" }}
+  className="bg-white shadow rounded-lg p-6 flex items-center gap-4 cursor-pointer"
+>
+<img 
+    src="/icon/stock.gif"
+    alt="Stock Icon"
+    className="w-10 h-10 object-contain"
+  />
+  <div>
+    <p className="text-gray-500 text-sm">Stock Value</p>
+    <p className="text-gray-900 mt-1 font-semibold">₹456,789</p>
+  </div>
+</motion.div>
+
+</div>
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
