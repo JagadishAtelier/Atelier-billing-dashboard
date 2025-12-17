@@ -78,6 +78,8 @@ export default function Sidebar({
         { to: "/billing/list", label: "Billing List" },
       ],
     },
+    { to: "/shipping", label: "Shipping", icon: Truck },
+    { to: "/packing", label: "Packing List", icon: ClipboardCheck },
     { to: "/stock/list", label: "Stocks", icon: Box },
     { to: "/inward/list", label: "Inward", icon: Truck },
     { to: "/return", label: "Returns", icon: Receipt },

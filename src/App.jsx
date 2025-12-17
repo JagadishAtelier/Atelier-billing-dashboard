@@ -28,7 +28,11 @@ import BranchPage from "./components/layout/SideBarPages/BranchPage";
 import AddBranch from "./components/layout/SideBarPages/AddBranch";
 import AIAnalytics from "./components/layout/SideBarPages/AIAnalytics";
 import CRMModule from "./components/layout/SideBarPages/CRMModule";
+import ShippingList from "./components/layout/SideBarPages/ShippingList";
+import AddShipping from "./components/layout/SideBarPages/AddShipping";
+import PackingList from "./components/layout/SideBarPages/PackingList";
 import { Toaster } from "sonner";
+import { RouteIcon } from "lucide-react";
 
 // import master from "./components/assets/cloud.png";
 const routeModules = import.meta.glob("./*/AppRoutes.jsx", { eager: true });
@@ -262,6 +266,41 @@ path="return/view/:id"
 element={
 <ProtectedRoute>
       <ViewReturn />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/shipping"
+  element={
+    <ProtectedRoute>
+      <ShippingList />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/shipping/add"
+  element={
+    <ProtectedRoute>
+      <AddShipping />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/shipping/edit/:id"
+  element={
+    <ProtectedRoute>
+      <AddShipping />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/packing"
+  element={
+    <ProtectedRoute>
+      <PackingList />
     </ProtectedRoute>
   }
 />

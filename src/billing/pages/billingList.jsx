@@ -429,9 +429,6 @@ function BillingList() {
             <Button style={{backgroundColor: "#506ee4", color:"#fff", height: "40px"}} icon={<PlusOutlined />} onClick={() => navigate("/billing/add")}>
               Add Billing
             </Button>
-            <Button style={{height: "40px"}} icon={<FilePdfOutlined />} onClick={exportPDF}>
-              Export PDF
-            </Button>
 
             {/* Added className "view-mode-radio" so we can scope CSS to only this instance */}
             <Radio.Group
