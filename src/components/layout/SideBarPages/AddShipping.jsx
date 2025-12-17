@@ -14,10 +14,12 @@ import {
   Col,
   Divider,
   Card,
+  Switch,
 } from "antd";
 import dayjs from "dayjs";
 import productService from "../../../Product/services/productService";
 import shippingService from "./services/shippingService";
+import customersService from "./services/customersService";
 
 const { Option } = Select;
 
@@ -30,6 +32,8 @@ function AddShipping() {
   const [loading, setLoading] = useState(false);
 
   const [products, setProducts] = useState([]);
+  const [customers, setCustomers] = useState([]);
+
   const searchTimeout = useRef(null);
 
   /* ---------- Initial ---------- */
@@ -37,12 +41,59 @@ function AddShipping() {
     form.setFieldsValue({
       shipping_date: dayjs(),
       status: "pending",
+      already_customer: false,
       items: [],
     });
+
+    fetchCustomers();
 
     if (isEdit) fetchShipping();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  /* ---------- Fetch customers ---------- */
+  const fetchCustomers = async () => {
+    try {
+      const res = await customersService.getAll({ limit: 200 });
+      setCustomers(res.data || res || []);
+    } catch {
+      setCustomers([]);
+    }
+  };
+
+  /* ---------- When a customer is selected, autofill recipient fields ---------- */
+  const handleCustomerSelect = async (customerId) => {
+    if (!customerId) return;
+    // try to find in loaded customers first
+    let cust = customers.find((c) => String(c.id) === String(customerId));
+    if (!cust) {
+      try {
+        const res = await customersService.getById(customerId);
+        cust = res?.data || res;
+      } catch (err) {
+        // ignore — we won't autofill if fetch fails
+      }
+    }
+
+    if (cust) {
+      // pick common fields (customer_name | name), phone, address
+      const name = cust.customer_name || cust.name || cust.full_name || "";
+      const phone = cust.phone || cust.mobile || cust.contact || "";
+      const address =
+        cust.address ||
+        cust.address_line ||
+        cust.address1 ||
+        (cust.addresses && cust.addresses[0] && cust.addresses[0].full_address) ||
+        "";
+
+      form.setFieldsValue({
+        recipient_name: name,
+        recipient_phone: phone,
+        recipient_address: address,
+        recipient_email: cust.email || cust.contact_email || form.getFieldValue("recipient_email"),
+      });
+    }
+  };
 
   /* ---------- Fetch existing shipping (EDIT) ---------- */
   const fetchShipping = async () => {
@@ -67,30 +118,8 @@ function AddShipping() {
           total_price: Number(i.total_price || 0),
         })) || [];
 
-      // preload products for edit
-      const productIds = [...new Set(items.map((i) => i.product_id))];
-      const loadedProducts = [];
-
-      for (const pid of productIds) {
-        try {
-          if (typeof productService.getById === "function") {
-            // eslint-disable-next-line no-await-in-loop
-            const pRes = await productService.getById(pid);
-            const prod = pRes?.data || pRes;
-            if (prod) loadedProducts.push(prod);
-          }
-        } catch {}
-      }
-
-      if (loadedProducts.length) {
-        setProducts((prev) => {
-          const map = new Map(prev.map((p) => [String(p.id), p]));
-          loadedProducts.forEach((p) => map.set(String(p.id), p));
-          return Array.from(map.values());
-        });
-      }
-
       form.setFieldsValue({
+        // recipient fields will be overwritten below if customer exists
         recipient_name: data.recipient_name,
         recipient_address: data.recipient_address,
         recipient_phone: data.recipient_phone,
@@ -103,8 +132,17 @@ function AddShipping() {
         status: data.status,
         paid_amount: data.paid_amount,
         notes: data.notes,
+        already_customer: Boolean(data.customer_id),
+        customer_id: data.customer_id || null,
         items,
       });
+
+      // if edit and customer exists, ensure autofill (and load customer if needed)
+      if (data.customer_id) {
+        // try autofill (this will fetch customer if not in customers list)
+        // wait to ensure form values are set before autofill
+        await handleCustomerSelect(data.customer_id);
+      }
     } catch (err) {
       console.error(err);
       message.error("Failed to load shipping details");
@@ -213,6 +251,8 @@ function AddShipping() {
         transport_no: values.transport_no,
         shipping_cost: Number(values.shipping_cost || 0),
         status: values.status,
+        already_customer: values.already_customer,
+        customer_id: values.already_customer ? values.customer_id : null,
         total_quantity,
         subtotal_amount,
         discount_amount,
@@ -314,6 +354,48 @@ function AddShipping() {
     <Spin spinning={loading}>
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Card title={isEdit ? "Edit Shipping" : "Add Shipping"}>
+          {/* --- Already customer on TOP --- */}
+          <Row gutter={16} style={{ marginBottom: 8 }}>
+            <Col span={12}>
+              <Form.Item
+                label="Already Customer"
+                name="already_customer"
+                valuePropName="checked"
+              >
+                <Switch />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              {/* Show customer select next to switch when true */}
+              <Form.Item shouldUpdate={(p, c) => p.already_customer !== c.already_customer} noStyle>
+                {({ getFieldValue }) =>
+                  getFieldValue("already_customer") ? (
+                    <Form.Item
+                      label="Customer"
+                      name="customer_id"
+                      rules={[{ required: true, message: "Please select a customer" }]}
+                    >
+                      <Select
+                        placeholder="Select customer"
+                        showSearch
+                        optionFilterProp="children"
+                        onChange={(val) => handleCustomerSelect(val)}
+                      >
+                        {customers.map((c) => (
+                          <Option key={c.id} value={c.id}>
+                            {c.customer_name || c.name} {c.phone ? `(${c.phone})` : ""}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  ) : null
+                }
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* Recipient fields (will be auto-filled when customer selected) */}
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item label="Recipient Name" name="recipient_name" rules={[{ required: true }]}>
