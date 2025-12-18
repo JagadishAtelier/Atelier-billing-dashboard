@@ -1,14 +1,14 @@
-// Header.jsx
+// Header.jsx (updated: optional setCollapsed prop + toggle button)
 import React, { useEffect, useState } from "react";
 import { Popover, Dropdown, List, Avatar, message } from "antd";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import { Bell, User, LogOut, ChevronDown, Search, Command } from "lucide-react";
+import { Bell, User, LogOut, ChevronDown, Search, Command, Menu } from "lucide-react";
 import { motion } from "framer-motion";
 import companyLogo from "../assets/Company_logo.png";
 import { Input } from "antd";
 
-const HeaderBar = ({ collapsed /* optional */ }) => {
+const HeaderBar = ({ collapsed /* optional */, setCollapsed /* optional */ }) => {
   const { theme, headerBgColor, headerGradient } = useTheme();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -77,6 +77,9 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
   const headerStyle = isGradient ? { background: headerGradient } : { backgroundColor: "#fff" };
   const textColor = theme === "dark" || isGradient ? "#fff" : "#011D4A";
 
+  // adjust left position so header stays aligned with collapsed sidebar
+  const leftPosition = collapsed ? 60 : 260;
+
   return (
     <header
       style={{
@@ -88,36 +91,40 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
         padding: "0 16px",
         position: "fixed",
         top: 0,
-        left: collapsed ? 255 : 320,
+        left: leftPosition,
         right: 0,
         zIndex: 100,
         borderBottom: ".5px solid #66708550",
-        // boxShadow: "0 2px 4px rgba(0,0,0,0.12)"
       }}
     >
-
-      {/* LEFT SIDE SEARCH INPUT ADDED HERE */}
+      {/* LEFT SIDE: toggle + search */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {/* Toggle button (hamburger) */}
+        <button
+          onClick={() => typeof setCollapsed === "function" && setCollapsed(!collapsed)}
+          aria-label="Toggle sidebar"
+          className="p-2 rounded-md hover:bg-gray-100"
+        >
+          <Menu size={18} style={{ color: textColor }} />
+        </button>
+
         <div className="relative w-56 sm:w-64 hidden sm:block">
           <Input
             type="text"
             placeholder="Search"
             className="!pl-[30px] pr-10 py-4 text-lg border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
           />
-
           <Search
             size={16}
             className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
           />
-
           <div className="absolute right-2.5 top-1/2 -translate-y-1/2 shadow-sm p-1 rounded-sm border border-gray-100 bg-white hover:bg-gray-50 cursor-pointer">
             <Command size={14} className="text-gray-400" />
           </div>
         </div>
       </div>
 
-
-      {/* RIGHT SIDE (No change) */}
+      {/* RIGHT SIDE */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <Popover content={notificationContent} trigger="click" placement="bottomRight">
           <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.96 }} aria-label="Notifications" style={{ position: "relative", padding: 8, borderRadius: 10, background: theme === "dark" ? "#374151" : "#f3f4f6", border: "none", cursor: "pointer" }}>
@@ -129,15 +136,13 @@ const HeaderBar = ({ collapsed /* optional */ }) => {
         </Popover>
 
         <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
-
           <img
-              src="https://static.vecteezy.com/system/resources/thumbnails/049/174/246/small/a-smiling-young-indian-man-with-formal-shirts-outdoors-photo.jpg"
-              alt="user"
-              className="h-9 w-9 rounded-full border border-gray-200 object-cover cursor-pointer hover:ring-2 hover:ring-indigo-100"
-            />
+            src="https://static.vecteezy.com/system/resources/thumbnails/049/174/246/small/a-smiling-young-indian-man-with-formal-shirts-outdoors-photo.jpg"
+            alt="user"
+            className="h-9 w-9 rounded-full border border-gray-200 object-cover cursor-pointer hover:ring-2 hover:ring-indigo-100"
+          />
         </Dropdown>
       </div>
-
     </header>
   );
 };

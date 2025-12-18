@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -11,12 +11,51 @@ export default function StatCard({
   icon,
   color = "#3b82f6",
   linkTo,
-  arrowColor = "#000", 
+  arrowColor = "#000",
 }) {
   const isPositive = percentage >= 1;
-
-  // compute a simple readable icon color (white for colored background)
   const arrowIconColor = arrowColor;
+
+  // Detect tablet view (Tailwind md)
+  const [isTablet, setIsTablet] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth >= 768 && window.innerWidth < 1024;
+  });
+
+  useEffect(() => {
+    const onResize = () => {
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  // 🔹 Format number with k/M support and currency handling
+  const formatValue = (input) => {
+    if (!isTablet) return input;
+
+    // Extract currency symbol (₹, $, etc.)
+    const currencyMatch = String(input).match(/^[^\d.-]+/);
+    const currency = currencyMatch ? currencyMatch[0] : "";
+
+    // Extract numeric value
+    const numeric = parseFloat(String(input).replace(/[^\d.-]/g, ""));
+    if (isNaN(numeric) || numeric < 1000) return input;
+
+    let formatted;
+    if (numeric >= 1_000_000) {
+      formatted = (numeric / 1_000_000).toFixed(1) + "M";
+    } else {
+      formatted = (numeric / 1000).toFixed(1) + "k";
+    }
+
+    // Remove .0 (4.0k → 4k)
+    formatted = formatted.replace(".0", "");
+
+    return `${currency}${formatted}`;
+  };
+
+  const displayValue = formatValue(value);
 
   return (
     <motion.div
@@ -26,8 +65,8 @@ export default function StatCard({
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
       className="relative bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col gap-1 cursor-pointer hover:shadow-md"
     >
-      {/* Top-right round arrow (shows only when linkTo provided) */}
-      {linkTo ? (
+      {/* Arrow */}
+      {linkTo && (
         <Link
           to={linkTo}
           aria-label={`Go to ${title || "detail"}`}
@@ -43,65 +82,36 @@ export default function StatCard({
             <ArrowRight size={16} color={arrowIconColor} />
           </div>
         </Link>
-      ) : null}
+      )}
 
       <div className="flex justify-between items-center text-gray-500">
         <div className="flex gap-3 items-start">
           <div
             className="w-14 h-14 mt-2 flex justify-center items-center rounded-lg"
-            style={{ background: `${color}` }}
+            style={{ background: color }}
           >
             {icon ? icon : <Users size={24} style={{ color }} />}
           </div>
 
           <div>
-            {/* Responsive text sizes:
-                - default (small phones): text-lg
-                - tablet (md): text-xl (reduced compared to large desktop)
-                - desktop/large (lg): text-3xl
-            */}
             <h2 className="text-lg md:text-xl lg:text-3xl pt-4 font-bold text-gray-800">
-              {value}
+              {displayValue}
             </h2>
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
-          {/* Optional percentage indicator (keeps existing behavior) */}
-          {typeof percentage !== "undefined" && (
-            <div
-              className={`text-sm font-medium flex items-center gap-1 ${
-                isPositive ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {isPositive ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M5 10a1 1 0 011-1h3V6a1 1 0 112 0v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 01-1-1z" />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 transform rotate-45"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M5 10a1 1 0 011-1h3V6a1 1 0 112 0v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 01-1-1z" />
-                </svg>
-              )}
-              <span>{percentage}%</span>
-            </div>
-          )}
-        </div>
+        {typeof percentage !== "undefined" && (
+          <div
+            className={`text-sm font-medium flex items-center gap-1 ${
+              isPositive ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            <span>{percentage}%</span>
+          </div>
+        )}
       </div>
 
-      {/* Extra summary (optional UI area) */}
       <div className="flex justify-between items-center text-gray-500">
-        {/* Responsive meta text size: smaller on phones, slightly larger on tablet */}
         <span className="text-sm md:text-[14px]">{meta}</span>
       </div>
     </motion.div>

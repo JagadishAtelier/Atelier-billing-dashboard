@@ -1,5 +1,5 @@
-// Sidebar.jsx (fixed)
-import React, { useEffect, useState } from "react";
+// Sidebar.jsx (updated: when collapsed, clicking a parent icon opens a floating box showing children)
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "../lib/utils";
@@ -7,35 +7,21 @@ import logo from "../assets/inlogo.png";
 import {
   Users,
   Settings,
-  CalendarDays,
   LayoutDashboard,
-  Bed,
   Building,
-  IdCardLanyard,
-  SquareUser,
-  HousePlus,
-  DoorOpen,
-  TestTubeDiagonal,
-  ToolCase,
-  AlignEndVertical,
-  ShoppingBasket,
-  Tractor,
   ShoppingCart,
-  FileInput,
-  Package,
-  ClipboardCheck,
-  X,
+  HousePlus,
   Receipt,
-  Box,
   Truck,
-  Target,
+  ClipboardCheck,
+  Box,
+  Package,
   FileText,
-  LogOut,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 export default function Sidebar({
-  // MainLayout passes some props; accept them but keep sensible defaults so this component
-  // works both when mounted directly or inside antd Sider / Drawer.
   isOpen,
   onClose,
   collapsed = false,
@@ -46,13 +32,13 @@ export default function Sidebar({
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // internal state for which parent menu is open in the sidebar (for nested menus)
   const [openParent, setOpenParent] = useState(selectedParentProp);
-
-  // keep internal openParent in sync when parent is controlled from outside
   useEffect(() => setOpenParent(selectedParentProp), [selectedParentProp]);
 
-  // menu definition
+  // popover state: which parent is showing and its bounding rect for positioning
+  const [popover, setPopover] = useState(null); // { parent: string, rect: DOMRect }
+  const popoverRef = useRef(null);
+
   const menu = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     {
@@ -109,25 +95,21 @@ export default function Sidebar({
     navigate("/login");
   };
 
-  // when toggling a parent menu, notify parent if a setter was provided
   const toggleParent = (to) => {
     const next = openParent === to ? null : to;
     setOpenParent(next);
     if (typeof setSelectedParent === "function") setSelectedParent(next);
   };
 
-  // helper to find which parent (if any) contains the current pathname
   const findParentForPath = (path) => {
     for (const p of menu) {
       if (p.children && p.children.length) {
-        // check child routes
         for (const c of p.children) {
           if (path === c.to || path.startsWith(c.to + "/")) {
             return p.to;
           }
         }
       }
-      // also check parent direct route
       if (p.to && (path === p.to || path.startsWith(p.to + "/"))) {
         return p.to;
       }
@@ -135,28 +117,115 @@ export default function Sidebar({
     return null;
   };
 
-  // When the route changes, open the parent that matches the current path.
-  // This keeps the parent expanded when a child link is clicked.
   useEffect(() => {
     const parentForPath = findParentForPath(pathname);
     if (parentForPath) {
       setOpenParent(parentForPath);
       if (typeof setSelectedParent === "function") setSelectedParent(parentForPath);
     }
-    // NOTE: do not forcibly close openParent if path doesn't match any parent.
-    // That preserves user-controlled open state.
+    // close popover when route changes
+    setPopover(null);
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // close popover on outside click or on Escape
+  useEffect(() => {
+    const handleDocClick = (e) => {
+      if (!popover) return;
+      if (popoverRef.current && popoverRef.current.contains(e.target)) return;
+      // clicked outside popover -> close it
+      setPopover(null);
+    };
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setPopover(null);
+    };
+    document.addEventListener("mousedown", handleDocClick);
+    document.addEventListener("keydown", handleEsc);
+    return () => {
+      document.removeEventListener("mousedown", handleDocClick);
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, [popover]);
+
+  // render popover box with children links when collapsed
+  const renderPopover = () => {
+    if (!popover) return null;
+    const { parent, rect, children } = popover;
+    if (!rect) return null;
+
+    // compute position: show box to the right of sidebar icon; clamp vertically
+    const top = Math.max(8, rect.top - 8);
+    const left = rect.right + 8; // small gap from icon
+    const maxHeight = Math.min(window.innerHeight - top - 16, 300);
+
+    return (
+      <div
+        ref={popoverRef}
+        className="z-50"
+        style={{
+          position: "fixed",
+          top: top,
+          left: left,
+          minWidth: 200,
+          maxWidth: 300,
+          maxHeight: maxHeight,
+          overflowY: "auto",
+          background: "#fff",
+          boxShadow: "0 8px 24px rgba(2,6,23,0.12)",
+          borderRadius: 8,
+          padding: 8,
+          border: "1px solid rgba(15,23,42,0.06)",
+        }}
+      >
+        <div style={{ padding: "6px 8px", fontWeight: 700, color: "#0f172a" }}>{parent}</div>
+        <div style={{ height: 1, background: "rgba(15,23,42,0.04)", margin: "6px 0" }} />
+        <div className="flex flex-col">
+          {children.map((child) => {
+            const childActive = pathname === child.to || pathname.startsWith(child.to + "/");
+            return (
+              <button
+                key={child.to}
+                onClick={() => {
+                  navigate(child.to);
+                  setPopover(null);
+                  if (typeof onClose === "function") onClose();
+                }}
+                className={cn(
+                  "text-left px-3 py-2 rounded hover:bg-gray-50 w-full",
+                  childActive ? "bg-blue-50 !text-[#3D5EE1]" : "text-[#374151]"
+                )}
+                style={{ border: "none", background: "transparent", cursor: "pointer" }}
+              >
+                {child.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   const SidebarContent = () => (
-    <div className="flex flex-col h-full shadow-lg">
+    <div
+      className={cn(
+        "flex flex-col h-full shadow-lg bg-white transition-all duration-200",
+        collapsed ? "items-center" : "items-stretch"
+      )}
+    >
       {/* Header */}
       <div
-        className="flex  justify-between w-full gap-2  h-[60px] bg-white"
+        className="flex justify-between w-full gap-2 h-[60px]"
         style={{ borderBottom: ".5px solid #66708550", alignItems: "center" }}
       >
-        <div className="flex itams-left">
-          <img src={logo} alt="logo" className="w-[350px] h-[210px] object-contain ml-[-20px]" />
-          
+        <div className="flex itams-left items-center">
+          {/* Shrink logo when collapsed */}
+          <img
+            src={logo}
+            alt="logo"
+            className={cn(
+              "object-contain ml-[-20px] transition-all duration-200",
+              collapsed ? "w-12 h-12 ml-0" : "w-[350px] h-[210px] ml-[-20px]"
+            )}
+          />
         </div>
 
         {/* Mobile close button (Drawer provides onClose) */}
@@ -168,41 +237,72 @@ export default function Sidebar({
           className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
           aria-label="close sidebar"
         >
-          {/* <X size={18} /> */}
         </button>
       </div>
 
       {/* Scrollable nav */}
-      <ScrollArea className="flex-1 overflow-y-auto">
-        <nav className="p-4 space-y-2">
+      <ScrollArea className="flex-1 overflow-y-auto w-full">
+        <nav className={cn("p-4 space-y-2 w-full", collapsed ? "px-1" : "px-4")}>
           {menu.map((item) => {
             const Icon = item.icon;
             const active = isLinkActive(item.to, item.children);
             const hasChildren = Array.isArray(item.children) && item.children.length > 0;
 
             return (
-              <div key={item.to || item.label} className="w-full">
-                {/* parent item */}
+              <div key={item.to || item.label} className="w-full relative">
                 <div
                   className={cn(
                     "w-full flex items-center justify-between font-medium text-[#667085] rounded-md text-[14.5px] gap-3 p-2 hover:bg-[#DDE4FF] transition-colors duration-200",
                     active ? "bg-[#F2F5FF] !text-[#3D5EE1]" : "text-[#667085]"
                   )}
+                  title={collapsed ? item.label : undefined}
                 >
                   <div className="flex items-center gap-3 w-full">
-                    <div
+                    {/* ICON: clickable behavior updated:
+                        - if collapsed & hasChildren -> show floating box
+                        - if collapsed & no children -> navigate
+                        - if not collapsed -> same as before */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        // if collapsed and this item has children -> show popover
+                        if (collapsed && hasChildren) {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          // toggle: if same parent clicked close
+                          if (popover && popover.parent === item.label) {
+                            setPopover(null);
+                          } else {
+                            setPopover({ parent: item.label, rect, children: item.children });
+                          }
+                        } else {
+                          // normal behavior: navigate if has a route; otherwise toggle submenu when expanded
+                          if (item.to && (!hasChildren || !collapsed)) {
+                            navigate(item.to);
+                            if (typeof onClose === "function") onClose();
+                          } else if (hasChildren && !collapsed) {
+                            toggleParent(item.to);
+                          }
+                        }
+                      }}
                       className={cn(
-                        "p-1.5 rounded-sm flex items-center text-[#667085]",
+                        "p-1.5 rounded-sm flex items-center text-[#667085] focus:outline-none",
                         active ? "bg-white shadow-sm !text-[#3D5EE1]" : "!text-[#667085]"
                       )}
+                      title={item.label}
+                      aria-label={item.label}
                     >
                       {Icon ? <Icon size={18} /> : null}
-                    </div>
+                    </button>
 
+                    {/* Label (hidden when collapsed) */}
                     {hasChildren ? (
                       <button
                         onClick={() => toggleParent(item.to)}
-                        className={cn("flex-1 text-left !text-[#667085]", active ? " !text-[#3D5EE1]" : "!text-[#667085]")}
+                        className={cn(
+                          "flex-1 text-left !text-[#667085] truncate",
+                          active ? " !text-[#3D5EE1]" : "!text-[#667085]",
+                          collapsed ? "hidden" : ""
+                        )}
                         aria-expanded={openParent === item.to}
                       >
                         {item.label}
@@ -213,18 +313,25 @@ export default function Sidebar({
                         onClick={() => {
                           if (typeof onClose === "function") onClose();
                         }}
-                        className={cn("flex-1 text-left !text-[#667085]", active ? " !text-[#3D5EE1]" : "!text-[#667085]")}
+                        className={cn(
+                          "flex-1 text-left !text-[#667085] truncate",
+                          active ? " !text-[#3D5EE1]" : "!text-[#667085]",
+                          collapsed ? "hidden" : ""
+                        )}
                       >
                         {item.label}
                       </Link>
                     )}
                   </div>
 
-                  {/* chevron for parents */}
-                  {hasChildren && (
+                  {/* chevron for parents (hidden when collapsed) */}
+                  {hasChildren && !collapsed && (
                     <button
                       onClick={() => toggleParent(item.to)}
-                      className={cn("text-sm px-2 py-1 rounded !text-[#667085]", openParent === item.to ? "rotate-180" : "")}
+                      className={cn(
+                        "text-sm px-2 py-1 rounded !text-[#667085]",
+                        openParent === item.to ? "rotate-180" : ""
+                      )}
                       aria-label="toggle submenu"
                     >
                       <svg
@@ -242,8 +349,8 @@ export default function Sidebar({
                   )}
                 </div>
 
-                {/* children */}
-                {hasChildren && openParent === item.to && (
+                {/* children (hidden when collapsed - inline) */}
+                {hasChildren && openParent === item.to && !collapsed && (
                   <div className="mt-1 ml-8 flex flex-col gap-1">
                     {item.children.map((child) => {
                       const childActive = pathname === child.to || pathname.startsWith(child.to + "/");
@@ -253,7 +360,6 @@ export default function Sidebar({
                           to={child.to}
                           onClick={() => {
                             if (typeof onClose === "function") onClose();
-                            // DO NOT close the parent here — we want the parent to remain expanded
                           }}
                           className={cn(
                             "w-full text-[16px] py-2 px-3 rounded-md text-left !text-[#667085] hover:bg-gray-100",
@@ -273,18 +379,29 @@ export default function Sidebar({
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-4 bg-white text-[14px]" style={{ borderTop: ".5px solid #66708550" }}>
-        <div
-          onClick={() => navigate("/settings")}
-          className="flex items-center justify-start gap-2 w-full font-medium p-2 rounded-md cursor-pointer hover:bg-gray-100 text-[#667085]"
-        >
-          <Settings size={16} />
-          Settings
+      <div className="p-4 bg-white text-[14px] w-full" style={{ borderTop: ".5px solid #66708550" }}>
+        {/* Toggle + Settings row */}
+        <div className="flex items-center justify-between gap-2">
+          
+
+          <div
+            onClick={() => navigate("/settings")}
+            className={cn(
+              "flex items-center justify-start gap-2 w-full font-medium p-2 rounded-md cursor-pointer hover:bg-gray-100 text-[#667085]",
+              collapsed ? "justify-center" : ""
+            )}
+            title={collapsed ? "Settings" : undefined}
+          >
+            <Settings size={16} />
+            {!collapsed && <span>Settings</span>}
+          </div>
         </div>
       </div>
+
+      {/* floating popover when collapsed */}
+      {renderPopover()}
     </div>
   );
 
-  // Return only the content (do not render extra asides). MainLayout already provides Sider / Drawer wrappers.
   return <SidebarContent className="shadow-lg" />;
 }
