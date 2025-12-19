@@ -31,6 +31,8 @@ function AddOrder() {
   const [vendors, setVendors] = useState([]);
   const [products, setProducts] = useState([]); // products shown in dropdown
   const [productsLoading, setProductsLoading] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
   const [summary, setSummary] = useState({
     items: [],
     count: 0,
@@ -52,6 +54,14 @@ function AddOrder() {
    *  - productService.search(query, { limit })                (fallback)
    *  - getAll() + client-side filter (final fallback)
    */
+
+  useEffect(() => {
+  const role = localStorage.getItem("role");
+  if (role && role.toLowerCase() === "super admin") {
+    setIsSuperAdmin(true);
+  }
+}, []);
+
   const fetchProducts = async (query = "", limit = 50) => {
     setProductsLoading(true);
     try {
@@ -440,6 +450,22 @@ function AddOrder() {
               </Form.Item>
             </Col>
           )}
+
+          {isSuperAdmin && (
+  <Col xs={24} sm={12}>
+    <Form.Item
+      label="Branch"
+      name="branch_id"
+      rules={[{ required: true, message: "Please select branch" }]}
+    >
+      <select className="w-full outline-none text-sm border border-gray-300 py-4 px-4 rounded-md bg-white">
+        <option value="">Select Branch</option>
+        {/* branch options already handled by backend / global state */}
+      </select>
+    </Form.Item>
+  </Col>
+)}
+
 
           {/* Add Product Buttons (replaces scan input) */}
           <Col xs={24}>

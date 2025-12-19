@@ -83,12 +83,13 @@ const Login = () => {
       // save the raw response for debugging/display
       setLastResponse(res.data ?? res);
 
-      const { message: responseMessage, token, refreshToken, user } = res.data;
+      const { message: responseMessage, token, refreshToken, user, role_name } = res.data;
 
       if (token && user) {
         localStorage.setItem("token", token);
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("role", role_name)
 
         toast.success(
           ` ${responseMessage} - Welcome, ${user.username || user.name || ""}!`

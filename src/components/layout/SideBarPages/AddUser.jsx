@@ -19,27 +19,22 @@ function AddUser() {
     password: "",
     phone: "",
     role_id: "",
-    branch_id: "", // NEW
+    branch_id: "",    // NEW
+    branch_name: "",  // NEW: store branch name to send with payload
   });
 
   const [loading, setLoading] = useState(false);
 
   // ---------------------------------------
-  // 🔍 Decode token to check if Admin or Super Admin
+  // 🔍 Check role from localStorage
   // ---------------------------------------
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        const role = payload.role || payload.user_role || payload.userType;
+    const role = localStorage.getItem("role");
 
-        if (role === "Admin" || role === "super admin" || role === "SUPER_ADMIN") {
-          setIsAdmin(true);
-        }
-      } catch (err) {
-        console.error("Error parsing token:", err);
-      }
+    if (role && role.toLowerCase() === "super admin") {
+      setIsAdmin(true); // only super admin can see branch
+    } else {
+      setIsAdmin(false);
     }
   }, []);
 
@@ -91,6 +86,7 @@ function AddUser() {
         phone: user.phone || "",
         role_id: user.role_id || user.role?.id || "",
         branch_id: user.branch_id || user.branch?.id || "", // NEW
+        branch_name: user.branch?.name || "",               // NEW (if editing)
       }));
     } catch (err) {
       console.error("Error fetching user:", err);
@@ -113,7 +109,20 @@ function AddUser() {
   // 🔹 Handle Input Change
   // ---------------------------------------
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+
+    // If branch select changed, also set branch_name
+    if (name === "branch_id") {
+      const selectedBranch = branches.find((b) => String(b.id) === String(value));
+      setFormData((prev) => ({
+        ...prev,
+        branch_id: value,
+        branch_name: selectedBranch?.name || "",
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // ---------------------------------------
@@ -131,9 +140,14 @@ function AddUser() {
         role_id: formData.role_id,
       };
 
-      // Only admin users send branch_id
+      // Only admin (super admin) users send branch_id + branch_name
       if (isAdmin) {
         payload.branch_id = formData.branch_id;
+
+        // ensure branch_name exists: prefer formData.branch_name, fallback to lookup
+        payload.branch_name =
+          formData.branch_name ||
+          (branches.find((b) => String(b.id) === String(formData.branch_id))?.name || "");
       }
 
       // Add password only in create mode
@@ -242,7 +256,7 @@ function AddUser() {
           </div>
         </div>
 
-        {/* Branch (ONLY FOR ADMIN USERS) */}
+        {/* Branch (ONLY FOR ADMIN / SUPER ADMIN USERS) */}
         {isAdmin && (
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">Branch *</label>
