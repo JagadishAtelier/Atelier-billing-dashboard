@@ -76,17 +76,22 @@ const HeaderBar = ({ collapsed /* optional */, setCollapsed /* optional */ }) =>
             style={{ display: "flex", justifyContent: "space-between", padding: 10 }}
           >
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-              <Avatar style={{ backgroundColor: "#eef2ff", color: "#3730a3" }}>
-                {(item.customer_name || item.customer || "U").charAt(0)}
-              </Avatar>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600 }}>
-                  {item.customer_name || item.customer || "Unknown"}
+              <a style={{ display: "flex", gap: 10, alignItems: "center" }} onClick={() => {
+
+                navigate("/billing/list"); // optional: navigate to billings page
+              }}>
+                <Avatar style={{ backgroundColor: "#eef2ff", color: "#3730a3" }}>
+                  {(item.customer_name || item.customer || "U").charAt(0)}
+                </Avatar>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>
+                    {item.customer_name || item.customer || "Unknown"}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#6b7280" }}>
+                    {item.billing_no ? `#${item.billing_no}` : "Recent bill"}
+                  </div>
                 </div>
-                <div style={{ fontSize: 12, color: "#6b7280" }}>
-                  {item.billing_no ? `#${item.billing_no}` : "Recent bill"}
-                </div>
-              </div>
+              </a>
             </div>
 
             <div style={{ fontWeight: 700 }}>
