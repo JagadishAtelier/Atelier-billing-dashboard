@@ -31,10 +31,38 @@ function AddShipping() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); // product options shown in Select
   const [customers, setCustomers] = useState([]);
 
   const searchTimeout = useRef(null);
+
+  /* ---------- Helpers ---------- */
+  const normalizeList = (resp) => {
+    if (!resp) return [];
+    if (Array.isArray(resp)) return resp;
+    if (Array.isArray(resp.data)) return resp.data;
+    if (Array.isArray(resp.data?.data)) return resp.data.data;
+    if (Array.isArray(resp.results)) return resp.results;
+    if (Array.isArray(resp.items)) return resp.items;
+    return [];
+  };
+
+  const fetchProductById = async (pid) => {
+    if (!pid) return null;
+    try {
+      if (typeof productService.getById === "function") {
+        const pres = await productService.getById(pid);
+        return pres?.data ?? pres ?? null;
+      }
+      // fallback: try fetching a page and matching id
+      const resp = await productService.getAll({ limit: 50 });
+      const list = normalizeList(resp);
+      return list.find((p) => String(p.id) === String(pid)) || null;
+    } catch (err) {
+      console.error("fetchProductById failed", err);
+      return null;
+    }
+  };
 
   /* ---------- Initial ---------- */
   useEffect(() => {
@@ -47,7 +75,11 @@ function AddShipping() {
 
     fetchCustomers();
 
+    // preload a page of products so the dropdown shows items before user types
+    fetchProducts("");
+
     if (isEdit) fetchShipping();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -55,8 +87,10 @@ function AddShipping() {
   const fetchCustomers = async () => {
     try {
       const res = await customersService.getAll({ limit: 200 });
-      setCustomers(res.data || res || []);
-    } catch {
+      const list = normalizeList(res);
+      setCustomers(list);
+    } catch (err) {
+      console.error("customers fetch failed", err);
       setCustomers([]);
     }
   };
@@ -137,10 +171,50 @@ function AddShipping() {
         items,
       });
 
+      // Ensure Select options include the selected products so Select shows names (not raw ids)
+      const productIds = [
+        ...new Set((items || []).map((it) => it.product_id).filter(Boolean)),
+      ];
+
+      if (productIds.length > 0) {
+        // fetch details for each productId in parallel and merge into products state
+        const fetched = await Promise.all(productIds.map((pid) => fetchProductById(pid)));
+        const valid = fetched.filter(Boolean);
+
+        if (valid.length > 0) {
+          setProducts((prev) => {
+            const prevArr = Array.isArray(prev) ? prev : [];
+            const combined = [...prevArr];
+            valid.forEach((p) => {
+              if (!combined.some((c) => String(c.id) === String(p.id))) combined.push(p);
+            });
+            return combined;
+          });
+
+          // enrich items with unit_price/unit/tax if missing
+          const enrichedItems = (form.getFieldValue("items") || []).map((it) => {
+            const p = valid.find((x) => String(x.id) === String(it.product_id));
+            if (p) {
+              return {
+                ...it,
+                unit_price: Number(it.unit_price || p.selling_price || p.purchase_price || 0),
+                unit: it.unit || p.unit || "",
+                tax: Number(it.tax || p.tax || p.tax_percentage || 0),
+                total_price: Number(
+                  (Number(it.quantity || 0) * Number(it.unit_price || 0) + Number(it.tax || 0) - Number(it.discount || 0)).toFixed(2)
+                ),
+              };
+            }
+            return it;
+          });
+
+          form.setFieldsValue({ items: enrichedItems });
+        }
+      }
+
       // if edit and customer exists, ensure autofill (and load customer if needed)
       if (data.customer_id) {
         // try autofill (this will fetch customer if not in customers list)
-        // wait to ensure form values are set before autofill
         await handleCustomerSelect(data.customer_id);
       }
     } catch (err) {
@@ -175,6 +249,8 @@ function AddShipping() {
       total_price: 0,
     });
     form.setFieldsValue({ items });
+    // preload products if empty so the new row has options immediately
+    if (!products || products.length === 0) fetchProducts("");
   };
 
   const removeItem = (index) => {
@@ -186,9 +262,11 @@ function AddShipping() {
   /* ---------- Product search ---------- */
   const fetchProducts = async (query = "") => {
     try {
-      const res = await productService.getAll({ search: query, limit: 20 });
-      setProducts(res.data || []);
-    } catch {
+      const res = await productService.getAll({ search: query, limit: 50 });
+      const list = normalizeList(res);
+      setProducts(list);
+    } catch (err) {
+      console.error("product fetch failed", err);
       setProducts([]);
     }
   };
@@ -206,7 +284,7 @@ function AddShipping() {
     items[index] = updateItem({
       ...items[index],
       product_id: p.id,
-      unit_price: Number(p.selling_price || 0),
+      unit_price: Number(p.selling_price || p.purchase_price || 0),
       unit: p.unit || "",
       tax: Number(p.tax || 0),
     });
@@ -293,11 +371,20 @@ function AddShipping() {
             placeholder="Search product"
             filterOption={false}
             onSearch={handleSearch}
+            onFocus={() => {
+              // preload if empty
+              if (!products || products.length === 0) fetchProducts("");
+            }}
             onChange={(v) => handleProductSelect(v, index)}
+            optionLabelProp="label" // show the friendly label when selected
           >
             {products.map((p) => (
-              <Option key={p.id} value={p.id}>
-                {p.product_name}
+              <Option
+                key={p.id}
+                value={p.id}
+                label={`${p.product_name || "Unnamed"}${p.product_code ? ` (${p.product_code})` : ""}`}
+              >
+                {p.product_name} {p.product_code ? ` — (${p.product_code})` : ""} {p.selling_price ? ` — ₹${p.selling_price}` : ""}
               </Option>
             ))}
           </Select>
@@ -320,14 +407,7 @@ function AddShipping() {
         </Form.Item>
       ),
     },
-    {
-      title: "Discount",
-      render: (_, __, index) => (
-        <Form.Item name={[index, "discount"]}>
-          <InputNumber min={0} />
-        </Form.Item>
-      ),
-    },
+    
     {
       title: "Tax",
       render: (_, __, index) => (
@@ -338,7 +418,7 @@ function AddShipping() {
     },
     {
       title: "Total",
-      render: (_, record) => `₹${record.total_price || 0}`,
+      render: (_, record) => `₹${Number(record.total_price || 0).toFixed(2)}`,
     },
     {
       title: "",

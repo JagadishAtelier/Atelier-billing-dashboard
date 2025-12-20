@@ -1,17 +1,24 @@
-// Header.jsx (updated: optional setCollapsed prop + toggle button)
+// Header.jsx (fetch recent 3 bills from billingService)
 import React, { useEffect, useState } from "react";
 import { Popover, Dropdown, List, Avatar, message } from "antd";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import { Bell, User, LogOut, ChevronDown, Search, Command, Menu } from "lucide-react";
+import { Bell, User, LogOut, Menu, Search, Command } from "lucide-react";
 import { motion } from "framer-motion";
 import companyLogo from "../assets/Company_logo.png";
 import { Input } from "antd";
+
+// import your billing service (adjust path if needed)
+import billingService from "../../billing/service/billingService";
 
 const HeaderBar = ({ collapsed /* optional */, setCollapsed /* optional */ }) => {
   const { theme, headerBgColor, headerGradient } = useTheme();
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // state for recent bills
+  const [recentBills, setRecentBills] = useState([]);
+  const [loadingBills, setLoadingBills] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -19,33 +26,88 @@ const HeaderBar = ({ collapsed /* optional */, setCollapsed /* optional */ }) =>
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const recentBills = [
-    { id: 1, customer: "John Doe", amount: 1280.5 },
-    { id: 2, customer: "Alice Rao", amount: 560.0 },
-    { id: 3, customer: "Mohan Kumar", amount: 2300.75 },
-  ];
+  // Fetch latest 3 bills on mount (defensive parsing)
+  useEffect(() => {
+    let mounted = true;
+    const fetchRecentBills = async () => {
+      setLoadingBills(true);
+      try {
+        // Request with limit=3 (API will vary; billingService.getAll returns res.data)
+        const res = await billingService.getAll({ page: 1, limit: 3, sort_by: "createdAt", order: "desc" });
+
+        // billingService.getAll returns res.data (or the API may return { data: [...] })
+        // handle both shapes defensively:
+        let items = [];
+        if (!res) items = [];
+        else if (Array.isArray(res)) items = res;
+        else if (Array.isArray(res.data)) items = res.data;
+        else if (Array.isArray(res.data?.data)) items = res.data.data; // extremely defensive
+        else if (Array.isArray(res.results)) items = res.results;
+        else items = [];
+
+        if (mounted) setRecentBills(items.slice(0, 3));
+      } catch (err) {
+        console.error("Failed to load recent bills:", err);
+        message.error("Unable to load notifications");
+        if (mounted) setRecentBills([]);
+      } finally {
+        if (mounted) setLoadingBills(false);
+      }
+    };
+
+    fetchRecentBills();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const notificationContent = (
-    <div style={{ minWidth: 300 }}>
-      <div style={{ padding: 12, fontWeight: 600 }}>Recent bills</div>
+    <div style={{ minWidth: 220 }}>
+      <div style={{ padding: 10, fontWeight: 600 }}>Recent bills</div>
+
       <List
         size="small"
+        loading={loadingBills}
         dataSource={recentBills}
+        locale={{ emptyText: loadingBills ? "Loading..." : "No recent bills" }}
         renderItem={(item) => (
-          <List.Item key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: 10 }}>
+          <List.Item
+            key={item.id || item.billing_no}
+            style={{ display: "flex", justifyContent: "space-between", padding: 10 }}
+          >
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-              <Avatar style={{ backgroundColor: "#eef2ff", color: "#3730a3" }}>{item.customer.charAt(0)}</Avatar>
+              <Avatar style={{ backgroundColor: "#eef2ff", color: "#3730a3" }}>
+                {(item.customer_name || item.customer || "U").charAt(0)}
+              </Avatar>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600 }}>{item.customer}</div>
-                <div style={{ fontSize: 12, color: "#6b7280" }}>Recent bill</div>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>
+                  {item.customer_name || item.customer || "Unknown"}
+                </div>
+                <div style={{ fontSize: 12, color: "#6b7280" }}>
+                  {item.billing_no ? `#${item.billing_no}` : "Recent bill"}
+                </div>
               </div>
             </div>
-            <div style={{ fontWeight: 700 }}>₹{item.amount.toFixed(2)}</div>
+
+            <div style={{ fontWeight: 700 }}>
+              {/* format amount defensively */}
+              {typeof item.total_amount === "number"
+                ? `₹${item.total_amount.toFixed(2)}`
+                : item.total_amount || item.subtotal_amount || "—"}
+            </div>
           </List.Item>
         )}
       />
+
       <div style={{ textAlign: "center", padding: 8, borderTop: "1px solid #f3f4f6" }}>
-        <a onClick={() => message.info("Open all notifications")}>View all</a>
+        <a
+          onClick={() => {
+            message.info("Open all notifications");
+            navigate("/billing/list"); // optional: navigate to billings page
+          }}
+        >
+          View all
+        </a>
       </div>
     </div>
   );
@@ -118,7 +180,7 @@ const HeaderBar = ({ collapsed /* optional */, setCollapsed /* optional */ }) =>
             size={16}
             className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
           />
-          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 shadow-sm p-1 rounded-sm border border-gray-100 bg-white hover:bg-gray-50 cursor-pointer">
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 shadow-sm p-1 rounded-sm border border-gray-100 bg-white hover:bg-gray-50 cursor-pointer">
             <Command size={14} className="text-gray-400" />
           </div>
         </div>

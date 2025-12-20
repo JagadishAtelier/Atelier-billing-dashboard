@@ -18,6 +18,7 @@ import {
 import vendorService from "./services/vendorService";
 import productService from "../../../Product/services/productService";
 import orderService from "./services/orderService";
+import branchService from "./services/branchService"; // <-- ADDED
 import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
@@ -32,6 +33,10 @@ function AddOrder() {
   const [products, setProducts] = useState([]); // products shown in dropdown
   const [productsLoading, setProductsLoading] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  // NEW: branches state
+  const [branches, setBranches] = useState([]);
+  const [branchesLoading, setBranchesLoading] = useState(false);
 
   const [summary, setSummary] = useState({
     items: [],
@@ -56,11 +61,42 @@ function AddOrder() {
    */
 
   useEffect(() => {
-  const role = localStorage.getItem("role");
-  if (role && role.toLowerCase() === "super admin") {
-    setIsSuperAdmin(true);
-  }
-}, []);
+    const role = localStorage.getItem("role");
+    if (role && role.toLowerCase() === "super admin") {
+      setIsSuperAdmin(true);
+    }
+  }, []);
+
+  // Fetch branches when user is super admin
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+
+    let mounted = true;
+    const fetchBranches = async () => {
+      setBranchesLoading(true);
+      try {
+        // try to get many branches (adjust params if backend differs)
+        const resp = await branchService.getAll({ limit: 1000 });
+
+        // normalize
+        let list = Array.isArray(resp) ? resp : resp?.data ?? resp?.results ?? resp?.items ?? [];
+        if (!Array.isArray(list)) list = [];
+
+        if (mounted) setBranches(list);
+      } catch (err) {
+        console.error("Failed to load branches:", err);
+        message.error("Failed to load branch list");
+        if (mounted) setBranches([]);
+      } finally {
+        if (mounted) setBranchesLoading(false);
+      }
+    };
+
+    fetchBranches();
+    return () => {
+      mounted = false;
+    };
+  }, [isSuperAdmin]);
 
   const fetchProducts = async (query = "", limit = 50) => {
     setProductsLoading(true);
@@ -84,7 +120,7 @@ function AddOrder() {
           }
           throw new Error("get not available");
         },
-        // 3) try getAll with params object (some services serialize differently, but keep as fallback)
+        // 3) try getAll with params object
         async () => {
           if (typeof productService.getAll === "function") {
             return await productService.getAll({ search: query || undefined, limit });
@@ -204,6 +240,7 @@ function AddOrder() {
           isManual: false,
         }));
 
+        // If branch id exists in order and branches loaded, set field
         form.setFieldsValue({
           vendor_id: orderData.vendor_id,
           order_date: orderData.order_date
@@ -211,6 +248,7 @@ function AddOrder() {
             : null,
           status: orderData.status || "",
           items,
+          branch_id: orderData.branch_id || form.getFieldValue("branch_id"),
         });
 
         updateSummary(items, -1);
@@ -351,6 +389,8 @@ function AddOrder() {
         order_date: values.order_date ? dayjs(values.order_date).toDate() : new Date(),
         status: id ? values.status : "pending",
         items: formattedItems,
+        // include branch_id if present (super admin selection)
+        ...(values.branch_id ? { branch_id: values.branch_id } : {}),
       };
 
       if (id) {
@@ -452,19 +492,23 @@ function AddOrder() {
           )}
 
           {isSuperAdmin && (
-  <Col xs={24} sm={12}>
-    <Form.Item
-      label="Branch"
-      name="branch_id"
-      rules={[{ required: true, message: "Please select branch" }]}
-    >
-      <select className="w-full outline-none text-sm border border-gray-300 py-4 px-4 rounded-md bg-white">
-        <option value="">Select Branch</option>
-        {/* branch options already handled by backend / global state */}
-      </select>
-    </Form.Item>
-  </Col>
-)}
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label="Branch"
+                name="branch_id"
+                rules={[{ required: true, message: "Please select branch" }]}
+              >
+                <select className="w-full outline-none text-sm border border-gray-300 py-4 px-4 rounded-md bg-white" disabled={branchesLoading}>
+                  <option value="">{branchesLoading ? "Loading branches..." : "Select Branch"}</option>
+                  {branches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.branch_name || b.name || b.title || b.label || `Branch ${b.id}`}
+                    </option>
+                  ))}
+                </select>
+              </Form.Item>
+            </Col>
+          )}
 
 
           {/* Add Product Buttons (replaces scan input) */}

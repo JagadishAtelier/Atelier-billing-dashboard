@@ -459,6 +459,13 @@ export default function CRMModule() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button 
+  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg 
+             bg-[#4C6EF5] hover:bg-[#3f5cd6] text-white font-semibold text-[15px]"
+>
+  <Plus className="w-5 h-5 text-white" />
+  <span className="!text-white">Bulk Upload Lead</span>
+</button>
         <button 
   onClick={handleOpenAdd}
   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg 
@@ -533,11 +540,11 @@ export default function CRMModule() {
       <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
         <img src="/icon/sales.gif" className="w-10 h-10" alt="Sales Icon" />
       </div>
-      <h2 className="text-3xl font-bold text-[#1F2937]">₹1.5K</h2>
+      <h2 className="text-3xl font-bold text-[#1F2937]">₹1K</h2>
     </div>
 
     <div className="px-3 py-1 rounded-md bg-[#FACC15] flex items-center justify-center">
-      <span className="text-white text-sm font-semibold">1.05%</span>
+      <span className="text-white text-sm font-semibold">1.5%</span>
     </div>
   </div>
   <p className="text-gray-600 text-sm">Revenue</p>

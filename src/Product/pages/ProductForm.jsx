@@ -30,7 +30,7 @@ const ProductFormSimple = () => {
   const fetchCategories = async () => {
     try {
       const res = await categoryService.getAll();
-      setCategories(res?.data || []);
+      setCategories(res?.data || res || []);
     } catch {
       toast.error("Failed to load categories");
     }
@@ -40,7 +40,7 @@ const ProductFormSimple = () => {
     form.setFieldsValue({ subcategory_id: undefined });
     try {
       const res = await subcategoryService.getByCategory(categoryId);
-      setSubcategories(res?.data || []);
+      setSubcategories(res?.data || res || []);
     } catch {
       toast.error("Failed to load subcategories");
     }
@@ -51,16 +51,56 @@ const ProductFormSimple = () => {
     setLoading(true);
 
     try {
-      const product = await productService.getById(routeId);
+      // productService.getById may return the product directly or as { data: product }
+      const raw = await productService.getById(routeId);
+      const product = raw?.data ?? raw;
 
-      if (product.category_id) await handleCategoryChange(product.category_id);
+      if (!product) {
+        throw new Error("No product returned");
+      }
 
+      // ensure numeric fields are numbers and strings are sane
+      const normalized = {
+        product_name: product.product_name ?? product.name ?? "",
+        category_id: product.category_id ?? product.categoryId ?? null,
+        subcategory_id: product.subcategory_id ?? product.subcategoryId ?? null,
+        brand: product.brand ?? "",
+        unit: product.unit ?? "",
+        purchase_price:
+          product.purchase_price !== undefined && product.purchase_price !== null
+            ? Number(product.purchase_price)
+            : 0,
+        selling_price:
+          product.selling_price !== undefined && product.selling_price !== null
+            ? Number(product.selling_price)
+            : 0,
+        tax_percentage:
+          product.tax_percentage !== undefined && product.tax_percentage !== null
+            ? Number(product.tax_percentage)
+            : 0,
+        min_quantity:
+          product.min_quantity !== undefined && product.min_quantity !== null
+            ? Number(product.min_quantity)
+            : 0,
+        max_quantity:
+          product.max_quantity !== undefined && product.max_quantity !== null
+            ? Number(product.max_quantity)
+            : 0,
+        description: product.description ?? "",
+        status: product.status ?? "active",
+      };
+
+      // If category exists, load subcategories
+      if (normalized.category_id) {
+        await handleCategoryChange(normalized.category_id);
+      }
+
+      // Set form with normalized values (no raw nulls / strings)
       form.setFieldsValue({
-        ...product,
-        min_quantity: product.min_quantity ?? 0,
-        max_quantity: product.max_quantity ?? 0,
+        ...normalized,
       });
-    } catch {
+    } catch (err) {
+      console.error("Failed to load product", err);
       toast.error("Failed to load product");
     } finally {
       setLoading(false);
@@ -70,15 +110,21 @@ const ProductFormSimple = () => {
   useEffect(() => {
     fetchCategories();
     if (routeId) fetchProduct();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeId]);
 
   const onFinish = async (values) => {
     setLoading(true);
 
+    // coerce numeric fields and ensure description is string
     const payload = {
       ...values,
+      purchase_price: Number(values.purchase_price || 0),
+      selling_price: Number(values.selling_price || 0),
+      tax_percentage: Number(values.tax_percentage || 0),
       min_quantity: Number(values.min_quantity || 0),
       max_quantity: Number(values.max_quantity || 0),
+      description: values.description ?? "",
     };
 
     try {
@@ -92,8 +138,14 @@ const ProductFormSimple = () => {
 
       navigate("/product/list");
     } catch (err) {
-      console.log(err);
-      toast.error("Failed to save");
+      console.error(err);
+      // attempt to surface server message if any
+      const serverMsg =
+        err?.response?.data?.message ||
+        err?.response?.data ||
+        err?.message ||
+        "Failed to save";
+      toast.error(serverMsg);
     } finally {
       setLoading(false);
     }
@@ -110,9 +162,16 @@ const ProductFormSimple = () => {
           form={form}
           layout="vertical"
           onFinish={onFinish}
-          initialValues={{ status: "active", purchase_price: 0, selling_price: 0 }}
+          initialValues={{
+            status: "active",
+            purchase_price: 0,
+            selling_price: 0,
+            tax_percentage: 0,
+            min_quantity: 0,
+            max_quantity: 0,
+            description: "",
+          }}
         >
-
           <Form.Item
             name="product_name"
             label="Product Name"
@@ -164,15 +223,27 @@ const ProductFormSimple = () => {
           </div>
 
           <div style={{ display: "flex", gap: 12 }}>
-            <Form.Item name="purchase_price" label="Purchase Price" style={{ flex: 1 }}>
+            <Form.Item
+              name="purchase_price"
+              label="Purchase Price"
+              style={{ flex: 1 }}
+            >
               <InputNumber min={0} style={{ width: "100%" }} />
             </Form.Item>
 
-            <Form.Item name="selling_price" label="Selling Price" style={{ flex: 1 }}>
+            <Form.Item
+              name="selling_price"
+              label="Selling Price"
+              style={{ flex: 1 }}
+            >
               <InputNumber min={0} style={{ width: "100%" }} />
             </Form.Item>
 
-            <Form.Item name="tax_percentage" label="Tax %" style={{ flex: 1 }}>
+            <Form.Item
+              name="tax_percentage"
+              label="Tax %"
+              style={{ flex: 1 }}
+            >
               <InputNumber min={0} style={{ width: "100%" }} />
             </Form.Item>
           </div>
@@ -198,7 +269,20 @@ const ProductFormSimple = () => {
             </Select>
           </Form.Item>
 
-          <Button  htmlType="submit" style={{ backgroundColor: "#506ee4", fontWeight: "500", fontSize: "16px", height: "40px", border: "none", color: "#fff", borderRadius: "4px", padding: "6px 16px", cursor: "pointer" }}>
+          <Button
+            htmlType="submit"
+            style={{
+              backgroundColor: "#506ee4",
+              fontWeight: "500",
+              fontSize: "16px",
+              height: "40px",
+              border: "none",
+              color: "#fff",
+              borderRadius: "4px",
+              padding: "6px 16px",
+              cursor: "pointer",
+            }}
+          >
             {routeId ? "Update Product" : "Create Product"}
           </Button>
         </Form>

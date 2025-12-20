@@ -9,10 +9,10 @@ import IncomingPOs from "./IncomingPOs";
 import LowStockAlerts from "./LowStockAlerts";
 import TopProducts from "./TopProducts";
 import { LATEST_COLLECTIONS } from "../../data/dummyData";
-import Billingicon from "../../../public/icon/billing-machine-svgrepo-com.png"
-import Usericon from "../../../public/icon/user.png"
-import Producticon from "../../../public/icon/product.png"
-import Walleticon from "../../../public/icon/wallet.png"
+import Billingicon from "../../../public/icon/billing-machine-svgrepo-com.png";
+import Usericon from "../../../public/icon/user.png";
+import Producticon from "../../../public/icon/product.png";
+import Walleticon from "../../../public/icon/wallet.png";
 import RevenueGrowth from "../../../public/icon/revenue-growth.gif";
 import ProductGIF from "../../../public/Product.gif";
 import UserGIF from "../../../public/icon/user.gif";
@@ -89,6 +89,22 @@ const DashboardFull = () => {
   const [lastUpdated, setLastUpdated] = useState("");
 
   const [lowStockItems, setLowStockItems] = useState([]);
+
+  // ⭐ ADDED: Title that depends on localStorage role (read on mount to avoid SSR/hydration issues)
+  const [dashboardTitle, setDashboardTitle] = useState("Dashboard");
+  useEffect(() => {
+    try {
+      const roleRaw = localStorage.getItem("role") || "";
+      const role = String(roleRaw).toLowerCase().trim();
+
+      if (role === "super admin") setDashboardTitle("Admin Dashboard");
+      else if (role === "branch admin") setDashboardTitle("Branch Admin");
+      else setDashboardTitle("Dashboard");
+    } catch (e) {
+      // fallback
+      setDashboardTitle("Dashboard");
+    }
+  }, []);
 
   useEffect(() => {
     dashboardService.getLowStock().then((res) => {
@@ -396,20 +412,16 @@ const DashboardFull = () => {
         color: "transparent",   
         noBg: true,             
         linkTo: "/report",
-      }
-      
-      
+      }      
     ];
 
 
   return (
     <div style={styles.page}>
-
-
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1" style={{ fontWeight: "700" }}>
-            Admin Dashboard
+            {dashboardTitle}
           </h1>
           <Text style={{ fontSize: 12, color: "#6b7280" }}>
             Last updated: {lastUpdated || "—"}
@@ -449,7 +461,6 @@ const DashboardFull = () => {
           ))}
       </Row>
 
-
       {/* Charts */}
       <Row gutter={[12, 12]} style={{ marginTop: 16 }}>
         <Col xs={24}>
@@ -464,16 +475,6 @@ const DashboardFull = () => {
       <Row gutter={[12, 12]} style={{ marginTop: 16 }}>
         <Col xs={24} lg={12}>
           <LowStockAlerts items={lowStockItems} />
-          {/* <LatestPayments
-            payments={payments}
-            filterKey={filterKey}
-            setFilterKey={setFilterKey}
-            searchQ={searchQ}
-            setSearchQ={setSearchQ}
-            expandedRowKeys={expandedRowKeys}
-            setExpandedRowKeys={setExpandedRowKeys}
-          /> */}
-
         </Col>
 
         {/* Incoming POs */}

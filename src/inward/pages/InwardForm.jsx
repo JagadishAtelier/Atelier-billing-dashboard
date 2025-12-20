@@ -569,16 +569,6 @@ const InwardForm = () => {
       ),
     },
     {
-      title: "Unit",
-      key: "unit",
-      width: 110,
-      render: (_, record, index) => (
-        <Form.Item name={[index, "unit"]} style={{ margin: 0 }}>
-          <Input />
-        </Form.Item>
-      ),
-    },
-    {
       title: "Expiry Date",
       key: "expiry_date",
       width: 160,

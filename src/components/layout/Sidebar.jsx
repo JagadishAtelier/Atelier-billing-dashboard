@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "../lib/utils";
 import logo from "../assets/inlogo.png";
+import smalllogo from "../assets/smalllogo.png";
 import {
   Users,
   Settings,
@@ -219,13 +220,14 @@ export default function Sidebar({
         <div className="flex itams-left items-center">
           {/* Shrink logo when collapsed */}
           <img
-            src={logo}
-            alt="logo"
-            className={cn(
-              "object-contain ml-[-20px] transition-all duration-200",
-              collapsed ? "w-12 h-12 ml-0" : "w-[350px] h-[210px] ml-[-20px]"
-            )}
-          />
+  src={collapsed ? smalllogo : logo}
+  alt="logo"
+  className={cn(
+    "object-contain transition-all duration-200",
+    collapsed ? "w-[50px] h-[50px] ml-0" : "w-[350px] h-[210px] ml-[-20px]"
+  )}
+/>
+
         </div>
 
         {/* Mobile close button (Drawer provides onClose) */}
