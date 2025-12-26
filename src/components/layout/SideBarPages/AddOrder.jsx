@@ -384,14 +384,28 @@ function AddOrder() {
         });
       }
 
+      const selectedBranch = branches.find(
+  (b) => String(b.id) === String(values.branch_id)
+);
+
       const payload = {
-        vendor_id: values.vendor_id,
-        order_date: values.order_date ? dayjs(values.order_date).toDate() : new Date(),
-        status: id ? values.status : "pending",
-        items: formattedItems,
-        // include branch_id if present (super admin selection)
-        ...(values.branch_id ? { branch_id: values.branch_id } : {}),
-      };
+  vendor_id: values.vendor_id,
+  order_date: values.order_date
+    ? dayjs(values.order_date).toDate()
+    : new Date(),
+  status: id ? values.status : "pending",
+  items: formattedItems,
+
+  // include branch_id & branch_name if selected
+  ...(values.branch_id && {
+    branch_id: values.branch_id,
+    branch_name:
+      selectedBranch?.branch_name ||
+      selectedBranch?.name ||
+      selectedBranch?.title ||
+      "",
+  }),
+};
 
       if (id) {
         await orderService.update(id, payload);

@@ -71,6 +71,7 @@ export default function Sidebar({
     { to: "/inward/list", label: "Inward", icon: Truck },
     { to: "/return", label: "Returns", icon: Receipt },
     { to: "/crm-module", label: "CRM Module", icon: Users },
+    { to: "/crm-tasks", label: "CRM Tasks", icon: Users },
     { to: "/report", label: "Reports", icon: FileText },
   ];
 

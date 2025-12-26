@@ -31,6 +31,7 @@ import CRMModule from "./components/layout/SideBarPages/CRMModule";
 import ShippingList from "./components/layout/SideBarPages/ShippingList";
 import AddShipping from "./components/layout/SideBarPages/AddShipping";
 import PackingList from "./components/layout/SideBarPages/PackingList";
+import CrmTask from "./components/layout/SideBarPages/CrmTask";
 import { Toaster } from "sonner";
 import { RouteIcon } from "lucide-react";
 
@@ -326,6 +327,14 @@ element={
   element={
     <ProtectedRoute>  
       <CRMModule />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/crm-tasks"
+  element={
+    <ProtectedRoute>  
+      <CrmTask />
     </ProtectedRoute>
   }
 />

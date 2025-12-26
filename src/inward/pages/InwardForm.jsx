@@ -248,6 +248,8 @@ const InwardForm = () => {
         items: [],
         order_id: undefined,
         vendor_id: undefined,
+        branch_id: undefined,
+        branch_name: undefined,
       });
       updateSummary([], -1);
       return;
@@ -278,12 +280,22 @@ const InwardForm = () => {
       const supplierName = orderData.vendor?.name || orderData.vendor_id || "";
       const receivedDate = orderData.order_date ? dayjs(orderData.order_date) : null;
 
+      // Preserve branch info from orderData (if present)
+      const branchIdFromOrder = orderData.branch_id ?? orderData.branch?.id;
+      const branchNameFromOrder =
+        orderData.branch_name ??
+        orderData.branch?.branch_name ??
+        orderData.branch?.name ??
+        undefined;
+
       form.setFieldsValue({
         supplier_name: supplierName,
         received_date: receivedDate,
         items: mappedItems,
         order_id: orderData.id,
         vendor_id: orderData.vendor?.id ?? orderData.vendor_id ?? undefined,
+        branch_id: branchIdFromOrder,
+        branch_name: branchNameFromOrder,
       });
 
       updateSummary(mappedItems, mappedItems.length - 1);
@@ -433,6 +445,9 @@ const InwardForm = () => {
         total_quantity: values.total_quantity !== undefined ? Number(values.total_quantity) : undefined,
         status: values.status || "pending",
         items,
+        // include branch info when present (from selected order or manual entry)
+        ...(values.branch_id ? { branch_id: values.branch_id } : {}),
+        ...(values.branch_name ? { branch_name: values.branch_name } : {}),
       };
 
       await inwardService.create(payload);
@@ -688,6 +703,14 @@ const InwardForm = () => {
                       </Select>
                     </Form.Item>
                   </Col>
+
+                  {/* HIDDEN: Ensure branch_id and branch_name are part of form values */}
+                  <Form.Item name="branch_id" style={{ display: "none" }}>
+                    <Input type="hidden" />
+                  </Form.Item>
+                  <Form.Item name="branch_name" style={{ display: "none" }}>
+                    <Input type="hidden" />
+                  </Form.Item>
 
                   <Col xs={24} sm={12}>
                     <Form.Item label="Supplier Name" name="supplier_name">

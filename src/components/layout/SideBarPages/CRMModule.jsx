@@ -38,6 +38,13 @@ export default function CRMModule() {
   const [usersLoading, setUsersLoading] = useState(false);
   const [customersLoading, setCustomersLoading] = useState(false);
 
+  // Bulk upload state
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [bulkFile, setBulkFile] = useState(null);
+  const [bulkUploading, setBulkUploading] = useState(false);
+  const [bulkSummary, setBulkSummary] = useState(null);
+  const [skipDuplicates, setSkipDuplicates] = useState(true);
+
   // Editing state for leads
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -379,6 +386,46 @@ export default function CRMModule() {
   };
 
 
+  // Bulk upload handlers --------------------------------------------------
+  const openBulkModal = () => {
+    setBulkFile(null);
+    setBulkSummary(null);
+    setIsBulkModalOpen(true);
+  };
+
+  const handleBulkFileChange = (e) => {
+    const f = e.target.files?.[0] || null;
+    setBulkFile(f);
+    setBulkSummary(null);
+  };
+
+  const handleBulkUpload = async () => {
+    if (!bulkFile) {
+      toast.error("Please select a file to upload");
+      return;
+    }
+
+    setBulkUploading(true);
+    setBulkSummary(null);
+    try {
+      // Use the helper which sends FormData
+      const res = await leadsService.bulkUploadFile(bulkFile, { skipDuplicates });
+      // Expected controller response: { message, summary }
+      const summary = res?.summary ?? res;
+      setBulkSummary(summary || { message: res?.message || "Uploaded" });
+
+      // Refresh leads after upload
+      await fetchLeads();
+      toast.success("Bulk upload completed");
+    } catch (err) {
+      console.error("Bulk upload failed:", err);
+      const errMsg = err?.response?.data?.error || err?.message || "Bulk upload failed";
+      toast.error(errMsg);
+    } finally {
+      setBulkUploading(false);
+    }
+  };
+
   // Submit convert: create customer and update lead status
   const handleConvertSubmit = async () => {
     if (!convertForm.name || !convertForm.phone) {
@@ -417,7 +464,7 @@ export default function CRMModule() {
           setLeads((prev) => prev.map((l) => (l.id === leadToConvert.id ? { ...l, status: "Converted" } : l)));
         } catch (err) {
           console.error("Failed to update lead status after convert:", err);
-            toast.warning("Customer added but failed to update lead status");
+          toast.warning("Customer added but failed to update lead status");
         }
       }
 
@@ -446,12 +493,12 @@ export default function CRMModule() {
 
   // UI ------------
   return (
-<div
-  className="min-h-screen w-full px-4 py-4"
-  style={{ backgroundColor: "transparent" }}
->
+    <div
+      className="min-h-screen w-full px-4 py-4"
+      style={{ backgroundColor: "transparent" }}
+    >
 
-    {/* Header */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[30px] font-bold text-[#1F2937]">Customer Relationship Management</h1>
@@ -459,170 +506,238 @@ export default function CRMModule() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button 
-  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg 
+          <button
+            onClick={openBulkModal}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg 
+               bg-[#4C6EF5] hover:bg-[#3f5cd6] text-white font-semibold text-[15px]"
+          >
+            <Plus className="w-5 h-5 text-white" />
+            <span className="!text-white">Bulk Upload Lead</span>
+          </button>
+
+          <button
+            onClick={handleOpenAdd}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg 
              bg-[#4C6EF5] hover:bg-[#3f5cd6] text-white font-semibold text-[15px]"
->
-  <Plus className="w-5 h-5 text-white" />
-  <span className="!text-white">Bulk Upload Lead</span>
-</button>
-        <button 
-  onClick={handleOpenAdd}
-  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg 
-             bg-[#4C6EF5] hover:bg-[#3f5cd6] text-white font-semibold text-[15px]"
->
-  <Plus className="w-5 h-5 text-white" />
-  <span className="!text-white">Add Lead</span>
-</button>
-  </div>
+          >
+            <Plus className="w-5 h-5 text-white" />
+            <span className="!text-white">Add Lead</span>
+          </button>
+        </div>
       </div>
+
+      {/* Bulk Upload Modal */}
+      {isBulkModalOpen && (
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-start justify-center pt-24">
+          <div className="fixed inset-0 bg-black/40" onClick={() => setIsBulkModalOpen(false)} />
+          {/* Added maxHeight + overflowY so modal body scrolls on long content */}
+          <div
+            className="relative bg-white w-full max-w-xl mx-4 rounded-xl shadow-lg z-10"
+            style={{ maxHeight: "80vh", overflowY: "auto" }}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h3 className="text-lg font-medium">Bulk Upload Leads</h3>
+              <button onClick={() => setIsBulkModalOpen(false)} className="text-gray-500 hover:text-gray-700">Close</button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-600">Upload a CSV or Excel file containing leads. The backend will parse and insert records. Duplicates (by phone or email) will be skipped by default.</p>
+
+              <div>
+                <label className="text-sm text-gray-700 block mb-2">Select file</label>
+                <input type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" onChange={handleBulkFileChange} />
+                {bulkFile && <div className="text-sm mt-2 text-gray-700">Selected: {bulkFile.name} ({Math.round(bulkFile.size / 1024)} KB)</div>}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input id="skipDup" type="checkbox" checked={skipDuplicates} onChange={(e) => setSkipDuplicates(e.target.checked)} />
+                <label htmlFor="skipDup" className="text-sm text-gray-700">Skip duplicates (phone/email)</label>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button onClick={handleBulkUpload} disabled={bulkUploading} className="px-4 py-2 bg-blue-600 !text-white rounded-md">
+                  {bulkUploading ? "Uploading..." : "Upload"}
+                </button>
+                <button onClick={() => { setBulkFile(null); setBulkSummary(null); }} className="px-4 py-2 border rounded-md">Reset</button>
+              </div>
+
+              {bulkSummary && (
+                <div className="mt-4 bg-gray-50 border rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-800 mb-2">Upload Summary</h4>
+
+                  <ul className="text-sm space-y-1">
+                    <li>📥 Total Records: <b>{bulkSummary.totalReceived}</b></li>
+                    <li>✅ Successfully Added: <b>{bulkSummary.createdCount}</b></li>
+                    <li>⏭ Skipped (Duplicates): <b>{bulkSummary.skippedCount}</b></li>
+                  </ul>
+
+                  {bulkSummary.duplicates?.length > 0 && (
+                    <div className="mt-3">
+                      <p className="font-medium text-sm mb-1">Skipped Records:</p>
+                      <div className="max-h-40 overflow-y-auto border rounded p-2 text-xs bg-white">
+                        {bulkSummary.duplicates.map((d, i) => (
+                          <div key={i} className="border-b py-1">
+                            {d.name} — {d.phone}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-{/* CARD 1 — Total Leads */}
+        {/* CARD 1 — Total Leads */}
 
-<motion.div
-  initial={{ opacity: 0, scale: 0.95 }}
-  animate={{ opacity: 1, scale: 1 }}
-  whileHover={{ y: -8, scale: 1.03 }}
-  transition={{ duration: 0.25, ease: "easeOut" }}
-  className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ y: -8, scale: 1.03 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
 
->
-  <div className="flex items-start justify-between">
-    <div className="flex items-center gap-4">
-      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
-        <img src="/icon/leads.gif" className="w-10 h-10" alt="Customer Icon" />
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+                <img src="/icon/leads.gif" className="w-10 h-10" alt="Customer Icon" />
+              </div>
+              <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
+            </div>
+
+            <div className="px-3 py-1 rounded-md bg-[#FF8A4C] flex items-center justify-center">
+              <span className="text-white text-sm font-semibold">1.8%</span>
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm mt-1">Total leads</p>
+        </motion.div>
+
+        {/* CARD 2 — Active Customers */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ y: -8, scale: 1.03 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
+
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+                <img src="/icon/customer-care.gif" className="w-10 h-10" alt="Customer Icon" />
+              </div>
+              <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
+            </div>
+
+            <div className="px-3 py-1 rounded-md bg-[#22C55E] flex items-center justify-center">
+              <span className="text-white text-sm font-semibold">2.1%</span>
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm">Active customer</p>
+        </motion.div>
+
+        {/* CARD 3 — Revenue */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ y: -8, scale: 1.03 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
+
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+                <img src="/icon/sales.gif" className="w-10 h-10" alt="Sales Icon" />
+              </div>
+              <h2 className="text-3xl font-bold text-[#1F2937]">₹1K</h2>
+            </div>
+
+            <div className="px-3 py-1 rounded-md bg-[#FACC15] flex items-center justify-center">
+              <span className="text-white text-sm font-semibold">1.5%</span>
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm">Revenue</p>
+        </motion.div>
+
+        {/* CARD 4 — Conversion Rate */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ y: -8, scale: 1.03 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
+
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
+                <img src="/icon/money-exchange.gif" className="w-10 h-10" alt="Sales Icon" />
+              </div>
+              <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
+            </div>
+
+            <div className="px-3 py-1 rounded-md bg-[#A0522D] flex items-center justify-center">
+              <span className="text-white text-sm font-semibold">2.5%</span>
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm">Conversion rate</p>
+        </motion.div>
+
       </div>
-      <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
-    </div>
-
-    <div className="px-3 py-1 rounded-md bg-[#FF8A4C] flex items-center justify-center">
-      <span className="text-white text-sm font-semibold">1.8%</span>
-    </div>
-  </div>
-  <p className="text-gray-600 text-sm mt-1">Total leads</p>
-</motion.div>
-
-{/* CARD 2 — Active Customers */}
-<motion.div
-  initial={{ opacity: 0, scale: 0.95 }}
-  animate={{ opacity: 1, scale: 1 }}
-  whileHover={{ y: -8, scale: 1.03 }}
-  transition={{ duration: 0.25, ease: "easeOut" }}
-  className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
-
->
-  <div className="flex items-start justify-between">
-    <div className="flex items-center gap-4">
-      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
-        <img src="/icon/customer-care.gif" className="w-10 h-10" alt="Customer Icon" />
-      </div>
-      <h2 className="text-3xl font-bold text-[#1F2937]">2</h2>
-    </div>
-
-    <div className="px-3 py-1 rounded-md bg-[#22C55E] flex items-center justify-center">
-      <span className="text-white text-sm font-semibold">2.1%</span>
-    </div>
-  </div>
-  <p className="text-gray-600 text-sm">Active customer</p>
-</motion.div>
-
-{/* CARD 3 — Revenue */}
-<motion.div
-  initial={{ opacity: 0, scale: 0.95 }}
-  animate={{ opacity: 1, scale: 1 }}
-  whileHover={{ y: -8, scale: 1.03 }}
-  transition={{ duration: 0.25, ease: "easeOut" }}
-  className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
-
->
-  <div className="flex items-start justify-between">
-    <div className="flex items-center gap-4">
-      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
-        <img src="/icon/sales.gif" className="w-10 h-10" alt="Sales Icon" />
-      </div>
-      <h2 className="text-3xl font-bold text-[#1F2937]">₹1K</h2>
-    </div>
-
-    <div className="px-3 py-1 rounded-md bg-[#FACC15] flex items-center justify-center">
-      <span className="text-white text-sm font-semibold">1.5%</span>
-    </div>
-  </div>
-  <p className="text-gray-600 text-sm">Revenue</p>
-</motion.div>
-
-{/* CARD 4 — Conversion Rate */}
-<motion.div
-  initial={{ opacity: 0, scale: 0.95 }}
-  animate={{ opacity: 1, scale: 1 }}
-  whileHover={{ y: -8, scale: 1.03 }}
-  transition={{ duration: 0.25, ease: "easeOut" }}
-  className="bg-white rounded-2xl shadow-sm p-4 border border-gray-200"
-
->
-  <div className="flex items-start justify-between">
-    <div className="flex items-center gap-4">
-      <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-transparent">
-        <img src="/icon/money-exchange.gif" className="w-10 h-10" alt="Sales Icon" />
-      </div>
-      <h2 className="text-3xl font-bold text-[#1F2937]">3</h2>
-    </div>
-
-    <div className="px-3 py-1 rounded-md bg-[#A0522D] flex items-center justify-center">
-      <span className="text-white text-sm font-semibold">2.5%</span>
-    </div>
-  </div>
-  <p className="text-gray-600 text-sm">Conversion rate</p>
-</motion.div>
-
-</div>
-
 
       {/* Tabs */}
       <div className="mt-4">
-  <div className="flex items-center gap-4 bg-white border border-gray-300 px-3 py-2 rounded-full shadow-sm w-fit">
-    {[
-      { key: "leads", label: "Leads Pipeline" },
-      { key: "customers", label: "Customer Insights" },
-      { key: "analytics", label: "Analytics" }
-    ].map((t) => (
-      <button
-  key={t.key}
-  onClick={() => setActiveTab(t.key)}
-  className={`
+        <div className="flex items-center gap-4 bg-white border border-gray-300 px-3 py-2 rounded-full shadow-sm w-fit">
+          {[
+            { key: "leads", label: "Leads Pipeline" },
+            { key: "customers", label: "Customer Insights" },
+            { key: "analytics", label: "Analytics" }
+          ].map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              className={`
     text-sm font-medium px-4 py-1 rounded-full transition-all
-    ${activeTab === t.key 
-      ? "bg-[#4F6CFB] !text-white shadow-sm"   
-      : "bg-transparent text-gray-800"}
+    ${activeTab === t.key
+                  ? "bg-[#4F6CFB] !text-white shadow-sm"
+                  : "bg-transparent text-gray-800"}
   `}
->
-  {t.label}
-</button>
+            >
+              {t.label}
+            </button>
 
-    ))}
-  </div>
-        {/* Leads Tab */}
+          ))}
+        </div>
+
+        {/* Leads Tab (rest unchanged) */}
         {activeTab === "leads" && (
           <div className="space-y-4 mt-4">
             <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm">
-            <div className="flex items-center bg-[#F3F4F6] rounded-xl px-4 h-10 w-full">
+              <div className="flex items-center bg-[#F3F4F6] rounded-xl px-4 h-10 w-full">
                 <Search className="w-4 h-4 text-gray-400 mr-2" />
                 <input
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-  placeholder="Search leads..."
-  className="bg-transparent w-full focus:outline-none text-base text-gray-700"
-/>
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search leads..."
+                  className="bg-transparent w-full focus:outline-none text-base text-gray-700"
+                />
               </div>
               <div className="flex items-center bg-[#F3F4F6] rounded-xl px-4 h-10 cursor-pointer">
                 <Filter className="w-4 h-4 text-gray-500 mr-2" />
                 <select
-  onChange={(e) => {
-    const status = e.target.value;
-    if (status === "all") fetchLeads();
-    else fetchLeads({ status });
-  }}
-  className="bg-transparent text-base text-gray-800 focus:outline-none"
->
+                  onChange={(e) => {
+                    const status = e.target.value;
+                    if (status === "all") fetchLeads();
+                    else fetchLeads({ status });
+                  }}
+                  className="bg-transparent text-base text-gray-800 focus:outline-none"
+                >
                   <option value="all">Filter by status</option>
                   <option value="New">New</option>
                   <option value="Contacted">Contacted</option>
@@ -644,7 +759,7 @@ export default function CRMModule() {
                         <div className="p-6">
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center bg-[#4C6EF5]">
+                              <div class="w-12 h-12 rounded-full flex items-center justify-center bg-[#4C6EF5]">
                                 <span className="text-white font-medium">{(lead.name || "U").charAt(0)}</span>
                               </div>
                               <div>
@@ -712,7 +827,7 @@ export default function CRMModule() {
           </div>
         )}
 
-        {/* Customers Tab */}
+        {/* Customers Tab (unchanged) */}
         {activeTab === "customers" && (
           <div className="space-y-6 mt-6">
             {customersLoading ? (
@@ -727,8 +842,8 @@ export default function CRMModule() {
                       <div className="p-6">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-4 flex-1">
-                          <div className="w-16 h-16 rounded-full flex items-center justify-center"
-     style={{ backgroundColor: "#4C6EF5" }}>
+                            <div className="w-16 h-16 rounded-full flex items-center justify-center"
+                              style={{ backgroundColor: "#4C6EF5" }}>
                               <span className="text-white text-xl font-medium">{(customer.name || "U").charAt(0)}</span>
                             </div>
                             <div className="flex-1">
@@ -783,7 +898,7 @@ export default function CRMModule() {
           </div>
         )}
 
-        {/* Analytics Tab */}
+        {/* Analytics Tab (unchanged) */}
         {activeTab === "analytics" && (
           <div className="space-y-6 mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -833,12 +948,12 @@ export default function CRMModule() {
         )}
       </div>
 
-      {/* Add/Edit Lead Modal */}
+      {/* Add/Edit Lead Modal (unchanged) */}
       {isAddLeadOpen && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-start justify-center pt-24">
           <div className="fixed inset-0 bg-black/40" onClick={() => { setIsAddLeadOpen(false); setIsEditing(false); setEditingId(null); }} />
           <div className="relative bg-white w-full max-w-2xl mx-4 rounded-xl shadow-lg z-10">
-          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center justify-between px-6 py-4">
               <h3 className="text-lg font-medium">{isEditing ? "Edit Lead" : "Add New Lead"}</h3>
               <button onClick={() => { setIsAddLeadOpen(false); setIsEditing(false); setEditingId(null); }} className="text-gray-500 hover:text-gray-700">Close</button>
             </div>
@@ -890,19 +1005,19 @@ export default function CRMModule() {
 
             <div className="flex justify-end gap-3 p-4">
               <button onClick={() => { setIsAddLeadOpen(false); setIsEditing(false); setEditingId(null); }} className="px-4 py-2 rounded-md border">Cancel</button>
-              {isEditing ? <button onClick={handleUpdateLead} className="px-4 py-2 rounded-md bg-purple-600 text-white">Update Lead</button> : <button 
-  onClick={handleAddLead} 
-  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg 
+              {isEditing ? <button onClick={handleUpdateLead} className="px-4 py-2 rounded-md bg-purple-600 text-white">Update Lead</button> : <button
+                onClick={handleAddLead}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg 
              bg-[#4C6EF5] hover:bg-[#3f5cd6] !text-white font-semibold transition"
->
-  Add Lead
-</button>}
+              >
+                Add Lead
+              </button>}
             </div>
           </div>
         </div>
       )}
 
-      {/* Convert Lead -> Customer Modal */}
+      {/* Convert Lead -> Customer Modal (unchanged) */}
       {isConvertOpen && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-start justify-center pt-24">
           <div className="fixed inset-0 bg-black/40" onClick={() => { setIsConvertOpen(false); setLeadToConvert(null); }} />
@@ -959,7 +1074,7 @@ export default function CRMModule() {
         </div>
       )}
 
-      {/* Customer details modal */}
+      {/* Customer details modal (unchanged) */}
       {isCustomerModalOpen && selectedCustomer && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/40" onClick={() => { setIsCustomerModalOpen(false); setSelectedCustomer(null); }} />
